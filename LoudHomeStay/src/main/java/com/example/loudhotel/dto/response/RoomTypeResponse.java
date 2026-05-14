@@ -29,4 +29,6 @@ public class RoomTypeResponse {
 
     private String mainImage;
     private List<ImageResponse> images;
+
+    private List<UtilitiesResponse> utilities;
 }

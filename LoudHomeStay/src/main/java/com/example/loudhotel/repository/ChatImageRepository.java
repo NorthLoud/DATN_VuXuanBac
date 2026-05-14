@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ChatImageRepository extends JpaRepository<ChatImage, Long> {
-    List<ChatImage> findByChatMessage_ChatId(Long chatId);
+    List<ChatImage> findByChat_ChatId(Long chatId);
 }

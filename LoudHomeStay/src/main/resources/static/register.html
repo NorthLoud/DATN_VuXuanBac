@@ -116,6 +116,20 @@
         color: #333;
       }
 
+      .brand-logo {
+        margin-bottom: 25px;
+        font-size: 24px;
+        font-weight: 800;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-logo i {
+        font-size: 22px;
+      }
+
       .input-group {
         margin-bottom: 14px;
         position: relative;
@@ -226,10 +240,11 @@
   <body>
     <div class="container">
       <div class="left">
-        <h1>Nền tảng mua sắm và đặt hàng trực tuyến</h1>
+        <div class="brand-logo"><i class="fas fa-hotel"></i> LoudBooking</div>
+        <h1>Khám phá không gian lưu trú đẳng cấp</h1>
         <p>
-          Đăng ký tài khoản để mua sắm, theo dõi đơn hàng và sử dụng các dịch vụ
-          một cách nhanh chóng, an toàn và tiện lợi.
+          Tạo tài khoản để tìm kiếm khách sạn, đặt phòng nhanh chóng, quản lý
+          lịch lưu trú và nhận những ưu đãi độc quyền từ LoudBooking.
         </p>
       </div>
 
@@ -238,33 +253,63 @@
 
         <div class="input-group">
           <i class="fa fa-user"></i>
-          <input type="text" id="username" placeholder="Tên tài khoản" />
+          <input
+            type="text"
+            id="username"
+            placeholder="Tên tài khoản"
+            autocomplete="new-username"
+          />
         </div>
         <div class="input-row">
           <div class="input-group">
             <i class="fa fa-user"></i>
-            <input type="text" id="firstName" placeholder="Họ" />
+            <input
+              type="text"
+              id="firstName"
+              placeholder="Họ"
+              autocomplete="new-first-name"
+            />
           </div>
 
           <div class="input-group">
             <i class="fa fa-user"></i>
-            <input type="text" id="lastName" placeholder="Tên" />
+            <input
+              type="text"
+              id="lastName"
+              placeholder="Tên"
+              autocomplete="new-last-name"
+            />
           </div>
         </div>
 
         <div class="input-group">
           <i class="fa fa-envelope"></i>
-          <input type="email" id="email" placeholder="Email" />
+          <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            autocomplete="new-email"
+          />
         </div>
 
         <div class="input-group">
           <i class="fa fa-phone"></i>
-          <input type="text" id="phone" placeholder="Số điện thoại" />
+          <input
+            type="text"
+            id="phone"
+            placeholder="Số điện thoại"
+            autocomplete="new-phone"
+          />
         </div>
 
         <div class="input-group">
           <i class="fa fa-lock"></i>
-          <input type="password" id="password" placeholder="Mật khẩu" />
+          <input
+            type="password"
+            id="password"
+            placeholder="Mật khẩu"
+            autocomplete="new-password"
+          />
         </div>
 
         <button onclick="register()">Đăng ký</button>

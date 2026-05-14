@@ -2,13 +2,16 @@ package com.example.loudhotel.service.impl;
 
 import com.example.loudhotel.dto.request.HotelRequest;
 import com.example.loudhotel.dto.response.HotelResponse;
+import com.example.loudhotel.dto.response.HotelSearchResponse;
 import com.example.loudhotel.dto.response.ImageResponse;
 import com.example.loudhotel.entity.Hotel;
 import com.example.loudhotel.entity.HotelImage;
+import com.example.loudhotel.entity.RoomType;
 import com.example.loudhotel.entity.User;
 import com.example.loudhotel.exception.BadRequestException;
 import com.example.loudhotel.exception.ResourceNotFoundException;
 import com.example.loudhotel.repository.HotelRepository;
+import com.example.loudhotel.repository.RoomRepository;
 import com.example.loudhotel.repository.RoomTypeRepository;
 import com.example.loudhotel.repository.UserRepository;
 import com.example.loudhotel.service.HotelService;
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -25,10 +29,11 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final UserRepository userRepository;
     private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
 
     private HotelResponse map(Hotel h) {
         h.setRoomsTotal(
-                h.getRooms() != null ? h.getRooms().size() : 0
+                (int) roomRepository.countByRoomType_HotelAndIsDeletedFalse(h)
         );
 
         List<ImageResponse> images = List.of();
@@ -70,11 +75,12 @@ public class HotelServiceImpl implements HotelService {
                 ) // thêm
                 .managerFullName(
                         h.getManager() != null
-                                ? (h.getManager().getFirstName() == null ? "" : h.getManager().getFirstName()) +
+                                ? (h.getManager().getLastName() == null ? "" : h.getManager().getLastName()) +
                                 " " +
-                                (h.getManager().getLastName() == null ? "" : h.getManager().getLastName())
+                                (h.getManager().getFirstName() == null ? "" : h.getManager().getFirstName())
                                 : null
                 )
+                .managerId(h.getManager() != null ? h.getManager().getUserId() : null)
                 .createdAt(h.getCreatedAt())
                 .updatedAt(h.getUpdatedAt())
                 .mainImage(mainImage)
@@ -100,6 +106,16 @@ public class HotelServiceImpl implements HotelService {
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<HotelResponse> getMyHotels(String keyword, org.springframework.data.domain.Pageable pageable) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User manager = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow();
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return hotelRepository.searchMyHotels(manager.getUserId(), keyword, pageable).map(this::map);
+        }
+        return hotelRepository.findByManager_UserIdAndIsDeletedFalse(manager.getUserId(), pageable).map(this::map);
     }
 
     @Override
@@ -155,6 +171,11 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    public org.springframework.data.domain.Page<HotelResponse> getAll(org.springframework.data.domain.Pageable pageable) {
+        return hotelRepository.findByIsDeletedFalse(pageable).map(this::map);
+    }
+
+    @Override
     public List<HotelResponse> searchAll(String keyword) {
 
         return hotelRepository
@@ -162,6 +183,11 @@ public class HotelServiceImpl implements HotelService {
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<HotelResponse> searchAll(String keyword, org.springframework.data.domain.Pageable pageable) {
+        return hotelRepository.searchAll(keyword, pageable).map(this::map);
     }
 
     @Override
@@ -260,4 +286,67 @@ public class HotelServiceImpl implements HotelService {
         return map(hotel);
     }
 
+    @Override
+    public List<HotelSearchResponse> searchAvailableHotels(
+            String keyword,
+            LocalDate checkIn,
+            LocalDate checkOut,
+            Integer guestCount
+    ) {
+
+        List<Hotel> hotels =
+                roomRepository.searchAvailableHotels(
+                        keyword,
+                        checkIn,
+                        checkOut,
+                        guestCount
+                );
+
+        return hotels.stream()
+                .map(h -> {
+
+                    String image = null;
+
+                    if (h.getImages() != null && !h.getImages().isEmpty()) {
+
+                        image = h.getImages()
+                                .stream()
+                                .filter(i -> Boolean.TRUE.equals(i.getIsMain()))
+                                .map(HotelImage::getImageUrl)
+                                .findFirst()
+                                .orElse(null);
+                    }
+
+                    int availableRooms =
+                            roomRepository.countAvailableRooms(
+                                    h.getHotelId(),
+                                    checkIn,
+                                    checkOut
+                            );
+
+                    Double minPrice =
+                            roomTypeRepository.findMinPriceByHotelId(
+                                    h.getHotelId()
+                            );
+
+                    List<String> utilities =
+                            h.getUtilitiesHotels()
+                                    .stream()
+                                    .limit(3)
+                                    .map(u -> u.getUtilities().getUtilitiesName())
+                                    .toList();
+
+                    return HotelSearchResponse.builder()
+                            .hotelId(h.getHotelId())
+                            .hotelName(h.getHotelName())
+                            .address(h.getAddress())
+                            .averageRating(h.getAverageRating())
+                            .mainImage(image)
+                            .minPrice(minPrice)
+                            .availableRooms(availableRooms)
+                            .utilities(utilities)
+                            .build();
+                })
+                .toList();
+    }
 }

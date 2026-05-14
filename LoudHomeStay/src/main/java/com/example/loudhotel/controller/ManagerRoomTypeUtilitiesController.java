@@ -24,8 +24,7 @@ public class ManagerRoomTypeUtilitiesController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "utilities.utilitiesName") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
-    ) {
+            @RequestParam(defaultValue = "asc") String direction) {
 
         Sort sort = direction.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()
@@ -38,7 +37,7 @@ public class ManagerRoomTypeUtilitiesController {
 
     @PostMapping("/{typeId}/{utilityId}")
     public void assign(@PathVariable Long typeId,
-                       @PathVariable Long utilityId) {
+            @PathVariable Long utilityId) {
 
         // ⚠️ service đã check manager ownership
         service.assignUtilityToRoomType(typeId, utilityId);
@@ -46,7 +45,7 @@ public class ManagerRoomTypeUtilitiesController {
 
     @DeleteMapping("/{typeId}/{utilityId}")
     public void remove(@PathVariable Long typeId,
-                       @PathVariable Long utilityId) {
+            @PathVariable Long utilityId) {
 
         service.removeUtilityFromRoomType(typeId, utilityId);
     }
@@ -57,8 +56,7 @@ public class ManagerRoomTypeUtilitiesController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "hotelId") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
-    ) {
+            @RequestParam(defaultValue = "asc") String direction) {
 
         Long managerId = SecurityUtil.getCurrentUserId();
 

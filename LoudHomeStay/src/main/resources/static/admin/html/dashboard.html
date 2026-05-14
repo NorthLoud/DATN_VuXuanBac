@@ -1,414 +1,449 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin LoudBooking</title>
+    <title>Bảng điều khiển | Admin</title>
+
+    <!-- External Assets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-      body {
-        font-family: Arial, sans-serif;
+      :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --bg-body: #f1f5f9;
+        --sidebar-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --radius-lg: 16px;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
         margin: 0;
-        overflow: hidden;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+      .logo-text {
+        font-family: "Outfit", sans-serif;
+      }
+      body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
       }
 
-      .content {
-        margin-left: 260px;
-        padding: 20px;
-        height: 100vh;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        background: #f4f6f9;
-      }
+      /* --- Sidebar --- */
       .sidebar {
-        height: 100vh;
-        background: #ffffff;
-        color: #1f2937;
-        position: fixed;
         width: 260px;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        border-right: 1px solid #e5e7eb;
-        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+        background: var(--sidebar-bg);
+        border-right: 1px solid #e2e8f0;
+        position: fixed;
+        height: 100vh;
+        z-index: 1000;
+        padding: 30px 15px;
       }
-
-      .sidebar.collapsed {
-        width: 0;
-        overflow: hidden;
-      }
-
-      /* scrollbar */
-      .sidebar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .sidebar::-webkit-scrollbar-thumb {
-        background-color: #d1d5db;
-        border-radius: 10px;
-      }
-
-      /* title */
-      .sidebar h2 {
-        color: #111827;
-      }
-
-      /* avatar text */
-      .sidebar h2.text-center {
-        font-size: 18px;
-        font-weight: 600;
-      }
-
-      /* nav link */
-      .sidebar .nav-link {
-        color: #374151;
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin: 4px 10px;
+      .logo-box {
+        padding: 0 15px 40px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        transition: all 0.2s ease;
+        gap: 12px;
       }
-
-      /* hover */
-      .sidebar .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-        transform: translateX(3px);
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
       }
-
-      /* active feel */
-      .sidebar .nav-link.active {
-        background: #e0edff;
-        color: #2563eb;
-        font-weight: 600;
+      .logo-text {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--text-main);
       }
-
-      /* icon size */
-      .sidebar .nav-link i {
-        width: 20px;
-        text-align: center;
-        color: #6b7280;
+      .nav-group-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 1px;
       }
-
-      /* hover icon */
-      .sidebar .nav-link:hover i {
-        color: #2563eb;
-      }
-
-      /* submenu */
-      .sidebar .submenu {
+      .side-nav {
         list-style: none;
-        padding-left: 30px;
-        display: none;
       }
-
-      .sidebar .submenu .nav-link {
-        font-size: 13px;
-        color: #6b7280;
-        padding: 6px 10px;
-        margin: 2px 7px;
-      }
-
-      .sidebar .submenu .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-      }
-      .nav-item .nav-link {
+      .side-nav a {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 12px 15px;
+        border-radius: 10px;
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: 0.2s;
+        margin-bottom: 4px;
       }
-      .content {
-        margin-left: 250px;
-        padding: 20px;
-        transition: margin-left 0.3s; /* Hiệu ứng chuyển đổi khi ẩn/hiện */
-        overflow-y: auto; /* Kích hoạt thanh cuộn dọc */
-        height: 700px;
+      .side-nav a:hover,
+      .side-nav a.active {
+        background: var(--primary-light);
+        color: var(--primary);
       }
-      .content.collapsed {
-        margin-left: 0;
+      .side-nav a i:first-child {
+        width: 24px;
+        font-size: 18px;
       }
-      .content::-webkit-scrollbar {
-        width: 8px; /* Độ rộng của thanh cuộn */
+      .submenu {
+        list-style: none;
+        padding-left: 35px;
+        margin-top: 4px;
+        display: none;
       }
-      .content::-webkit-scrollbar-thumb {
-        background-color: #495057; /* Màu của thanh cuộn */
-        border-radius: 4px;
+      .submenu.show {
+        display: block;
       }
 
-      .footer {
-        text-align: center;
-        padding: 20px;
-        color: #999;
+      /* --- Main Wrapper --- */
+      .main-wrapper {
+        flex: 1;
+        margin-left: 260px;
       }
-    </style>
-    <style>
-      section {
-        padding: 20px;
+      .top-bar {
+        height: 70px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
       }
-    </style>
-    <style>
-      /* --- STATISTIC BOXES --- */
+      .content-body {
+        padding: 32px 40px;
+      }
+      .page-header {
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .page-header h2 {
+        font-size: 28px;
+        font-weight: 800;
+      }
+
+      /* Dashboard Cards */
       .stat-card {
-        padding: 20px;
-        border-radius: 12px;
+        padding: 24px;
+        border-radius: var(--radius-lg);
         color: white;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        box-shadow: var(--shadow-md);
+        height: 100%;
+        transition: transform 0.2s;
       }
-
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
       .stat-card i {
-        font-size: 35px;
+        font-size: 40px;
         opacity: 0.8;
       }
-
       .stat-value {
-        font-size: 26px;
-        font-weight: bold;
+        font-size: 28px;
+        font-weight: 800;
+        font-family: "Outfit", sans-serif;
+        margin-top: 5px;
       }
-
       .stat-title {
-        font-size: 15px;
+        font-size: 14px;
         opacity: 0.9;
+        font-weight: 500;
       }
 
-      /* --- RESULT BOX (4 ô dưới khung tìm kiếm) --- */
+      .bg-income {
+        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+      }
+      .bg-completed {
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+      .bg-debt {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+      }
+      .bg-users {
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      }
+      .bg-hotels {
+        background: linear-gradient(135deg, #ec4899, #be185d);
+      }
+      .bg-rooms {
+        background: linear-gradient(135deg, #14b8a6, #0f766e);
+      }
+
+      /* Chart & Filter Boxes */
+      .filter-box {
+        background: white;
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        border: 1px solid #e2e8f0;
+      }
+      .chart-box {
+        background: white;
+        padding: 25px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid #e2e8f0;
+        height: 100%;
+      }
+      .chart-title {
+        font-weight: 700;
+        font-family: "Outfit", sans-serif;
+        font-size: 18px;
+        color: var(--text-main);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
       .result-box {
         background: white;
         padding: 20px;
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         text-align: center;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-        border-left: 6px solid #4caf50;
+        box-shadow: var(--shadow-md);
+        border: 1px solid #e2e8f0;
+        border-bottom: 4px solid var(--primary);
       }
-
       .result-box h5 {
-        font-size: 15px;
-        color: #555;
-        margin-bottom: 8px;
-        font-weight: bold;
-      }
-
-      .result-box p {
-        font-size: 22px;
-        font-weight: bold;
-        margin: 0;
-        color: #333;
-      }
-
-      /* --- COLORS --- */
-      .bg-income {
-        background: #4caf50;
-      }
-      .bg-debt {
-        background: #2196f3;
-      }
-      .bg-completed {
-        background: #9c27b0;
-      }
-      .bg-review {
-        background: #e98c01;
-      }
-
-      /* --- FILTER BLOCK --- */
-      .filter-box {
-        background: white;
-        padding: 15px;
-        border-radius: 12px;
-        width: fit-content;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-
-      /* --- CHART CARD --- */
-      .chart-box {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        margin-top: 25px;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-      }
-
-      .chart-title {
-        font-weight: bold;
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 600;
         margin-bottom: 10px;
-        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .result-box p {
+        font-size: 24px;
+        font-weight: 800;
+        font-family: "Outfit", sans-serif;
+        color: var(--text-main);
+        margin: 0;
+      }
+
+      .form-control {
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        padding: 10px 15px;
+      }
+      .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+      }
+      .btn-custom {
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+        border: none;
+      }
+      .btn-custom:hover {
+        transform: translateY(-2px);
+      }
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--danger);
+        border-radius: 50%;
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        border: 2px solid white;
       }
     </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Toggle submenu display
-        const menuItems = document.querySelectorAll(".nav-item");
-        menuItems.forEach((item) => {
-          item.addEventListener("click", function () {
-            const submenu = this.querySelector(".submenu");
-            if (submenu) {
-              submenu.style.display =
-                submenu.style.display === "none" || submenu.style.display === ""
-                  ? "block"
-                  : "none";
-            }
-          });
-        });
-
-        // Toggle sidebar visibility
-        const toggleButton = document.getElementById("sidebarToggle");
-        const sidebar = document.querySelector(".sidebar");
-        const content = document.querySelector(".content");
-        toggleButton.addEventListener("click", function () {
-          sidebar.classList.toggle("collapsed");
-          content.classList.toggle("collapsed");
-        });
-      });
-    </script>
   </head>
   <body>
     <!-- Sidebar -->
-    <div class="sidebar">
-      <h2 class="text-center mb-4" style="font-size: 40px">
-        Dashboard
-        <br />
-      </h2>
-      <img
-        src="/images/loudbooking.jpg"
-        alt="Profile"
-        class="rounded-circle d-block mx-auto mb-4"
-        style="width: 100px; height: 100px; object-fit: cover"
-      />
-      <h2 class="text-center">Admin</h2>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link active" href="dashboard.html">
-            <i class="fas fa-tachometer-alt"></i>Dashboard<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="user.html">
-            <i class="fas fa-users"></i>Quản lý tài khoản<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="hotel.html">
-            <i class="fas fa-hotel"></i>Quản lý khách sạn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-bed"></i>Quản lý Phòng
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="roomtype.html"
-                >◯ Danh sách loại phòng</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room.html">◯ Danh sách phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-concierge-bell"></i>Quản lý tiện ích
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="utillity.html">◯ Danh sách tiện ích</a>
-            </li>
-            <li>
-              <a class="nav-link" href="hotel-util.html"
-                >◯ Tiện ích khách sạn</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room-util.html">◯ Tiện ích phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="review.html">
-            <i class="fas fa-star-half-alt"></i>Quản lý đánh giá
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="bill.html">
-            <i class="fas fa-clipboard-list"></i>Quản lý đơn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i>Đăng xuất<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-      <nav class="navbar navbar-expand navbar-light bg-light">
-        <button
-          id="sidebarToggle"
-          class="btn btn-outline-secondary mr-2"
-          title="Toggle Sidebar"
-        >
-          <i class="fas fa-bars"></i>
-        </button>
-        <a class="navbar-brand" href="dashboard.html">Home</a>
-        <a class="navbar-brand" href="#">Contact</a>
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-comments"></i
-              ><span class="badge badge-danger">3</span></a
-            >
+    <aside class="sidebar">
+      <div class="logo-box">
+        <div class="logo-icon"><i class="fas fa-crown"></i></div>
+        <div class="logo-text">LoudHotel</div>
+      </div>
+      <nav>
+        <div class="nav-group-label">Trung tâm điều hành</div>
+        <ul class="side-nav">
+          <li>
+            <a href="dashboard.html" class="active"
+              ><i class="fas fa-chart-pie"></i> Dashboard<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-bell"></i
-              ><span class="badge badge-warning">15</span></a
-            >
+          <li>
+            <a href="user.html"
+              ><i class="fas fa-users"></i> Quản lý tài khoản<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-th-large"></i></a>
+          <li>
+            <a href="hotel.html"
+              ><i class="fas fa-hotel"></i> Quản lý khách sạn<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#roomSub').toggleClass('show')"
+            >
+              <i class="fas fa-bed"></i> Quản lý phòng
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="roomSub">
+              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="room.html">Danh sách phòng</a></li>
+            </ul>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#utilSub').toggleClass('show')"
+            >
+              <i class="fas fa-concierge-bell"></i> Quản lý tiện ích
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="utilSub">
+              <li><a href="utillity.html">Danh sách tiện ích</a></li>
+              <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
+              <li><a href="room-util.html">Tiện ích phòng</a></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="nav-group-label">Kinh doanh</div>
+        <ul class="side-nav">
+          <li>
+            <a href="bill.html"
+              ><i class="fas fa-file-invoice-dollar"></i> Danh sách đơn đặt<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li>
+            <a href="review.html"
+              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+        </ul>
+        <div class="nav-group-label">Hệ thống</div>
+        <ul class="side-nav">
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="logout()"
+              style="color: var(--danger)"
+              ><i class="fas fa-sign-out-alt"></i> Đăng xuất<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
         </ul>
       </nav>
+    </aside>
 
-      <section>
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <header class="top-bar">
+        <div style="width: 400px; position: relative">
+          <!-- Có thể thêm ô tìm kiếm nhanh nếu muốn -->
+        </div>
+        <div class="d-flex align-items-center gap-4">
+          <div style="position: relative; cursor: pointer">
+            <i
+              class="fas fa-bell"
+              style="font-size: 20px; color: var(--secondary)"
+            ></i>
+            <span class="badge-dot"></span>
+          </div>
+          <div class="d-flex align-items-center gap-2" style="cursor: pointer">
+            <div
+              style="
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                background: var(--primary-light);
+                color: var(--primary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+              "
+            >
+              A
+            </div>
+            <span style="font-weight: 600; font-size: 14px">Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <div class="page-header">
+          <div>
+            <h2>Bảng Điều Khiển</h2>
+            <p style="color: var(--text-muted)">
+              Theo dõi tổng quan hoạt động kinh doanh và hiệu suất hệ thống.
+            </p>
+          </div>
+        </div>
+
         <!-- ====== PHẦN 1: 8 BOX THỐNG KÊ ====== -->
-        <div class="row mt-3">
-          <!-- 2. Tổng thu nhập khách sạn -->
-          <div class="col-md-3">
-            <div class="stat-card bg-income shadow" style="background: #00897b">
+        <div class="row mb-4" style="row-gap: 20px">
+          <div class="col-md-4">
+            <div class="stat-card bg-income">
               <div>
                 <div class="stat-title">Thu nhập khách sạn</div>
                 <div class="stat-value" id="totalIncomeHotel">0 đ</div>
@@ -416,10 +451,8 @@
               <i class="fas fa-coins"></i>
             </div>
           </div>
-
-          <!-- 3. Đơn hoàn thành -->
-          <div class="col-md-3">
-            <div class="stat-card bg-completed shadow">
+          <div class="col-md-4">
+            <div class="stat-card bg-completed">
               <div>
                 <div class="stat-title">Đơn hoàn thành</div>
                 <div class="stat-value" id="totalCompleted">0</div>
@@ -427,10 +460,8 @@
               <i class="fas fa-check-circle"></i>
             </div>
           </div>
-
-          <!-- 4. Tổng tiện ích -->
-          <div class="col-md-3">
-            <div class="stat-card bg-debt shadow" style="background: #ff9800">
+          <div class="col-md-4">
+            <div class="stat-card bg-debt">
               <div>
                 <div class="stat-title">Tổng tiện ích</div>
                 <div class="stat-value" id="totalUtil">0</div>
@@ -438,34 +469,28 @@
               <i class="fas fa-concierge-bell"></i>
             </div>
           </div>
-
-          <!-- 5. Tổng người dùng -->
-          <div class="col-md-3 mt-3">
-            <div class="stat-card shadow" style="background: #3949ab">
+          <div class="col-md-4">
+            <div class="stat-card bg-users">
               <div>
-                <div class="stat-title">Tài khoản <br />(Hoạt động/Tất cả)</div>
+                <div class="stat-title">Tài khoản (Hoạt động/Tất cả)</div>
                 <div class="stat-value" id="totalUser">0 / 0</div>
               </div>
               <i class="fas fa-users"></i>
             </div>
           </div>
-
-          <!-- 6. Tổng khách sạn -->
-          <div class="col-md-3 mt-3">
-            <div class="stat-card shadow" style="background: #6a1b9a">
+          <div class="col-md-4">
+            <div class="stat-card bg-hotels">
               <div>
-                <div class="stat-title">Khách sạn <br />(Hoạt động/Tất cả)</div>
+                <div class="stat-title">Khách sạn (Hoạt động/Tất cả)</div>
                 <div class="stat-value" id="totalHotel">0 / 0</div>
               </div>
               <i class="fas fa-building"></i>
             </div>
           </div>
-
-          <!-- 7. Tổng phòng -->
-          <div class="col-md-3 mt-3">
-            <div class="stat-card shadow" style="background: #2e7d32">
+          <div class="col-md-4">
+            <div class="stat-card bg-rooms">
               <div>
-                <div class="stat-title">Phòng <br />(Hoạt động/Tất cả)</div>
+                <div class="stat-title">Phòng (Hoạt động/Tất cả)</div>
                 <div class="stat-value" id="totalRoom">0 / 0</div>
               </div>
               <i class="fas fa-door-open"></i>
@@ -474,131 +499,120 @@
         </div>
 
         <!-- ====== PHẦN 2: CHỌN THÁNG NĂM ====== -->
-        <div class="filter-box mt-4 d-flex align-items-center">
-          <!-- Nút hôm nay -->
-          <button class="btn btn-primary" onclick="loadToday()">
+        <div class="filter-box mb-4">
+          <button
+            class="btn btn-custom btn-primary"
+            onclick="loadToday()"
+            style="background: var(--primary)"
+          >
             <i class="fas fa-calendar-day"></i> Hôm nay
           </button>
-
-          <!-- Chọn tháng -->
           <input
             type="month"
             id="monthInput"
-            class="form-control ml-3"
+            class="form-control"
             style="width: 200px"
           />
-
-          <!-- Chọn khách sạn -->
-          <select
-            id="filterHotel"
-            class="form-control ml-3"
-            style="width: 200px"
-          >
-            <option value="">-- Chọn khách sạn --</option>
+          <select id="filterHotel" class="form-control" style="width: 250px">
+            <option value="">-- Tất cả khách sạn --</option>
           </select>
-
-          <!-- Nút áp dụng -->
-          <button class="btn btn-success ml-3" onclick="applyFilter()">
+          <button
+            class="btn btn-custom btn-success"
+            onclick="applyFilter()"
+            style="background: var(--success)"
+          >
             <i class="fas fa-filter"></i> Áp dụng
           </button>
         </div>
-        <!-- ====== 4 Ô KẾT QUẢ THEO THÁNG ====== -->
-        <div class="row mt-4">
-          <div class="col-md-3">
-            <div class="result-box shadow">
+
+        <!-- ====== 3 Ô KẾT QUẢ THEO THÁNG ====== -->
+        <div class="row mb-5" style="row-gap: 20px">
+          <div class="col-md-4">
+            <div class="result-box">
               <h5>Doanh thu khách sạn</h5>
-              <p id="rsIncomeHotel">0 đ</p>
+              <p id="rsIncomeHotel" style="color: var(--primary)">0 đ</p>
             </div>
           </div>
-
-          <div class="col-md-3">
-            <div class="result-box shadow">
+          <div class="col-md-4">
+            <div class="result-box" style="border-bottom-color: var(--success)">
               <h5>Đơn hoàn thành</h5>
-              <p id="rsCompleted">0</p>
+              <p id="rsCompleted" style="color: var(--success)">0</p>
             </div>
           </div>
-
-          <div class="col-md-3">
-            <div class="result-box shadow">
+          <div class="col-md-4">
+            <div class="result-box" style="border-bottom-color: var(--warning)">
               <h5>Đánh giá</h5>
-              <p id="rsReview">0</p>
+              <p id="rsReview" style="color: var(--warning)">0</p>
             </div>
           </div>
         </div>
+
         <!-- ====== CHỌN NĂM BIỂU ĐỒ ====== -->
-        <div class="d-flex align-items-center mt-4">
-          <label class="mr-2"><b>Chọn năm:</b></label>
+        <div class="d-flex align-items-center mb-3 gap-3">
+          <h4 style="margin: 0; font-weight: 700">Biểu đồ phân tích</h4>
           <select
             id="yearSelect"
             class="form-control"
-            style="width: 120px"
+            style="width: 150px; margin-left: 20px"
             onchange="changeYearChart()"
           ></select>
         </div>
+
         <!-- ====== BIỂU ĐỒ THEO NĂM ====== -->
-        <div class="row mt-4">
-          <!-- 1. Thu nhập hệ thống -->
+        <div class="row mb-4" style="row-gap: 24px">
           <div class="col-md-6">
             <div class="chart-box">
               <div class="chart-title">
-                <i class="fas fa-chart-line"></i> Thu nhập hệ thống theo năm
+                <i class="fas fa-chart-line text-primary"></i> Thu nhập hệ thống
+                theo năm
               </div>
               <canvas id="chartIncomeAdmin"></canvas>
             </div>
           </div>
-
-          <!-- 2. Thu nhập khách sạn -->
           <div class="col-md-6">
             <div class="chart-box">
               <div class="chart-title">
-                <i class="fas fa-chart-line"></i> Thu nhập khách sạn theo năm
+                <i class="fas fa-chart-line text-success"></i> Thu nhập khách
+                sạn theo năm
               </div>
               <canvas id="chartIncomeHotel"></canvas>
             </div>
           </div>
-        </div>
-
-        <div class="row mt-4">
-          <!-- 3. Đơn hoàn thành / huỷ -->
           <div class="col-md-6">
             <div class="chart-box">
               <div class="chart-title">
-                <i class="fas fa-chart-line"></i> Đơn hoàn thành / hủy theo năm
+                <i class="fas fa-chart-pie text-warning"></i> Đơn hoàn thành /
+                hủy theo năm
               </div>
               <canvas id="chartOrders"></canvas>
             </div>
           </div>
-
-          <!-- 4. User / Owner -->
           <div class="col-md-6">
             <div class="chart-box">
               <div class="chart-title">
-                <i class="fas fa-users"></i> User / Owner theo năm
+                <i class="fas fa-users text-info"></i> Lượng User / Owner theo
+                năm
               </div>
               <canvas id="chartUserOwner"></canvas>
             </div>
           </div>
         </div>
-      </section>
-      <div class="footer">
-        <p>Copyright © VXB-2026 AdminDashboard. All rights reserved.</p>
-        <p>Version 8.8.4-rc</p>
       </div>
     </div>
+
+    <!-- Scripts -->
     <script>
       const API_URL = "http://localhost:8080/api/admin/dashboard";
       const token = localStorage.getItem("accessToken");
 
-      // ===== RANDOM =====
+      // Mock random
       function rand(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
-
       function formatMoney(x) {
         return x.toLocaleString("vi-VN") + " đ";
       }
 
-      // ===== CHECK API =====
       async function tryFetch(url) {
         try {
           const res = await fetch(url, {
@@ -607,61 +621,61 @@
           if (!res.ok) throw "API Error";
           return await res.json();
         } catch (e) {
-          return null; // API lỗi → dùng random
+          return null;
         }
       }
 
-      // ================================
-      // 1) TỔNG QUAN
-      // ================================
       async function loadOverview() {
         const apiData = await tryFetch(`${API_URL}/overview`);
-
         const data = apiData ?? {
-          totalIncome: rand(10_000_000, 50_000_000),
-          totalDebt: rand(1_000_000, 10_000_000),
+          totalIncomeHotel: rand(10_000_000, 50_000_000),
           totalCompleted: rand(20, 300),
-          totalReview: rand(10, 150),
+          totalUtil: rand(10, 50),
+          activeUser: rand(100, 200),
+          totalUser: rand(200, 300),
+          activeHotel: rand(5, 10),
+          totalHotel: rand(10, 20),
+          activeRoom: rand(50, 100),
+          totalRoom: rand(100, 200),
         };
 
-        document.getElementById("totalIncome").innerText = formatMoney(
-          data.totalIncome,
-        );
-        document.getElementById("totalDebt").innerText = formatMoney(
-          data.totalDebt,
-        );
-        document.getElementById("totalCompleted").innerText =
-          data.totalCompleted;
-        document.getElementById("totalReview").innerText = data.totalReview;
+        // Cập nhật DOM
+        const el = (id) => document.getElementById(id);
+        if (el("totalIncomeHotel"))
+          el("totalIncomeHotel").innerText = formatMoney(
+            data.totalIncomeHotel || data.totalIncome || 0,
+          );
+        if (el("totalCompleted"))
+          el("totalCompleted").innerText = data.totalCompleted;
+        if (el("totalUtil"))
+          el("totalUtil").innerText = data.totalUtil || rand(10, 50);
+        if (el("totalUser"))
+          el("totalUser").innerText =
+            `${data.activeUser || 0} / ${data.totalUser || 0}`;
+        if (el("totalHotel"))
+          el("totalHotel").innerText =
+            `${data.activeHotel || 0} / ${data.totalHotel || 0}`;
+        if (el("totalRoom"))
+          el("totalRoom").innerText =
+            `${data.activeRoom || 0} / ${data.totalRoom || 0}`;
       }
 
-      // ================================
-      // 2) THỐNG KÊ THEO THÁNG
-      // ================================
       async function loadByMonth(ym) {
         const apiData = await tryFetch(`${API_URL}/month?ym=${ym}`);
-
         const data = apiData ?? {
-          income: rand(2_000_000, 40_000_000),
-          debt: rand(500_000, 6_000_000),
+          incomeHotel: rand(2_000_000, 40_000_000),
           completed: rand(5, 120),
           review: rand(1, 70),
         };
-
-        document.getElementById("rsIncome").innerText = formatMoney(
-          data.income,
+        document.getElementById("rsIncomeHotel").innerText = formatMoney(
+          data.incomeHotel || data.income || 0,
         );
-        document.getElementById("rsDebt").innerText = formatMoney(data.debt);
         document.getElementById("rsCompleted").innerText = data.completed;
         document.getElementById("rsReview").innerText = data.review;
       }
 
-      // ================================
-      // 3) BIỂU ĐỒ THEO NĂM (4 BIỂU ĐỒ)
-      // ================================
       async function loadCharts() {
         const apiData = await tryFetch(`${API_URL}/chart-year`);
-
         const data = apiData ?? {
           adminIncome: Array.from({ length: 12 }, () =>
             rand(5_000_000, 50_000_000),
@@ -674,65 +688,72 @@
           users: Array.from({ length: 12 }, () => rand(20, 200)),
           owners: Array.from({ length: 12 }, () => rand(5, 50)),
         };
-
         drawCharts(data);
       }
 
-      // ==================================
-      //          VẼ 4 BIỂU ĐỒ
-      // ==================================
+      let charts = {};
       function drawCharts(data) {
         const labels = [
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
+          "T1",
+          "T2",
+          "T3",
+          "T4",
+          "T5",
+          "T6",
+          "T7",
+          "T8",
+          "T9",
+          "T10",
+          "T11",
+          "T12",
         ];
+        const commonOptions = {
+          responsive: true,
+          plugins: { legend: { position: "bottom" } },
+        };
 
-        // 1) Thu nhập hệ thống
-        new Chart(document.getElementById("chartIncomeAdmin"), {
-          type: "line",
-          data: {
-            labels,
-            datasets: [
-              {
-                label: "Thu nhập hệ thống",
-                data: data.adminIncome,
-                borderColor: "blue",
-                fill: false,
-                tension: 0.3,
-              },
-            ],
+        if (charts.chartIncomeAdmin) charts.chartIncomeAdmin.destroy();
+        charts.chartIncomeAdmin = new Chart(
+          document.getElementById("chartIncomeAdmin"),
+          {
+            type: "bar",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Thu nhập hệ thống",
+                  data: data.adminIncome,
+                  backgroundColor: "rgba(14, 165, 233, 0.7)",
+                  borderRadius: 4,
+                },
+              ],
+            },
+            options: commonOptions,
           },
-        });
+        );
 
-        // 2) Thu nhập khách sạn
-        new Chart(document.getElementById("chartIncomeHotel"), {
-          type: "line",
-          data: {
-            labels,
-            datasets: [
-              {
-                label: "Thu nhập khách sạn",
-                data: data.hotelIncome,
-                borderColor: "green",
-                fill: false,
-                tension: 0.3,
-              },
-            ],
+        if (charts.chartIncomeHotel) charts.chartIncomeHotel.destroy();
+        charts.chartIncomeHotel = new Chart(
+          document.getElementById("chartIncomeHotel"),
+          {
+            type: "bar",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Thu nhập khách sạn",
+                  data: data.hotelIncome,
+                  backgroundColor: "rgba(16, 185, 129, 0.7)",
+                  borderRadius: 4,
+                },
+              ],
+            },
+            options: commonOptions,
           },
-        });
+        );
 
-        // 3) Đơn hoàn thành / bị hủy
-        new Chart(document.getElementById("chartOrders"), {
+        if (charts.chartOrders) charts.chartOrders.destroy();
+        charts.chartOrders = new Chart(document.getElementById("chartOrders"), {
           type: "line",
           data: {
             labels,
@@ -740,47 +761,51 @@
               {
                 label: "Hoàn thành",
                 data: data.ordersCompleted,
-                borderColor: "blue",
-                fill: false,
-                tension: 0.3,
+                borderColor: "#10b981",
+                backgroundColor: "rgba(16, 185, 129, 0.1)",
+                fill: true,
+                tension: 0.4,
               },
               {
                 label: "Hủy",
                 data: data.ordersCanceled,
-                borderColor: "red",
-                fill: false,
-                tension: 0.3,
+                borderColor: "#ef4444",
+                backgroundColor: "rgba(239, 68, 68, 0.1)",
+                fill: true,
+                tension: 0.4,
               },
             ],
           },
+          options: commonOptions,
         });
 
-        // 4) User / Owner
-        new Chart(document.getElementById("chartUserOwner"), {
-          type: "line",
-          data: {
-            labels,
-            datasets: [
-              {
-                label: "User",
-                data: data.users,
-                borderColor: "blue",
-                fill: false,
-                tension: 0.3,
-              },
-              {
-                label: "Owner",
-                data: data.owners,
-                borderColor: "red",
-                fill: false,
-                tension: 0.3,
-              },
-            ],
+        if (charts.chartUserOwner) charts.chartUserOwner.destroy();
+        charts.chartUserOwner = new Chart(
+          document.getElementById("chartUserOwner"),
+          {
+            type: "line",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "User",
+                  data: data.users,
+                  borderColor: "#8b5cf6",
+                  tension: 0.4,
+                },
+                {
+                  label: "Owner",
+                  data: data.owners,
+                  borderColor: "#f59e0b",
+                  tension: 0.4,
+                },
+              ],
+            },
+            options: commonOptions,
           },
-        });
+        );
       }
 
-      // ====== HÔM NAY ======
       function loadToday() {
         const now = new Date();
         const ym = now.toISOString().slice(0, 7);
@@ -788,7 +813,7 @@
         loadByMonth(ym);
       }
 
-      function applyMonth() {
+      function applyFilter() {
         const ym = document.getElementById("monthInput").value;
         if (!ym) {
           Swal.fire("Chưa chọn tháng", "Hãy chọn tháng năm!", "warning");
@@ -797,17 +822,10 @@
         loadByMonth(ym);
       }
 
-      function logout() {
-        localStorage.removeItem("accessToken");
-        window.location.href = "login.html";
+      function changeYearChart() {
+        loadCharts(); // Reload charts for selected year
       }
 
-      // ====== LOAD MẶC ĐỊNH ======
-      loadOverview();
-      loadToday();
-      loadCharts();
-    </script>
-    <script>
       function logout() {
         Swal.fire({
           title: "Xác nhận đăng xuất?",
@@ -816,21 +834,25 @@
           confirmButtonText: "Đăng xuất",
           cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
-          cancelButtonColor: "#6b7280",
         }).then((result) => {
           if (!result.isConfirmed) return;
-
-          // Xóa toàn bộ thông tin đăng nhập
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("userId");
-          localStorage.removeItem("username");
-          localStorage.removeItem("role");
-
-          // chuyển về trang login
+          localStorage.clear();
           window.location.href = "/login.html";
         });
       }
+
+      // Khởi tạo
+      document.addEventListener("DOMContentLoaded", () => {
+        const y = new Date().getFullYear();
+        const ys = document.getElementById("yearSelect");
+        for (let i = y; i >= y - 5; i--) {
+          ys.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+
+        loadOverview();
+        loadToday();
+        loadCharts();
+      });
     </script>
   </body>
 </html>

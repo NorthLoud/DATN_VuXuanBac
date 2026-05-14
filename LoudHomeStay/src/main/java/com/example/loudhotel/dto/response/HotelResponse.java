@@ -26,5 +26,6 @@ public class HotelResponse {
 
     private List<String> utilities;
     private String managerFullName;
+    private Long managerId;
 
 }

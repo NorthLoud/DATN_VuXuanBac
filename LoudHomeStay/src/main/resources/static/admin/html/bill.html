@@ -1,729 +1,219 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin LoudBooking</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <title>Admin Dashboard</title>
+
+    <!-- External Assets -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        overflow: hidden;
+      :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --bg-body: #f1f5f9;
+        --sidebar-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --radius-lg: 16px;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       }
 
-      .content {
-        margin-left: 260px;
-        padding: 20px;
-        height: 100vh;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        background: #f4f6f9;
-      }
-      .sidebar {
-        height: 100vh;
-        background: #ffffff;
-        color: #1f2937;
-        position: fixed;
-        width: 260px;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        border-right: 1px solid #e5e7eb;
-        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; }
+     .logo-text { font-family: "Outfit", sans-serif; }
+      body { background-color: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-      .sidebar.collapsed {
-        width: 0;
-        overflow: hidden;
-      }
+      /* --- Sidebar --- */
+      .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid #e2e8f0; position: fixed; height: 100vh; z-index: 1000; padding: 30px 15px; }
+      .logo-box { padding: 0 15px 40px; display: flex; align-items: center; gap: 12px; }
+      .logo-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+      .logo-text { font-size: 20px; font-weight: 800; color: var(--text-main); }
+      .nav-group-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+      .side-nav { list-style: none; }
+      .side-nav a { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-radius: 10px; color: var(--secondary); text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.2s; margin-bottom: 4px; }
+      .side-nav a:hover, .side-nav a.active { background: var(--primary-light); color: var(--primary); }
+      .side-nav a i:first-child { width: 24px; font-size: 18px; }
+      .submenu { list-style: none; padding-left: 35px; margin-top: 4px; display: none; }
+      .submenu.show { display: block; }
 
-      /* scrollbar */
-      .sidebar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .sidebar::-webkit-scrollbar-thumb {
-        background-color: #d1d5db;
-        border-radius: 10px;
-      }
+      /* --- Main Wrapper --- */
+      .main-wrapper { flex: 1; margin-left: 260px; }
+      .top-bar { height: 70px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: sticky; top: 0; z-index: 900; }
+      .content-body { padding: 32px 40px; }
 
-      /* title */
-      .sidebar h2 {
-        color: #111827;
-      }
+      /* Table Card */
+      .table-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid #e2e8f0; margin-top: 20px; }
+      .table-header { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
 
-      /* avatar text */
-      .sidebar h2.text-center {
-        font-size: 18px;
-        font-weight: 600;
-      }
+      .admin-table { width: 100%; border-collapse: collapse; }
+      .admin-table th { background: #f8fafc; padding: 12px 15px; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); border-bottom: 1.5px solid #e2e8f0; text-align: left; cursor: pointer; letter-spacing: 0.3px; }
+      .admin-table th:hover { background: #f1f5f9; }
+      .admin-table td { padding: 12px 15px; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+      .admin-table tbody tr { transition: 0.2s; }
+      .admin-table tbody tr:hover { background-color: #f9fafb; }
 
-      /* nav link */
-      .sidebar .nav-link {
-        color: #374151;
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin: 4px 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.2s ease;
-      }
+      /* Form Styling */
+      .form-group label { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+      .form-control { border-radius: 12px; padding: 12px; border: 1.5px solid #e2e8f0; font-size: 14px; transition: 0.3s; width: 100%; }
+      .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); outline: none; }
 
-      /* hover */
-      .sidebar .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-        transform: translateX(3px);
-      }
+      /* Action Buttons */
+      .btn-action { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: var(--secondary); display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; margin-right: 4px; font-size: 14px; }
+      .btn-action:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+      .btn-action.text-danger:hover { border-color: var(--danger); color: var(--danger); background: #fef2f2; }
+      .btn-luxury { padding: 10px 22px; border-radius: 10px; font-weight: 600; transition: 0.3s; font-size: 14px; border: none; }
+      .badge-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; position: absolute; top: -2px; right: -2px; border: 2px solid white; }
 
-      /* active feel */
-      .sidebar .nav-link.active {
-        background: #e0edff;
-        color: #2563eb;
-        font-weight: 600;
-      }
+      /* Pagination */
+      .pagination { list-style: none; display: flex; gap: 4px; margin: 0; }
+      .page-item { margin: 0; }
+      .page-item .page-link { padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid #e2e8f0; color: var(--secondary); transition: 0.2s; min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: white; }
+      .page-item .page-link:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+      .page-item.active .page-link { background: var(--primary); border-color: var(--primary); color: white; }
+      .page-item.disabled .page-link { opacity: 0.5; cursor: not-allowed; }
 
-      /* icon size */
-      .sidebar .nav-link i {
-        width: 20px;
-        text-align: center;
-        color: #6b7280;
-      }
-
-      /* hover icon */
-      .sidebar .nav-link:hover i {
-        color: #2563eb;
-      }
-
-      /* submenu */
-      .sidebar .submenu {
-        list-style: none;
-        padding-left: 30px;
-        display: none;
-      }
-
-      .sidebar .submenu .nav-link {
-        font-size: 13px;
-        color: #6b7280;
-        padding: 6px 10px;
-        margin: 2px 7px;
-      }
-
-      .sidebar .submenu .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-      }
-      .nav-item .nav-link {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .content {
-        margin-left: 250px;
-        padding: 20px;
-        transition: margin-left 0.3s; /* Hiệu ứng chuyển đổi khi ẩn/hiện */
-        overflow-y: auto; /* Kích hoạt thanh cuộn dọc */
-        height: 700px;
-      }
-      .content.collapsed {
-        margin-left: 0;
-      }
-      .content::-webkit-scrollbar {
-        width: 8px; /* Độ rộng của thanh cuộn */
-      }
-      .content::-webkit-scrollbar-thumb {
-        background-color: #495057; /* Màu của thanh cuộn */
-        border-radius: 4px;
-      }
-
-      .footer {
-        text-align: center;
-        padding: 20px;
-        color: #999;
-      }
+      /* Modal Styling */
+      .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+      .modal-footer .btn { padding: 8px 16px; font-size: 14px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; }
+      .modal-footer .btn-secondary { background: #e2e8f0; color: var(--text-main); }
+      .modal-footer .btn-secondary:hover { background: #cbd5e1; }
+      .modal-footer .btn-primary { background: var(--primary); color: white; }
+      .modal-footer .btn-primary:hover { background: #4338ca; }
     </style>
-    <style>
-      /* ===== ADMIN USER PAGE STYLE ===== */
-
-      section {
-        background: #f4f6f9;
-        font-family: "Segoe UI", Arial, sans-serif;
-      }
-
-      /* tiêu đề */
-      h1 {
-        color: #1f2937;
-        font-weight: 700;
-      }
-
-      /* thanh công cụ */
-      .container .btn-primary {
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 600;
-        transition: 0.2s;
-      }
-
-      .container .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
-      }
-
-      /* khung tìm kiếm */
-      .search-box {
-        position: relative;
-        width: 280px;
-      }
-
-      /* input */
-      .search-box input {
-        width: 100%;
-        padding: 10px 42px 10px 14px; /* chừa chỗ cho nút */
-        border-radius: 999px;
-        border: 1px solid #d1d5db;
-        outline: none;
-        transition: 0.2s;
-        font-size: 14px;
-      }
-
-      .search-box input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-      }
-
-      /* nút search nằm trong input */
-      .search-box button {
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        border: none;
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        color: white;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .search-box button:hover {
-        transform: translateY(-50%) scale(1.05);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-      }
-
-      /* bảng */
-      .table {
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      }
-
-      .table thead {
-        background: linear-gradient(135deg, #089662);
-        color: white;
-      }
-
-      .table th,
-      .table td {
-        vertical-align: middle !important;
-        font-size: 14px;
-      }
-
-      .table tbody tr:hover {
-        background: #f1f5f9;
-        transition: 0.15s;
-      }
-
-      /* button action */
-      .btn-warning {
-        background: #f59e0b;
-        border: none;
-        color: white;
-        border-radius: 6px;
-        padding: 4px 10px;
-      }
-
-      .btn-warning:hover {
-        background: #d97706;
-      }
-
-      .btn-danger {
-        background: #ef4444;
-        border: none;
-        border-radius: 6px;
-        padding: 4px 10px;
-      }
-
-      .btn-danger:hover {
-        background: #dc2626;
-      }
-
-      /* modal */
-      .modal-content {
-        border-radius: 14px;
-        border: none;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-      }
-
-      .modal-title {
-        font-weight: 600;
-      }
-
-      .modal-body label {
-        font-weight: 600;
-        font-size: 13px;
-        color: #374151;
-      }
-
-      .modal-body input {
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-        padding: 10px;
-      }
-
-      .modal-body input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-      }
-
-      /* modal button */
-      .modal-footer .btn-success {
-        background: linear-gradient(135deg, #16a34a, #22c55e);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 18px;
-        font-weight: 600;
-      }
-
-      .modal-footer .btn-success:hover {
-        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
-      }
-
-      /* responsive */
-      @media (max-width: 768px) {
-        #searchInput {
-          width: 100% !important;
-          margin-top: 10px;
-        }
-      }
-      /* ===== STATUS CHUẨN USER ===== */
-
-      .order-pending {
-        color: #1677ff;
-        font-weight: 600;
-      }
-
-      .order-paid {
-        color: rgb(63, 63, 63);
-        font-weight: 600;
-      }
-
-      .order-cancel {
-        color: #ff4d4f;
-        font-weight: 600;
-      }
-
-      .status-paid {
-        color: #0071c2;
-        font-weight: 600;
-      }
-
-      .status-cod {
-        color: #059c6a;
-        font-weight: 600;
-      }
-
-      /* stay */
-      .stay-booked {
-        color: #1677ff;
-        font-weight: 600;
-      }
-
-      .stay-hold {
-        color: #059c6a;
-        font-weight: 600;
-      }
-
-      .stay-in {
-        color: #722ed1;
-        font-weight: 600;
-      }
-
-      .stay-done {
-        color: rgb(63, 63, 63);
-        font-weight: 600;
-      }
-
-      .stay-noshow {
-        color: #fa8c16;
-        font-weight: 600;
-      }
-      .stay-cancel {
-        color: #ff4d4f;
-        font-weight: 600;
-      }
-    </style>
-    <style>
-      /* Thao tác nút*/
-      .step-line {
-        display: flex;
-        align-items: center;
-        gap: 50px;
-      }
-
-      .step {
-        position: relative;
-        z-index: 2;
-        background: #fff;
-        padding: 8px 16px;
-        border-radius: 20px;
-        border: 2px solid #ccc;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-
-      /* line giữa các step */
-      .step-line .line {
-        flex: 1;
-        height: 3px;
-        background: #d1d5db;
-        z-index: 1;
-      }
-
-      /* bước hiện tại */
-      .step.active {
-        border-color: #2563eb;
-        color: white;
-        background: #2563eb;
-        transform: scale(1.1);
-        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
-      }
-
-      /* bước đã xong */
-      .step.done {
-        border-color: #16a34a;
-        color: #16a34a;
-        background: #f0fdf4;
-        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-      }
-
-      /* bước lỗi / hủy */
-      .step.cancel {
-        border-color: #dc2626;
-        color: #dc2626;
-      }
-      /* step có thể click */
-      .step.clickable {
-        cursor: pointer;
-        border-color: #2563eb;
-      }
-
-      /* hover chỉ áp dụng cho step hợp lệ */
-      .step.clickable:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
-        background: #eff6ff;
-        color: rgb(66, 65, 65);
-      }
-
-      /* step bị disable */
-      .step.disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        pointer-events: none;
-      }
-
-      /* mũi tên giữa các step */
-      .step:not(:last-child)::after {
-        content: "➜";
-        position: absolute;
-        right: -30px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 14px;
-        color: #9ca3af;
-      }
-      /* ===== BILL DETAIL (GIỐNG MANAGER) ===== */
-      .bill-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-
-      .bill-box {
-        border: 1px solid #eee;
-        border-radius: 8px;
-        padding: 12px 15px;
-      }
-
-      .bill-box h4 {
-        margin-bottom: 8px;
-        color: #4a90e2;
-        font-size: 15px;
-      }
-
-      .room-scroll {
-        max-height: 220px;
-        overflow-y: auto;
-      }
-
-      /* scroll phòng */
-      .room-scroll {
-        max-height: 220px;
-        overflow-y: auto;
-        padding-right: 5px;
-      }
-
-      /* total */
-      .total {
-        margin-top: 10px;
-      }
-
-      /* responsive */
-      @media (max-width: 768px) {
-        .bill-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-    <style>
-      /*Lọc */
-      /* màu option trong select */
-      select option.status-paid {
-        color: #0071c2;
-        font-weight: 600;
-      }
-
-      select option.status-cod {
-        color: #059c6a;
-        font-weight: 600;
-      }
-
-      select option.order-pending {
-        color: #1677ff;
-        font-weight: 600;
-      }
-
-      select option.order-paid {
-        color: rgb(63, 63, 63);
-        font-weight: 600;
-      }
-
-      select option.order-cancel {
-        color: #ff4d4f;
-        font-weight: 600;
-      }
-
-      /* stay */
-      select option.stay-booked {
-        color: #1677ff;
-        font-weight: 600;
-      }
-
-      select option.stay-hold {
-        color: #059c6a;
-        font-weight: 600;
-      }
-
-      select option.stay-in {
-        color: #722ed1;
-        font-weight: 600;
-      }
-
-      select option.stay-done {
-        color: rgb(63, 63, 63);
-        font-weight: 600;
-      }
-
-      select option.stay-noshow {
-        color: #fa8c16;
-        font-weight: 600;
-      }
-      select option.stay-cancel {
-        color: #ff4d4f;
-        font-weight: 600;
-      }
-    </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Toggle submenu display
-        const menuItems = document.querySelectorAll(".nav-item");
-        menuItems.forEach((item) => {
-          item.addEventListener("click", function () {
-            const submenu = this.querySelector(".submenu");
-            if (submenu) {
-              submenu.style.display =
-                submenu.style.display === "none" || submenu.style.display === ""
-                  ? "block"
-                  : "none";
-            }
-          });
-        });
-
-        // Toggle sidebar visibility
-        const toggleButton = document.getElementById("sidebarToggle");
-        const sidebar = document.querySelector(".sidebar");
-        const content = document.querySelector(".content");
-        toggleButton.addEventListener("click", function () {
-          sidebar.classList.toggle("collapsed");
-          content.classList.toggle("collapsed");
-        });
-      });
-    </script>
   </head>
   <body>
     <!-- Sidebar -->
-    <div class="sidebar">
-      <h2 class="text-center mb-4" style="font-size: 40px">
-        Dashboard
-        <br />
-      </h2>
-      <img
-        src="http://localhost:8080/images/LoudBooking.png"
-        alt="Profile"
-        class="rounded-circle d-block mx-auto mb-4"
-        style="width: 100px; height: 100px; object-fit: cover"
-      />
-      <h2 class="text-center">Admin</h2>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="dashboard.html">
-            <i class="fas fa-tachometer-alt"></i>Dashboard<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="user.html">
-            <i class="fas fa-users"></i>Quản lý tài khoản<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="hotel.html">
-            <i class="fas fa-hotel"></i>Quản lý khách sạn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-bed"></i>Quản lý Phòng
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="roomtype.html"
-                >◯ Danh sách loại phòng</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room.html">◯ Danh sách phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-concierge-bell"></i>Quản lý tiện ích
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="utillity.html"
-                >◯ Danh sách tiện ích</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="hotel-util.html"
-                >◯ Tiện ích khách sạn</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room-util.html">◯ Tiện ích phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="review.html">
-            <i class="fas fa-star-half-alt"></i>Quản lý đánh giá
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="bill.html">
-            <i class="fas fa-clipboard-list"></i>Quản lý đơn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
+    <aside class="sidebar">
+      <div class="logo-box">
+        <div class="logo-icon"><i class="fas fa-crown"></i></div>
+        <div class="logo-text">LoudHotel</div>
+      </div>
 
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i>Đăng xuất<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-      </ul>
-    </div>
+      <nav>
+        <div class="nav-group-label">Trung tâm điều hành</div>
+        <ul class="side-nav">
+          <li>
+            <a href="dashboard.html"
+              ><i class="fas fa-chart-pie"></i> Dashboard<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li><a href="user.html"><i class="fas fa-users"></i> Quản lý tài khoản<i
+                class="fas fa-chevron-down-o"
+              ></i
+          ></a></li>
+          <li>
+            <a href="hotel.html"
+              ><i class="fas fa-hotel"></i> Quản lý khách sạn<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#roomSub').toggleClass('show')"
+            >
+              <i class="fas fa-bed"></i> Quản lý phòng
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="roomSub">
+              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="room.html">Danh sách phòng</a></li>
+            </ul>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#utilSub').toggleClass('show')"
+            >
+              <i class="fas fa-concierge-bell"></i> Quản lý tiện ích
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="utilSub">
+              <li><a href="utillity.html">Danh sách tiện ích</a></li>
+              <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
+              <li><a href="room-util.html">Tiện ích phòng</a></li>
+            </ul>
+          </li>
+        </ul>
 
-    <!-- Content -->
-    <div class="content">
-      <nav class="navbar navbar-expand navbar-light bg-light">
-        <button
-          id="sidebarToggle"
-          class="btn btn-outline-secondary mr-2"
-          title="Toggle Sidebar"
-        >
-          <i class="fas fa-bars"></i>
-        </button>
-        <a class="navbar-brand" href="dashboard.html">Home</a>
-        <a class="navbar-brand" href="#">Contact</a>
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-comments"></i
-              ><span class="badge badge-danger">3</span></a
-            >
+        <div class="nav-group-label">Kinh doanh</div>
+        <ul class="side-nav">
+          <li>
+            <a href="bill.html" class="active"
+              ><i class="fas fa-file-invoice-dollar"></i> Danh sách đơn đặt<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-bell"></i
-              ><span class="badge badge-warning">15</span></a
-            >
+          <li>
+            <a href="review.html"
+              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-th-large"></i></a>
+          
+        </ul>
+
+        <div class="nav-group-label">Hệ thống</div>
+        <ul class="side-nav">
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="logout()"
+              style="color: var(--danger)"
+              ><i class="fas fa-sign-out-alt"></i> Đăng xuất<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
         </ul>
       </nav>
+    </aside>
 
-      <section>
-        <div class="container mt-4">
-          <h2 class="mb-4 text-center">
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <header class="top-bar">
+        <div style="width: 400px; position: relative">
+        </div>
+        <div class="d-flex align-items-center gap-4">
+          <div style="position: relative; cursor: pointer">
+            <i class="fas fa-bell" style="font-size: 20px; color: var(--secondary)"></i>
+            <span class="badge-dot"></span>
+          </div>
+          <div class="d-flex align-items-center gap-2" style="cursor: pointer">
+            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800;">A</div>
+            <span style="font-weight: 600; font-size: 14px">Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-body">
+
+        <div class="page-header">
+          <div>
+            <h2>Quản lý</h2>
+            <p style="color: var(--text-muted)">Quản lý quản lý trong hệ thống</p>
+          </div>
+        </div>
+    
+        <h2 class="mb-4 text-center">
             <b>Quản Lý Đơn Đặt Phòng</b>
           </h2>
 
@@ -737,7 +227,7 @@
             "
           >
             <!-- FILTER BUTTON LEFT -->
-            <button class="btn btn-primary" onclick="openFilter()">
+            <button class="btn btn-primary btn-luxury" onclick="openFilter()">
               <i class="fa fa-filter"></i> Bộ lọc
             </button>
 
@@ -758,9 +248,9 @@
           <!-- FILTER MODAL -->
           <div class="modal fade" id="filterModal">
             <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Bộ lọc đơn</h5>
+              <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px 16px 0 0;">
+                  <h5 class="modal-title" style="font-weight: 800;">Bộ lọc đơn</h5>
                   <button class="close" data-dismiss="modal">&times;</button>
                 </div>
 
@@ -855,12 +345,12 @@
                   </div>
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer" style="border-top: 1px solid #e2e8f0;">
                   <button class="btn btn-secondary" onclick="resetFilter()">
                     Reset
                   </button>
 
-                  <button class="btn btn-primary" onclick="applyFilter()">
+                  <button class="btn btn-primary btn-luxury" onclick="applyFilter()">
                     Áp dụng
                   </button>
                 </div>
@@ -868,9 +358,9 @@
             </div>
           </div>
 
-          <div class="table-responsive">
+          <div class="admin-table">
             <table
-              class="table table-bordered table-hover text-center align-middle"
+              class="admin-table"
             >
               <thead>
                 <tr>
@@ -891,29 +381,123 @@
               <tbody id="billTableBody"></tbody>
             </table>
           </div>
-        </div>
-      </section>
+        
+<div class="modal fade" id="filterModal">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px 16px 0 0;">
+                  <h5 class="modal-title" style="font-weight: 800;">Bộ lọc đơn</h5>
+                  <button class="close" data-dismiss="modal">&times;</button>
+                </div>
 
-      <div class="modal fade" id="viewBillModal">
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Thanh toán</label>
+                      <select id="filterPayment" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="VNPAY" class="status-paid">VNPAY</option>
+                        <option value="CASH" class="status-cod">
+                          Tiền mặt
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-4">
+                      <label>Bill status</label>
+                      <select id="filterBillStatus" class="form-control">
+                        <option value="">Tất cả</option>
+
+                        <option value="PENDING" class="order-pending">
+                          Chưa thanh toán
+                        </option>
+
+                        <option value="PAID" class="order-paid">
+                          Đã thanh toán
+                        </option>
+
+                        <option value="CANCELED" class="order-cancel">
+                          Đã hủy
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-4">
+                      <label>Lưu trú</label>
+
+                      <select id="filterStayStatus" class="form-control">
+                        <option value="">Tất cả</option>
+
+                        <option value="BOOKED" class="stay-booked">
+                          Đã đặt
+                        </option>
+
+                        <option value="HOLD" class="stay-hold">
+                          Giữ phòng
+                        </option>
+
+                        <option value="CHECKED_IN" class="stay-in">
+                          Đang ở
+                        </option>
+
+                        <option value="COMPLETED" class="stay-done">
+                          Đã trả phòng
+                        </option>
+
+                        <option value="NO_SHOW" class="stay-noshow">
+                          Không đến
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-4">
+                      <label>Ngày tạo đơn</label>
+                      <input
+                        type="date"
+                        id="filterCreateDate"
+                        class="form-control"
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label>Check-in từ</label>
+                      <input
+                        type="date"
+                        id="filterCheckIn"
+                        class="form-control"
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label>Check-out đến</label>
+                      <input
+                        type="date"
+                        id="filterCheckOut"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                </div>
+<div class="modal fade" id="viewBillModal">
         <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
+          <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px 16px 0 0;">
               <h5>Chi tiết đơn</h5>
               <button class="close" data-dismiss="modal">&times;</button>
             </div>
 
             <div class="modal-body" id="billDetailContent"></div>
 
-            <div class="modal-footer">
+            <div class="modal-footer" style="border-top: 1px solid #e2e8f0;">
               <button class="btn btn-secondary" data-dismiss="modal">
                 Đóng
               </button>
             </div>
           </div>
         </div>
-      </div>
-
-      <script>
+<script>
         let bills = [];
         const API = "http://localhost:8080/api/bills";
         const token = localStorage.getItem("accessToken");
@@ -954,7 +538,7 @@
               <td>${formatBillStatus(b.billStatus)}</td>
               <td>${formatStayStatus(b.stayStatus)}</td>
               <td>
-                 <button class="btn btn-sm btn-outline-info mr-1" onclick="viewBill(${b.billId})" title="Xem đơn">
+                 <button class="btn-action text-info" onclick="viewBill(${b.billId})" title="Xem đơn">
                   <i class="fa fa-eye"></i>
               </td>
             </tr>`;
@@ -1178,7 +762,7 @@
           });
         }
       </script>
-      <script>
+<script>
         // Lọc
         function openFilter() {
           $("#filterModal").modal("show");
@@ -1223,8 +807,7 @@
           renderBills(bills);
         }
       </script>
-
-      <script>
+<script>
       function logout() {
         Swal.fire({
           title: "Xác nhận đăng xuất?",
@@ -1249,10 +832,6 @@
         });
       }
     </script>
-
-      <div class="footer">
-        <p>Copyright © VXB-2026 AdminDashboard. All rights reserved.</p>
-        <p>Version 8.8.4-rc</p>
       </div>
     </div>
   </body>

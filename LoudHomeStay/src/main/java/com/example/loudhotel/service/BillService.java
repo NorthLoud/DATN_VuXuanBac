@@ -13,13 +13,22 @@ public interface BillService {
 
     BillResponse cancel(Long billId);
 
-    BillResponse checkIn(Long billId);
+    BillResponse assignRooms(Long billId, com.example.loudhotel.dto.request.CheckInRequest request);
+    
+
+    BillResponse checkIn(Long billId, com.example.loudhotel.dto.request.CheckInRequest request);
+
+    BillResponse addExtraFee(Long billId, com.example.loudhotel.dto.request.ExtraFeeRequest request);
 
     BillResponse checkOut(Long billId);
 
     List<BillResponse> getAll();
 
     List<BillResponse> getByUser(Long userId);
+    
+    BillResponse pay(Long billId);
+    
+    BillResponse payExtraFee(Long billId, Long extraFeeId);
 
     List<BillResponse> getBillsOfManager(Long managerId);
 }

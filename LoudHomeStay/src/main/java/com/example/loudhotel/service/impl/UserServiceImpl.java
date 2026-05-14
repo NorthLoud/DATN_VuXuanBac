@@ -1,5 +1,6 @@
 package com.example.loudhotel.service.impl;
 
+import com.example.loudhotel.config.CustomUserDetails;
 import com.example.loudhotel.dto.request.UserRequest;
 import com.example.loudhotel.dto.response.UserResponse;
 import com.example.loudhotel.entity.User;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +39,9 @@ public class UserServiceImpl implements UserService {
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
                 .fullName(
-                        (u.getFirstName() == null ? "" : u.getFirstName()) +
+                        (u.getLastName() == null ? "" : u.getLastName()) +
                                 " " +
-                                (u.getLastName() == null ? "" : u.getLastName())
+                                (u.getFirstName() == null ? "" : u.getFirstName())
                 )
                 .role(u.getRole())
                 .status(u.getStatus())
@@ -202,6 +205,72 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.searchUsers(User.Role.ADMIN, keyword, pageable)
                 .map(this::mapToResponse);
+    }
+
+    @Override
+    public UserResponse getMyProfile() {
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) auth.getPrincipal();
+
+        User user = userRepository
+                .findById(userDetails.getUserId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User không tồn tại"));
+
+        return mapToResponse(user);
+    }
+
+    @Override
+    public UserResponse updateMyProfile(UserRequest req) {
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) auth.getPrincipal();
+
+        User user = userRepository
+                .findById(userDetails.getUserId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User không tồn tại"));
+
+
+        // check email
+        if (!user.getEmail().equals(req.getEmail())
+                && userRepository.existsByEmailAndIsDeletedFalse(req.getEmail())) {
+
+            throw new BadRequestException("Email đã tồn tại");
+        }
+
+        // check phone
+        if (!user.getPhone().equals(req.getPhone())
+                && userRepository.existsByPhoneAndIsDeletedFalse(req.getPhone())) {
+
+            throw new BadRequestException("Số điện thoại đã tồn tại");
+        }
+
+        user.setUsername(req.getUsername());
+        user.setFirstName(req.getFirstName());
+        user.setLastName(req.getLastName());
+        user.setEmail(req.getEmail());
+        user.setPhone(req.getPhone());
+
+        // đổi mật khẩu nếu nhập
+        if (req.getPassword() != null
+                && !req.getPassword().isBlank()) {
+
+            user.setPassword(
+                    passwordEncoder.encode(req.getPassword())
+            );
+        }
+
+        return mapToResponse(
+                userRepository.save(user)
+        );
     }
 
 }

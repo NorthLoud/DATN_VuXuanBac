@@ -33,6 +33,9 @@ public class Bill {
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BillDetail> billDetails;
 
+    @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BillExtraFee> extraFees;
+
     private String orderName;
     private String orderEmail;
     private String orderPhone;
@@ -57,12 +60,13 @@ public class Bill {
     @Enumerated(EnumType.STRING)
     private CancelReason cancelReason;
 
+
     public enum BillStatus {
         PENDING, PAID, CANCELED
     }
 
     public enum PaymentMethod {
-        VNPAY
+        VNPAY, CASH
     }
 
     public enum CancelReason {

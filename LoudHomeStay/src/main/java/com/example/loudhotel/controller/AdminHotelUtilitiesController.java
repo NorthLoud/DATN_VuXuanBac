@@ -46,7 +46,7 @@ public class AdminHotelUtilitiesController {
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
         return utilitiesHotelService.getSummary(
-                keyword, hotelStatus, page,  sortBy, sortDir
+                keyword, hotelStatus, page, sortBy, sortDir
         );
     }
 

@@ -1,1246 +1,1285 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manager LoudBooking</title>
-
+    <title>Hỗ trợ khách hàng | Manager</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-      body {
-        font-family: Arial, sans-serif;
+      :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --bg-body: #f1f5f9;
+        --sidebar-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-md:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      * {
         margin: 0;
-        overflow: hidden;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
       }
 
-      .content {
-        margin-left: 260px;
-        padding: 20px;
-        height: 100vh;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        background: #f4f6f9;
+      .logo-text {
+        font-family: "Outfit", sans-serif;
       }
+      body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* --- Sidebar --- */
       .sidebar {
-        height: 100vh;
-        background: #ffffff;
-        color: #1f2937;
-        position: fixed;
         width: 260px;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        border-right: 1px solid #e5e7eb;
-        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+        background: var(--sidebar-bg);
+        border-right: 1px solid #e2e8f0;
+        position: fixed;
+        height: 100vh;
+        z-index: 1000;
+        transition: 0.3s;
+        padding: 30px 15px;
       }
-
-      .sidebar.collapsed {
-        width: 0;
-        overflow: hidden;
-      }
-
-      /* scrollbar */
-      .sidebar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .sidebar::-webkit-scrollbar-thumb {
-        background-color: #d1d5db;
-        border-radius: 10px;
-      }
-
-      /* title */
-      .sidebar h2 {
-        color: #111827;
-      }
-
-      /* avatar text */
-      .sidebar h2.text-center {
-        font-size: 18px;
-        font-weight: 600;
-      }
-
-      /* nav link */
-      .sidebar .nav-link {
-        color: #374151;
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin: 4px 10px;
+      .logo-box {
+        padding: 0 15px 40px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        transition: all 0.2s ease;
+        gap: 12px;
+      }
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+      }
+      .logo-text {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--text-main);
       }
 
-      /* hover */
-      .sidebar .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-        transform: translateX(3px);
+      .nav-group-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 1px;
       }
-
-      /* active feel */
-      .sidebar .nav-link.active {
-        background: #e0edff;
-        color: #2563eb;
-        font-weight: 600;
-      }
-
-      /* icon size */
-      .sidebar .nav-link i {
-        width: 20px;
-        text-align: center;
-        color: #6b7280;
-      }
-
-      /* hover icon */
-      .sidebar .nav-link:hover i {
-        color: #2563eb;
-      }
-
-      /* submenu */
-      .sidebar .submenu {
+      .side-nav {
         list-style: none;
-        padding-left: 30px;
-        display: none;
       }
-
-      .sidebar .submenu .nav-link {
-        font-size: 13px;
-        color: #6b7280;
-        padding: 6px 10px;
-        margin: 2px 10px;
+      .side-nav li {
+        margin-bottom: 4px;
       }
-
-      .sidebar .submenu .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-      }
-      .nav-item .nav-link {
+      .side-nav a {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 12px 15px;
+        border-radius: 10px;
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: 0.2s;
       }
-      .content {
-        margin-left: 250px;
-        padding: 20px;
-        transition: margin-left 0.3s; /* Hiệu ứng chuyển đổi khi ẩn/hiện */
-        overflow-y: auto; /* Kích hoạt thanh cuộn dọc */
-        height: 700px;
+      .side-nav a:hover,
+      .side-nav a.active {
+        background: var(--primary-light);
+        color: var(--primary);
       }
-      .content.collapsed {
-        margin-left: 0;
+      .side-nav a i:first-child {
+        width: 24px;
+        font-size: 18px;
       }
-      .content::-webkit-scrollbar {
-        width: 8px; /* Độ rộng của thanh cuộn */
+      .submenu {
+        list-style: none;
+        padding-left: 35px;
+        margin-top: 4px;
+        display: none;
       }
-      .content::-webkit-scrollbar-thumb {
-        background-color: #495057; /* Màu của thanh cuộn */
-        border-radius: 4px;
+      .submenu.show {
+        display: block;
+      }
+      .submenu a {
+        padding: 8px 12px;
+        font-size: 13px;
       }
 
-      .footer {
-        text-align: center;
-        padding: 20px;
-        color: #999;
+      /* Main Content */
+      .main-wrapper {
+        flex: 1;
+        margin-left: 260px;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
       }
-    </style>
-    <style>
-      .chat-wrapper {
-        margin: 10px;
-        border: #e4e6eb 1px solid;
-        height: calc(100vh - 120px);
-        background: #f0f2f5;
-        border-radius: 10px;
+
+      .top-bar {
+        height: 70px;
+        background: white;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+      }
+
+      .chat-container {
+        flex: 1;
+        display: flex;
+        background: #fff;
+        margin: 20px;
+        border-radius: var(--radius-lg);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
         overflow: hidden;
       }
 
-      /* ================= LAYOUT ================= */
-      .chat-layout {
-        display: flex;
-        height: 100%;
-      }
-      @media (max-width: 1000px) {
-        .chat-wrapper {
-          overflow-x: auto; /* ✅ chỉ bật khi màn hình nhỏ */
-        }
-      }
-      /* ================= COLUMNS ================= */
-      .chat-col {
-        width: 260px;
-        background: white;
-        border-right: 1px solid #e4e6eb;
+      .chat-list {
+        width: 360px;
+        border-right: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
-      }
-      .hotel-col {
-        width: 280px;
-      }
-      .user-col {
-        width: 230px;
-      }
-      /* ================= HEADER ================= */
-      .chat-col-header {
-        padding: 16px;
-        font-weight: 600;
-        border-bottom: 1px solid #eee;
         background: #fff;
       }
-      /* ================= LIST ================= */
-      .chat-list {
+
+      .chat-list-header {
+        padding: 20px;
+        font-weight: 800;
+        font-size: 24px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .chat-partners {
         flex: 1;
         overflow-y: auto;
-        width: 300px;
+        padding: 8px;
       }
-      /* ================= ITEM ================= */
+
       .chat-item {
-        width: 280px;
+        padding: 12px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 12px 14px;
+        gap: 12px;
         cursor: pointer;
         transition: 0.2s;
+        border-radius: 12px;
+        margin-bottom: 4px;
       }
-      .chat-item:hover,
+
+      .chat-item:hover {
+        background: #f2f2f2;
+      }
+
       .chat-item.active {
-        background: #ececed;
+        background: #ebf5ff;
       }
+
       .chat-item img {
-        width: 38px;
-        height: 38px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
         object-fit: cover;
       }
+
+      .chat-item-info {
+        flex: 1;
+        min-width: 0;
+      }
+
       .chat-item-name {
-        max-width: 179px;
-        font-size: 14px;
-        font-weight: 500;
-
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 2px;
       }
-      .chat-item-name-user {
-        max-width: 139px;
-        font-size: 14px;
-        font-weight: 500;
 
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-
+      .chat-item-last {
+        font-size: 13px;
+        color: var(--text-muted);
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
-      /* ================= CHAT MAIN ================= */
-      .chat-main {
+      .unread-dot {
+        width: 12px;
+        height: 12px;
+        background: var(--primary);
+        border-radius: 50%;
+      }
+
+      .chat-item.unread .chat-item-name {
+        font-weight: 700;
+      }
+
+      .chat-item.unread .chat-item-last {
+        font-weight: 700;
+        color: #050505;
+      }
+
+      .chat-window {
         flex: 1;
         display: flex;
         flex-direction: column;
-        background: #f0f2f5;
-        position: relative; /* 🔥 QUAN TRỌNG */
+        background: #fff;
       }
-      /* ================= CHAT HEADER ================= */
+
       .chat-header {
-        height: 57px;
-        padding: 12px 18px;
-        background: white;
-        border-bottom: 1px solid #e4e6eb;
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--border-color);
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
       }
-      .chat-avatar {
+
+      .chat-header img {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        object-fit: cover;
       }
-      .chat-name {
-        font-weight: 600;
-        font-size: 15px;
-      }
-      /* ================= MESSAGES ================= */
+
       .chat-messages {
-        padding-bottom: 90px;
         flex: 1;
+        padding: 20px;
         overflow-y: auto;
-        overflow-x: hidden;
-        padding: 30px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        background: #f0f2f5;
+        gap: 4px;
+        min-height: 0;
       }
-      /* ================= BUBBLE ================= */
-      .msg {
-        max-width: 60%;
-        padding: 10px 14px;
+
+      .message-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 5px;
+      }
+
+      .message-row.me {
+        justify-content: flex-end;
+      }
+
+      .message-row.other {
+        justify-content: flex-start;
+      }
+
+      .msg-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        align-self: flex-end;
+        flex-shrink: 0;
+      }
+
+      .message-wrapper {
+        display: flex;
+        flex-direction: column;
+        max-width: 70%;
+        position: relative;
+      }
+
+      .me .message-wrapper {
+        align-items: flex-end;
+      }
+
+      .other .message-wrapper {
+        align-items: flex-start;
+      }
+
+      /* Reply Style Refinement */
+      .msg-reply-line {
+        font-size: 11px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 2px;
+        opacity: 0.8;
+      }
+
+      .msg-reply-line i {
+        transform: scaleX(-1);
+        font-size: 10px;
+      }
+
+      .msg-quoted-content {
+        font-size: 13px;
+        color: var(--text-muted);
+        background: #f0f2f5;
+        padding: 8px 12px;
+        border-radius: 14px 14px 14px 14px;
+        margin-bottom: -12px;
+        padding-bottom: 20px;
+        opacity: 0.8;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        border-left: 3px solid var(--primary);
+        position: relative;
+        z-index: 1;
+      }
+
+      .me .msg-quoted-content {
+        background: #f0f2f5;
+        color: var(--text-muted);
+        border-left-color: var(--primary);
+      }
+
+      .other .msg-quoted-content {
+        border-left-color: var(--primary);
+      }
+
+      .msg-bubble {
+        padding: 8px 12px;
         border-radius: 18px;
-        font-size: 14px;
+        font-size: 15px;
+        line-height: 1.4;
+        word-break: break-word;
+        position: relative;
+        z-index: 2;
+      }
+
+      .msg-text {
+        margin-top: 4px;
+        word-break: break-word;
         line-height: 1.4;
       }
-      .msg-me {
-        background: #0084ff;
-        color: white;
-        align-self: flex-end;
-        border-bottom-right-radius: 5px;
-      }
-      .msg-other {
-        background: #e4e6eb;
-        align-self: flex-start;
-        border-bottom-left-radius: 5px;
-      }
-      /* ================= IMAGE ================= */
-      .msg img {
-        max-width: 200px;
-        border-radius: 12px;
-        margin-bottom: 6px;
-        cursor: pointer;
-      }
-      /* ================= INPUT ================= */
-      .chat-input-area {
-        position: relative;
-        z-index: 20;
-        margin-right: -19px;
-        display: flex;
-        padding: 10px;
-        background: white;
-        border-top: 1px solid #e4e6eb;
-      }
-      .chat-input {
-        background-color: #f0f2f5;
-        flex: 1;
-        border: 1px none;
-        border-radius: 30px;
-        padding: 10px 15px;
-        outline: none;
-      }
-      .chat-input-area input:focus {
-        outline: none;
-        box-shadow: 0 0 0 1px #d0cfcf;
-      }
-      .send-btn {
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        background: transparent; /* nếu muốn không nền */
-        margin-right: 30px;
-        width: 42px;
-        height: 42px;
-        font-size: 18px;
-        color: #0084ff;
-        cursor: pointer;
-      }
-      .send-btn :hover {
-        color: #47a1f6;
-      }
-      .fas fa-image {
-        margin-left: 10px;
-      }
-      .img-btn {
-        font-size: 20px;
-        cursor: pointer;
-        padding: 8px;
-        margin: 5px 10px 0 0;
-        border-radius: 50%;
-      }
-      .img-btn:hover {
-        background: #f1f3f5;
-      }
-      #previewImages {
-        position: absolute;
-        bottom: 62px;
-        left: 0;
 
-        display: flex;
-        gap: 10px;
-        padding: 10px;
-
-        background: #fff;
-        border-top: 1px solid #eee;
-
-        overflow-x: auto;
-        overflow-y: hidden;
-
-        z-index: 999;
-        max-height: 130px;
-        flex-wrap: nowrap;
-        width: 100%;
-      }
-
-      .preview-item {
-        position: relative;
-        height: 120px;
-        flex: 0 0 auto;
-      }
-
-      .preview-item img {
-        width: 100px;
-        height: 100px;
-        border-radius: 8px;
-        object-fit: cover;
-      }
-
-      .remove-img {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: red;
+      .me .msg-bubble {
+        background: var(--primary);
         color: #fff;
-        border-radius: 50%;
-        width: 18px;
-        height: 18px;
-        font-size: 12px;
-        text-align: center;
-        cursor: pointer;
       }
 
-      .dot {
-        width: 8.5px;
-        height: 8.5px;
-        background: #0084ff;
-        border-radius: 50%;
-      }
-      .msg-divider {
-        text-align: center;
-        font-size: 12px;
-        color: #888;
-        margin: 15px 0;
-      }
-      .hotel-title {
-        position: relative;
-        display: inline-block;
+      .other .msg-bubble {
+        background: #e4e6eb;
+        color: var(--text-main);
       }
 
-      .header-dot {
-        position: absolute;
-        right: -10px; /* chỉnh sát chữ "sạn" */
-        width: 8px;
-        height: 8px;
-        background: #0084ff;
-        border-radius: 50%;
-        display: none;
-      }
-    </style>
-    <style>
       .msg-images {
+        margin-top: 4px;
+        width: 180px;
+        border-radius: 12px;
+        overflow: hidden;
         position: relative;
-        display: inline-block;
-        margin-top: 6px;
+        cursor: pointer;
+        border: 1px solid var(--border-color);
       }
 
       .msg-images img {
-        max-width: 220px;
-        border-radius: 12px;
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+
+      .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .msg-actions {
+        display: none;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        gap: 5px;
+        height: 100%;
+        align-items: center;
+        z-index: 10;
+      }
+
+      .me .msg-actions {
+        right: 100%;
+        padding-right: 15px;
+      }
+
+      .other .msg-actions {
+        left: 100%;
+        padding-left: 15px;
+      }
+
+      .message-wrapper:hover .msg-actions {
+        display: flex;
+      }
+
+      .action-item {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: var(--secondary);
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .action-item:hover {
+        background: #f2f2f2;
+        color: var(--primary);
+      }
+
+      .msg-status {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .chat-input-container {
+        padding: 10px 15px;
+        border-top: 1px solid var(--border-color);
+        position: relative;
+      }
+
+      #replyBar {
+        display: none;
+        padding: 8px 15px;
+        background: #fff;
+        border-top: 1px solid var(--border-color);
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+      }
+
+      .reply-content {
+        flex: 1;
+        min-width: 0;
+        border-left: 2px solid var(--primary);
+        padding-left: 10px;
+      }
+
+      .reply-content b {
+        display: block;
+        font-size: 12px;
+      }
+
+      .reply-content span {
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
+
+      .close-reply {
+        cursor: pointer;
+        color: var(--secondary);
+        font-size: 20px;
+        padding: 0 5px;
+      }
+
+      .chat-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f0f2f5;
+        padding: 8px 12px;
+        border-radius: 20px;
+      }
+
+      .chat-input-wrapper input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 15px;
+      }
+
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 20px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        border-radius: 50%;
+      }
+
+      .icon-btn:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      #fileInput {
+        position: absolute;
+        font-size: 100px;
+        opacity: 0;
+        right: 0;
+        top: 0;
         cursor: pointer;
       }
 
-      .img-overlay {
-        position: absolute;
-        bottom: 6px;
-        right: 8px;
-        background: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        padding: 4px 8px;
-        border-radius: 10px;
-        font-size: 13px;
+      .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
       }
-      /* MODAL */
-      .image-modal {
+
+      .preview-item {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+      }
+
+      .preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .preview-item .remove-btn {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 18px;
+        height: 18px;
+        background: #fff;
+        color: var(--danger);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        cursor: pointer;
+      }
+
+      /* Highlight animation */
+      @keyframes highlight {
+        0% {
+          background-color: #fff9c4;
+        }
+
+        100% {
+          background-color: transparent;
+        }
+      }
+
+      .highlight-msg .msg-bubble {
+        animation: highlight 2s ease-out;
+      }
+
+      /* Gallery Overlay */
+      .gallery-overlay {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        display: none;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 9999;
         align-items: center;
         justify-content: center;
-        z-index: 999;
       }
 
-      .image-modal img {
-        max-width: 80%;
-        max-height: 80%;
-        border-radius: 10px;
+      .gallery-content {
+        position: relative;
+        width: 95%;
+        height: 95%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
       }
 
-      .modal-btn {
+      .gallery-main {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 0;
+      }
+
+      .gallery-main-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+
+      .gallery-thumbs {
+        display: flex;
+        gap: 10px;
+        padding: 20px;
+        overflow-x: auto;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .gallery-thumbs img {
+        width: 80px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: 0.3s;
+      }
+
+      .gallery-thumbs img.active {
+        opacity: 1;
+        border: 2px solid var(--primary);
+      }
+
+      .gallery-overlay .close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: white;
+        font-size: 50px;
+        cursor: pointer;
+        z-index: 10001;
+      }
+
+      .g-nav {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 30px;
-        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
         cursor: pointer;
-        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        z-index: 10000;
       }
 
-      .modal-prev {
-        left: 40px;
-      }
-      .modal-next {
-        right: 40px;
+      .g-nav.prev {
+        left: 20px;
       }
 
-      .modal-close {
-        position: absolute;
-        top: 30px;
-        right: 40px;
-        font-size: 30px;
-        color: #fff;
-        cursor: pointer;
+      .g-nav.next {
+        right: 20px;
+      }
+      .msg-time-separator {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin: 20px 0 10px;
+        font-weight: 600;
       }
     </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Toggle submenu display
-        const menuItems = document.querySelectorAll(".nav-item");
-        menuItems.forEach((item) => {
-          item.addEventListener("click", function () {
-            const submenu = this.querySelector(".submenu");
-            if (submenu) {
-              submenu.style.display =
-                submenu.style.display === "none" || submenu.style.display === ""
-                  ? "block"
-                  : "none";
-            }
-          });
-        });
-
-        // Toggle sidebar visibility
-        const toggleButton = document.getElementById("sidebarToggle");
-        const sidebar = document.querySelector(".sidebar");
-        const content = document.querySelector(".content");
-        toggleButton.addEventListener("click", function () {
-          sidebar.classList.toggle("collapsed");
-          content.classList.toggle("collapsed");
-        });
-      });
-    </script>
   </head>
+
   <body>
     <!-- Sidebar -->
-    <div class="sidebar">
-      <h2 class="text-center mb-4" style="font-size: 40px">
-        Dashboard
-        <br />
-      </h2>
-      <img
-        src="/images/loudbooking.jpg"
-        alt="Profile"
-        class="rounded-circle d-block mx-auto mb-4"
-        style="width: 100px; height: 100px; object-fit: cover"
-      />
-      <h2 class="text-center">Manager</h2>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="dashboard.html">
-            <i class="fas fa-tachometer-alt"></i>Dashboard
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="hotel.html">
-            <i class="fas fa-hotel"></i>Quản lý khách sạn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-bed"></i>Quản lý phòng
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="roomtype.html"
-                >◯ Danh sách loại phòng</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room.html">◯ Danh sách phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-concierge-bell"></i>Quản lý tiện ích
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="hotel-util.html"
-                >◯ Tiện ích khách sạn</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room-util.html">◯ Tiện ích phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="review.html">
-            <i class="fas fa-star-half-alt"></i>Quản lý đánh giá
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="bill.html">
-            <i class="fas fa-clipboard-list"></i>Quản lý đơn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="chat.html">
-            <i class="fas fa-comments"></i>Liên hệ
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i>Đăng xuất<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-      </ul>
-    </div>
+    <aside class="sidebar">
+      <div class="logo-box">
+        <div class="logo-icon"><i class="fas fa-paper-plane"></i></div>
+        <div class="logo-text">LoudHotel</div>
+      </div>
 
-    <!-- Content -->
-    <div class="content">
-      <nav class="navbar navbar-expand navbar-light bg-light">
-        <button
-          id="sidebarToggle"
-          class="btn btn-outline-secondary mr-2"
-          title="Toggle Sidebar"
-        >
-          <i class="fas fa-bars"></i>
-        </button>
-        <a class="navbar-brand" href="dashboard.html">Home</a>
-        <a class="navbar-brand" href="#">Contact</a>
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-comments"></i
-              ><span class="badge badge-danger">3</span></a
-            >
+      <nav>
+        <div class="nav-group-label">Trung tâm điều hành</div>
+        <ul class="side-nav">
+          <li>
+            <a href="dashboard.html"
+              ><i class="fas fa-chart-pie"></i> Dashboard<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-bell"></i
-              ><span class="badge badge-warning">15</span></a
-            >
+          <li>
+            <a href="hotel.html"
+              ><i class="fas fa-hotel"></i> Khách sạn của tôi<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-th-large"></i></a>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#roomSub').toggleClass('show')"
+            >
+              <i class="fas fa-bed"></i> Quản lý phòng
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="roomSub">
+              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="room.html">Danh sách phòng</a></li>
+            </ul>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#utilSub').toggleClass('show')"
+            >
+              <i class="fas fa-concierge-bell"></i> Quản lý tiện ích
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="utilSub">
+              <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
+              <li><a href="room-util.html">Tiện ích phòng</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <div class="nav-group-label">Kinh doanh</div>
+        <ul class="side-nav">
+          <li>
+            <a href="bill.html"
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li>
+            <a href="review.html"
+              ><i class="fas fa-comment-alt"></i> Đánh giá của khách<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li>
+            <a href="chat.html" class="active"
+              ><i class="fas fa-comments"></i> Hỗ trợ khách hàng<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+        </ul>
+
+        <div class="nav-group-label">Hệ thống</div>
+        <ul class="side-nav">
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="logout()"
+              style="color: var(--danger)"
+              ><i class="fas fa-sign-out-alt"></i> Đăng xuất<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
         </ul>
       </nav>
-
-
-      <div class="chat-wrapper">
-        <div class="chat-layout">
-          <!-- CỘT 1 : HOTEL -->
-          <div class="chat-col hotel-col">
-            <div class="chat-col-header">
-              <span class="hotel-title">
-                Khách sạn
-                <span id="hotelDot" class="header-dot"></span>
-              </span>
+    </aside>
+    <div class="main-wrapper">
+      <header class="top-bar">
+        <div style="width: 400px; position: relative"></div>
+        <div class="d-flex align-items-center gap-4">
+          <div style="position: relative; cursor: pointer">
+            <i
+              class="fas fa-bell"
+              style="font-size: 20px; color: var(--secondary)"
+            ></i>
+            <span class="badge-dot"></span>
+          </div>
+          <div class="d-flex align-items-center gap-2" style="cursor: pointer">
+            <div
+              style="
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                background: var(--primary-light);
+                color: var(--primary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+              "
+            >
+              M
             </div>
+            <span style="font-weight: 600; font-size: 14px">Quản lý viên</span>
+          </div>
+        </div>
+      </header>
 
-            <div class="chat-list" id="hotelList">
-              <!-- render hotel -->
+      <div class="chat-container">
+        <div class="chat-list">
+          <div class="chat-list-header">Đoạn chat</div>
+          <div class="chat-partners" id="partnerList"></div>
+        </div>
+
+        <div class="chat-window">
+          <div class="chat-header" id="chatHeader" style="display: none">
+            <img id="activePartnerAvatar" src="" alt="" />
+            <div class="chat-header-info">
+              <h4
+                id="activePartnerName"
+                style="font-weight: 600; font-size: 20px; margin: 0"
+              ></h4>
+              <p
+                id="activeHotelContext"
+                style="font-size: 12px; color: var(--primary); margin: 0"
+              ></p>
             </div>
           </div>
 
-          <!-- CỘT 2 : USER -->
-          <div class="chat-col user-col">
-            <div class="chat-col-header">Người dùng</div>
-
-            <div class="chat-list" id="userList">
-              <!-- render user -->
+          <div class="chat-messages" id="messageList">
+            <div
+              style="
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-muted);
+                text-align: center;
+              "
+            >
+              <i
+                class="fab fa-facebook-messenger"
+                style="font-size: 80px; color: #f0f2f5; margin-bottom: 20px"
+              ></i>
+              <h5 style="font-weight: 700">Hãy chọn một tin nhắn</h5>
             </div>
           </div>
 
-          <!-- CỘT 3 : CHAT -->
-          <div class="chat-main">
-            <!-- HEADER -->
-            <div class="chat-header">
-              <img
-                id="chatAvatar"
-                src="https://i.pravatar.cc/40"
-                class="chat-avatar"
-              />
-
-              <div id="chatName" class="chat-name">
-                Chọn người dùng để liên hệ
+          <div
+            class="chat-input-container"
+            id="inputContainer"
+            style="display: none"
+          >
+            <div id="replyBar">
+              <div class="reply-content">
+                <b id="replyToUser"></b>
+                <span id="replyToText"></span>
               </div>
+              <div class="close-reply" onclick="cancelReply()">&times;</div>
             </div>
 
-            <!-- MESSAGES -->
-            <div class="chat-messages" id="chatMessages"></div>
-            <div id="previewImages"></div>
-            <!-- INPUT -->
-            <div class="chat-input-area">
-              <label class="img-btn">
-                <i class="fa-solid fa-image"></i>
-                <input
-                  id="imgInput"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  hidden
-                />
-              </label>
-              <input
-                id="msgInput"
-                type="text"
-                placeholder="Nhập tin nhắn..."
-                class="chat-input"
-              />
-              <button class="send-btn" id="sendBtn">
-                <i class="fas fa-paper-plane fa-2x ml-3 text-primary"></i>
-              </button>
+            <div id="previewImages" class="preview-container"></div>
+            <div class="chat-input-wrapper">
+              <div class="icon-btn" title="Gửi ảnh">
+                <i class="fas fa-image"></i>
+                <input type="file" id="fileInput" multiple accept="image/*" />
+              </div>
+              <input type="text" id="chatInput" placeholder="Aa" />
+              <div class="icon-btn" id="sendBtn">
+                <i class="fas fa-paper-plane"></i>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="image-modal" id="imageModal">
-        <span class="modal-close" onclick="closeModal()">✕</span>
-        <span class="modal-btn modal-prev" onclick="prevImage()">❮</span>
-        <img id="modalImg" src="" />
-        <span class="modal-btn modal-next" onclick="nextImage()">❯</span>
-      </div>
-      <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-      <script>
-        const API_URL = "http://localhost:8080/api";
-        const token = localStorage.getItem("accessToken");
-
-        const hotelList = document.getElementById("hotelList");
-        const userList = document.getElementById("userList");
-        const chatMessages = document.getElementById("chatMessages");
-        const chatAvatar = document.getElementById("chatAvatar");
-        const chatName = document.getElementById("chatName");
-        const imgInput = document.getElementById("imgInput");
-
-        let currentConversationId = null;
-
-        let currentImages = [];
-        let currentIndex = 0;
-
-        let pendingImages = [];
-        let currentHotelId = null;
-
-        let stompClient = null; //web socket
-        function connectOwnerSocket() {
-          const socket = new SockJS("http://localhost:8080/chat-socket");
-
-          stompClient = Stomp.over(socket);
-
-          stompClient.connect({}, () => {
-            // nhận tin nhắn mới của manager
-            stompClient.subscribe("/topic/manager/" + getMyId(), (msg) => {
-              const data = JSON.parse(msg.body);
-
-              handleIncomingMessage(data);
-            });
-          });
-        }
-        function handleIncomingMessage(m) {
-          // nếu đang mở đúng conversation → append luôn
-          if (m.conversationId === currentConversationId) {
-            appendMessage(m);
-
-            return;
-          }
-
-          // nếu chưa mở → tăng unread
-          const c = window.allConversations.find(
-            (x) => x.conversationId === m.conversationId,
-          );
-
-          if (c) {
-            renderHotels(window.allConversations);
-          } else {
-            // conversation mới hoàn toàn
-            loadConversations();
-          }
-        }
-        function subscribeChat(conversationId) {
-          stompClient.subscribe("/topic/chat/" + conversationId, (msg) => {
-            const data = JSON.parse(msg.body);
-
-            appendMessage(data);
-          });
-        }
-        document.getElementById("sendBtn").onclick = sendText;
-        document
-          .getElementById("msgInput")
-          .addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendText();
-          });
-        function getAvatar(username) {
-          return `https://i.pravatar.cc/150?u=${username}`;
-        }
-
-        function getMyId() {
-          const payload = JSON.parse(atob(token.split(".")[1]));
-          return payload.userId;
-        }
-        function selectHotel(hotelId) {
-          const conversations = window.allConversations;
-
-          // ✅ chỉ lấy user có username thật
-          const users = conversations.filter(
-            (c) => c.hotelId === hotelId && c.username,
-          );
-
-          renderUsers(users);
-        }
-        function renderUsers(users) {
-          userList.innerHTML = "";
-
-          // ✅ nếu không có ai chat
-          if (!users || users.length === 0) {
-            userList.innerHTML = `
-              <div style="padding:20px; color:#888;">
-                Chưa có ai liên hệ
-              </div>
-            `;
-            return;
-          }
-          users.forEach((u) => {
-            const div = document.createElement("div");
-
-            div.className = "chat-item";
-
-            div.innerHTML = `
-              <img src="${getAvatar(u.username || "user")}">
-              <div class="chat-item-name-user">
-                ${u.username || "Người dùng"}
-              </div>
-              ${u.unreadCountManager > 0 ? `<span class="dot"></span>` : ""}
-            `;
-
-            div.onclick = () => openConversation(u);
-
-            userList.appendChild(div);
-          });
-        }
-
-        async function loadConversations() {
-          const res = await fetch(API_URL + "/chat/manager", {
-            headers: { Authorization: "Bearer " + token },
-          });
-
-          const conversations = await res.json();
-          window.allConversations = conversations;
-
-          const hotels = renderHotels(conversations);
-
-          // ✅ CHỈ set lần đầu
-          if (!currentHotelId && hotels.length > 0) {
-            currentHotelId = hotels[0].hotelId;
-            selectHotel(currentHotelId);
-          }
-        }
-        function renderHotels(conversations) {
-          hotelList.innerHTML = "";
-
-          const uniqueHotels = {};
-
-          conversations.forEach((c) => {
-            if (!uniqueHotels[c.hotelId]) {
-              uniqueHotels[c.hotelId] = c;
-            } else {
-              // 👉 lấy conversation mới nhất của hotel
-              if (
-                new Date(c.lastMessageTime) >
-                new Date(uniqueHotels[c.hotelId].lastMessageTime)
-              ) {
-                uniqueHotels[c.hotelId] = c;
-              }
-            }
-          });
-
-          const hotels = Object.values(uniqueHotels).sort(
-            (a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime),
-          );
-          // ✅ NEW: check có unread toàn hệ thống không
-          const hasAnyUnread = conversations.some(
-            (c) => c.unreadCountManager > 0,
-          );
-
-          const hotelDot = document.getElementById("hotelDot");
-          if (hasAnyUnread) {
-            hotelDot.style.display = "inline-block";
-          } else {
-            hotelDot.style.display = "none";
-          }
-
-          hotels.forEach((c, index) => {
-            const div = document.createElement("div");
-
-            div.className = "chat-item";
-            if (c.hotelId === currentHotelId) {
-              div.classList.add("active");
-            }
-            const hasUnread = conversations.some(
-              (x) => x.hotelId === c.hotelId && x.unreadCountManager > 0,
-            );
-            div.innerHTML = `
-              <img src="http://localhost:8080${c.hotelImage || ""}">
-              <div class="chat-item-name">${c.hotelName}</div>
-              ${hasUnread ? `<span class="dot"></span>` : ""}
-            `;
-            div.onclick = () => {
-              currentHotelId = c.hotelId;
-              document
-                .querySelectorAll("#hotelList .chat-item")
-                .forEach((e) => e.classList.remove("active"));
-
-              div.classList.add("active");
-
-              selectHotel(c.hotelId);
-            };
-
-            hotelList.appendChild(div);
-          });
-
-          return hotels;
-        }
-        function openConversation(c) {
-          currentConversationId = c.conversationId;
-          subscribeChat(c.conversationId);
-          chatName.innerText = c.username;
-          if (!c.username) return; // bỏ qua hotel chưa có chat
-
-          // ✅ avatar giống bên list
-          chatAvatar.src = getAvatar(c.username);
-
-          // ✅ reset unread local
-          c.unreadCountManager = 0;
-          // ✅ gọi BE
-          fetch(API_URL + "/chat/read/" + c.conversationId, {
-            method: "POST",
-            headers: { Authorization: "Bearer " + token },
-          });
-          // ✅ render lại user list để mất chấm xanh
-          const users = window.allConversations.filter(
-            (x) => x.hotelId === c.hotelId,
-          );
-          renderUsers(users);
-          // ✅ render lại hotel (nếu hotel hết unread → mất dot + tụt xuống)
-          renderHotels(window.allConversations);
-
-          loadMessages(c.conversationId);
-        }
-
-        async function loadMessages(id) {
-          const res = await fetch(API_URL + "/chat/" + id, {
-            headers: { Authorization: "Bearer " + token },
-          });
-          const messages = await res.json();
-          renderMessages(messages);
-        }
-        function renderMessages(messages) {
-          chatMessages.innerHTML = "";
-
-          messages.forEach((m, index) => {
-            const currentTime = new Date(m.createdAt);
-
-            // 👉 message đầu tiên
-            if (index === 0) {
-              addTimeDivider(currentTime);
-            } else {
-              const prevTime = new Date(messages[index - 1].createdAt);
-              const diff = currentTime - prevTime;
-
-              // 👉 cách nhau >= 1 tiếng thì hiện mốc thời gian
-              if (diff >= 10 * 60 * 1000) {
-                addTimeDivider(currentTime);
-              }
-            }
-
-            const div = document.createElement("div");
-
-            const isMe = m.senderId === getMyId();
-            div.className = "msg " + (isMe ? "msg-me" : "msg-other");
-
-            let html = "";
-
-            if (m.images && m.images.length > 0) {
-              const firstImg = m.images[0];
-              const extra = m.images.length - 1;
-
-              html += `
-                <div class="msg-images" onclick='openModal(${JSON.stringify(m.images)})'>
-                  <img src="http://localhost:8080${firstImg}">
-                  ${extra > 0 ? `<div class="img-overlay">+${extra}</div>` : ""}
-                </div>
-              `;
-            }
-
-            if (m.content) {
-              html += `<div>${m.content}</div>`;
-            }
-
-            div.innerHTML = html;
-            chatMessages.appendChild(div);
-          });
-
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        async function sendText() {
-          const input = document.getElementById("msgInput");
-          const text = input.value.trim();
-
-          if (!text && pendingImages.length === 0) return;
-          if (!currentConversationId) return;
-
-          let imageUrls = [];
-
-          // upload ảnh nếu có
-          if (pendingImages.length > 0) {
-            const form = new FormData();
-            pendingImages.forEach((f) => form.append("files", f));
-
-            const uploadRes = await fetch(API_URL + "/chat/upload", {
-              method: "POST",
-              headers: { Authorization: "Bearer " + token },
-              body: form,
-            });
-
-            imageUrls = await uploadRes.json();
-          }
-
-          // gửi message
-          await fetch(API_URL + "/chat/send", {
-            method: "POST",
-            headers: {
-              Authorization: "Bearer " + token,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              conversationId: currentConversationId,
-              content: text,
-              images: imageUrls,
-            }),
-          });
-
-          // 👇 thêm dòng này
-          setTimeout(() => {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-          }, 50);
-
-          // reset
-          input.value = "";
-          pendingImages = [];
-          document.getElementById("previewImages").innerHTML = "";
-          imgInput.value = "";
-        }
-        async function uploadImages(files) {
-          const formData = new FormData();
-          for (const file of files) {
-            formData.append("files", file);
-          }
-          const res = await fetch(API_URL + "/chat/upload", {
-            method: "POST",
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-            body: formData,
-          });
-
-          return await res.json();
-        }
-
-        imgInput.onchange = function () {
-          const files = Array.from(imgInput.files);
-          pendingImages = [...pendingImages, ...files];
-          renderPreview();
-        };
-        function appendMessage(m) {
-          const div = document.createElement("div");
-
-          const isMe = m.senderId === getMyId();
-
-          div.className = "msg " + (isMe ? "msg-me" : "msg-other");
-
-          let html = "";
-          if (m.images && m.images.length > 0) {
-            const firstImg = m.images[0];
-            const extra = m.images.length - 1;
-
-            html += `
-      <div class="msg-images" onclick='openModal(${JSON.stringify(m.images)})'>
-        <img src="http://localhost:8080${firstImg}">
-        ${extra > 0 ? `<div class="img-overlay">+${extra}</div>` : ""}
-      </div>
-    `;
-          }
-          if (m.content) {
-            html += `<div>${m.content}</div>`;
-          }
-          div.innerHTML = html;
-
-          chatMessages.appendChild(div);
-
-          // 👉 scroll MƯỢT
-          chatMessages.scrollTo({
-            top: chatMessages.scrollHeight,
-            behavior: "smooth",
-          });
-        }
-        function renderPreview() {
-          const preview = document.getElementById("previewImages");
-          preview.innerHTML = "";
-
-          pendingImages.forEach((file, index) => {
-            const div = document.createElement("div");
-            div.className = "preview-item";
-
-            const img = document.createElement("img");
-            img.src = URL.createObjectURL(file);
-
-            const remove = document.createElement("div");
-            remove.className = "remove-img";
-            remove.innerText = "×";
-
-            remove.onclick = () => {
-              pendingImages.splice(index, 1);
-              renderPreview();
-            };
-
-            div.appendChild(img);
-            div.appendChild(remove);
-            preview.appendChild(div);
-          });
-        }
-
-        function openModal(images) {
-          currentImages = images;
-          currentIndex = 0;
-
-          document.getElementById("imageModal").style.display = "flex";
-
-          showImage();
-        }
-        function showImage() {
-          document.getElementById("modalImg").src =
-            "http://localhost:8080" + currentImages[currentIndex];
-        }
-        function nextImage() {
-          currentIndex = (currentIndex + 1) % currentImages.length;
-
-          showImage();
-        }
-        function prevImage() {
-          currentIndex =
-            (currentIndex - 1 + currentImages.length) % currentImages.length;
-
-          showImage();
-        }
-        function closeModal() {
-          document.getElementById("imageModal").style.display = "none";
-        }
-        function formatTime(dateStr) {
-          const date = new Date(dateStr);
-          const now = new Date();
-
-          const oneDay = 24 * 60 * 60 * 1000;
-
-          const isToday = date.toDateString() === now.toDateString();
-
-          const isYesterday =
-            now - date < 2 * oneDay &&
-            date.getDate() === new Date(now - oneDay).getDate();
-
-          const time = date.toLocaleTimeString("vi-VN", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          if (isToday) return time;
-          if (isYesterday) return "Hôm qua " + time;
-
-          return date.toLocaleDateString("vi-VN") + " " + time;
-        }
-        function addTimeDivider(date) {
-          const divider = document.createElement("div");
-          divider.className = "msg-divider";
-
-          const time = date.toLocaleTimeString("vi-VN", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          const day = date.toLocaleDateString("vi-VN");
-
-          divider.innerText = time + " " + day;
-
-          chatMessages.appendChild(divider);
-        }
-        loadConversations();
-        connectOwnerSocket();
-      </script>
-      <script>
-      function logout() {
-        Swal.fire({
-          title: "Xác nhận đăng xuất?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
-          cancelButtonText: "Hủy",
-          confirmButtonColor: "#ef4444",
-          cancelButtonColor: "#6b7280",
-        }).then((result) => {
-          if (!result.isConfirmed) return;
-
-          // Xóa toàn bộ thông tin đăng nhập
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("userId");
-          localStorage.removeItem("username");
-          localStorage.removeItem("role");
-
-          // chuyển về trang login
-          window.location.href = "/login.html";
-        });
-      }
-    </script>
-      <div class="footer">
-        <p>Copyright © VXB-2026 AdminDashboard. All rights reserved.</p>
-        <p>Version 8.8.4-rc</p>
+    </div>
+
+    <div id="previewGallery" class="gallery-overlay">
+      <div class="gallery-content">
+        <span class="close" onclick="closePreviewGallery()">&times;</span>
+        <div class="gallery-main">
+          <img id="previewMainImage" class="gallery-main-img" src="" />
+          <button class="g-nav prev" onclick="changePreviewSlide(-1)">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="g-nav next" onclick="changePreviewSlide(1)">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="gallery-thumbs" id="previewThumbs"></div>
       </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+      const API_BASE = "/api/chat";
+      const token = localStorage.getItem("accessToken");
+      let myId = null;
+      let activePartnerId = null;
+      let activeHotelId = null;
+      let stompClient = null;
+      let pendingFiles = [];
+      let allConversationImages = [];
+      let previewIdx = 0;
+      let replyToId = null;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!token) {
+          window.location.href = "/login.html";
+          return;
+        }
+        myId = getMyId();
+        loadPartners();
+        connectSocket();
+      });
+
+      function getMyId() {
+        try {
+          const p = JSON.parse(atob(token.split(".")[1]));
+          return p.userId || p.id;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      async function loadPartners() {
+        const res = await fetch(`${API_BASE}/partners`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const partners = await res.json();
+        renderPartners(partners);
+      }
+
+      function renderPartners(partners) {
+        const list = document.getElementById("partnerList");
+        list.innerHTML = "";
+        partners.forEach((p) => {
+          const displayName = p.fullName;
+          const isUnread = p.unreadCount > 0;
+          const div = document.createElement("div");
+          div.className = `chat-item ${isUnread ? "unread" : ""} ${p.userId == activePartnerId && p.hotelId == activeHotelId ? "active" : ""}`;
+          div.onclick = () =>
+            selectPartner(p.userId, displayName, p.hotelId, p.hotelName);
+
+          div.innerHTML = `
+          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random" alt="">
+          <div class="chat-item-info">
+            <div class="chat-item-name">${displayName}</div>
+            <div class="chat-item-last">${p.lastMessage || "Bắt đầu trò chuyện"}</div>
+          </div>
+          ${isUnread ? `<div class="unread-dot"></div>` : ""}
+        `;
+          list.appendChild(div);
+        });
+      }
+
+      async function selectPartner(partnerId, partnerName, hotelId, hotelName) {
+        activePartnerId = partnerId;
+        activeHotelId = hotelId;
+        document.getElementById("chatHeader").style.display = "flex";
+        document.getElementById("inputContainer").style.display = "block";
+        document.getElementById("activePartnerName").textContent = partnerName;
+        document.getElementById("activeHotelContext").textContent = hotelName
+          ? ``
+          : "";
+        document.getElementById("activePartnerAvatar").src =
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(partnerName)}&background=random`;
+
+        await loadMessages(partnerId);
+        await markAsRead(partnerId);
+        loadPartners();
+        cancelReply();
+      }
+
+      async function loadMessages(partnerId) {
+        const res = await fetch(`${API_BASE}/messages/${partnerId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const messages = await res.json();
+        renderMessages(messages);
+      }
+
+      function renderMessages(messages) {
+        const list = document.getElementById("messageList");
+        list.innerHTML = "";
+        allConversationImages = [];
+        const filtered = messages.filter((m) => m.hotelId == activeHotelId);
+        const partnerName =
+          document.getElementById("activePartnerName").textContent;
+
+        let lastTime = null;
+
+        filtered.forEach((m, index) => {
+          const isLast = index === filtered.length - 1;
+          const mTime = new Date(m.createdAt);
+
+          // Hiển thị mốc thời gian nếu là tin đầu tiên hoặc cách tin trước > 15 phút
+          if (!lastTime || mTime - lastTime > 15 * 60 * 1000) {
+            const timeDiv = document.createElement("div");
+            timeDiv.className = "msg-time-separator";
+            timeDiv.textContent = `${mTime.getHours().toString().padStart(2, "0")}:${mTime.getMinutes().toString().padStart(2, "0")} ${mTime.getDate().toString().padStart(2, "0")}/${(mTime.getMonth() + 1).toString().padStart(2, "0")}/${mTime.getFullYear()}`;
+            list.appendChild(timeDiv);
+          }
+          lastTime = mTime;
+
+          const isMe = m.senderId == myId;
+          const row = document.createElement("div");
+          row.className = `message-row ${isMe ? "me" : "other"}`;
+
+          const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(isMe ? "Me" : partnerName)}&background=random`;
+
+          let replyLineHtml = "";
+          let quotedMsgHtml = "";
+          if (m.replyToId) {
+            const replierName = isMe ? "Bạn" : partnerName;
+            const repliedToName = m.replyToUser || "người dùng";
+            replyLineHtml = `<div class="msg-reply-line"><i class="fas fa-reply"></i> ${replierName} đã trả lời</div>`;
+            quotedMsgHtml = `<div class="msg-quoted-content" onclick="scrollToMessage(${m.replyToId})">${m.replyToContent || "Hình ảnh"}</div>`;
+          }
+
+          let imagesHtml = "";
+          if (m.images && m.images.length > 0) {
+            imagesHtml = renderImageGrid(m.images);
+            allConversationImages.push(...m.images);
+          }
+
+          const currentSenderNameForIcon = isMe ? "Bạn" : partnerName;
+          const msgText =
+            m.content || (m.images && m.images.length > 0 ? "[Hình ảnh]" : "");
+
+          row.innerHTML = `
+          ${!isMe ? `<img src="${avatarUrl}" class="msg-avatar">` : ""}
+          <div class="message-wrapper" id="msg-${m.chatId}">
+            ${replyLineHtml}
+            ${quotedMsgHtml}
+            <div class="msg-bubble">
+              ${
+                m.isDeleted
+                  ? '<i style="color: gray">Tin nhắn đã bị gỡ</i>'
+                  : `
+        ${imagesHtml}
+        ${m.content ? `<div class="msg-text">${m.content}</div>` : ""}
+      `
+              }
+              <div class="msg-actions">
+                <div class="action-item" onclick="startReply(${m.chatId}, '${currentSenderNameForIcon}', '${msgText.replace(/'/g, "\\'")}')" title="Trả lời"><i class="fas fa-reply"></i></div>
+                ${
+                  isMe && !m.isDeleted
+                    ? `
+                  <div class="action-item" onclick="deleteMsg(${m.chatId})" title="Gỡ"><i class="fas fa-trash"></i></div>
+                `
+                    : ""
+                }
+              </div>
+            </div>
+            <div class="msg-status">
+              ${isMe && isLast ? `${new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} • ${m.isRead ? "Đã xem" : "Đã gửi"}` : ""}
+            </div>
+          </div>
+        `;
+          list.appendChild(row);
+        });
+        list.scrollTop = list.scrollHeight;
+      }
+
+      function scrollToMessage(id) {
+        const el = document.getElementById(`msg-${id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.classList.add("highlight-msg");
+          setTimeout(() => el.classList.remove("highlight-msg"), 2000);
+        }
+      }
+
+      function renderImageGrid(images) {
+        const count = images.length;
+        return `<div class="msg-images" onclick="openPreviewGallery('${images[0]}')">
+                <img src="${images[0]}">
+                ${count > 1 ? `<div class="image-overlay">+${count - 1}</div>` : ""}
+              </div>`;
+      }
+
+      function startReply(id, user, text) {
+        replyToId = id;
+        document.getElementById("replyToUser").textContent =
+          `Đang trả lời ${user}`;
+        document.getElementById("replyToText").textContent = text;
+        document.getElementById("replyBar").style.display = "flex";
+        document.getElementById("chatInput").focus();
+      }
+
+      function cancelReply() {
+        replyToId = null;
+        document.getElementById("replyBar").style.display = "none";
+      }
+
+      async function sendMessage() {
+        const content = document.getElementById("chatInput").value.trim();
+        if (!content && pendingFiles.length === 0) return;
+        let urls = [];
+        if (pendingFiles.length > 0) {
+          const fd = new FormData();
+          pendingFiles.forEach((f) => fd.append("files", f));
+          const res = await fetch(`${API_BASE}/upload`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: fd,
+          });
+          urls = await res.json();
+        }
+        await fetch(`${API_BASE}/send`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            recipientId: activePartnerId,
+            hotelId: activeHotelId,
+            content: content,
+            images: urls,
+            replyToId: replyToId,
+          }),
+        });
+        document.getElementById("chatInput").value = "";
+        pendingFiles = [];
+        renderPreview();
+        cancelReply();
+        loadMessages(activePartnerId);
+        loadPartners();
+      }
+
+      document.getElementById("chatInput").onkeypress = (e) => {
+        if (e.key === "Enter") sendMessage();
+      };
+      document.getElementById("sendBtn").onclick = sendMessage;
+
+      document.getElementById("fileInput").onchange = (e) => {
+        pendingFiles = [...pendingFiles, ...Array.from(e.target.files)];
+        renderPreview();
+      };
+
+      function renderPreview() {
+        const container = document.getElementById("previewImages");
+        container.innerHTML = "";
+        pendingFiles.forEach((file, index) => {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `<img src="${URL.createObjectURL(file)}"><div class="remove-btn" onclick="pendingFiles.splice(${index}, 1); renderPreview()">×</div>`;
+          container.appendChild(div);
+        });
+      }
+
+      async function deleteMsg(chatId) {
+        if (!confirm("Gỡ tin nhắn này?")) return;
+        await fetch(`${API_BASE}/delete/${chatId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        loadMessages(activePartnerId);
+      }
+
+      function openPreviewGallery(url) {
+        previewIdx = allConversationImages.findIndex(
+          (img) => img === url || img.endsWith(url) || url.endsWith(img),
+        );
+        if (previewIdx === -1) previewIdx = 0;
+        document.getElementById("previewGallery").style.display = "flex";
+        renderPreviewGallery();
+      }
+
+      function renderPreviewGallery() {
+        const thumbs = document.getElementById("previewThumbs");
+        thumbs.innerHTML = "";
+        allConversationImages.forEach((img, index) => {
+          const el = document.createElement("img");
+          el.src = img;
+          el.className = index === previewIdx ? "active" : "";
+          el.onclick = () => {
+            previewIdx = index;
+            updateMainImage();
+          };
+          thumbs.appendChild(el);
+        });
+        updateMainImage();
+      }
+
+      function updateMainImage() {
+        document.getElementById("previewMainImage").src =
+          allConversationImages[previewIdx];
+        const thumbs = document.getElementById("previewThumbs").children;
+        [...thumbs].forEach((t, i) =>
+          t.classList.toggle("active", i === previewIdx),
+        );
+        if (thumbs[previewIdx])
+          thumbs[previewIdx].scrollIntoView({
+            behavior: "smooth",
+            inline: "center",
+          });
+      }
+
+      function changePreviewSlide(step) {
+        previewIdx =
+          (previewIdx + step + allConversationImages.length) %
+          allConversationImages.length;
+        updateMainImage();
+      }
+
+      function closePreviewGallery() {
+        document.getElementById("previewGallery").style.display = "none";
+      }
+      async function markAsRead(pId) {
+        await fetch(`${API_BASE}/read/${pId}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+
+      function connectSocket() {
+        const socket = new SockJS("/chat-socket");
+        stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+        stompClient.connect({}, () => {
+          stompClient.subscribe(`/topic/chat/${myId}`, (msg) => {
+            const chat = JSON.parse(msg.body);
+            if (
+              chat.senderId == activePartnerId ||
+              chat.recipientId == activePartnerId
+            )
+              loadMessages(activePartnerId);
+            loadPartners();
+          });
+        });
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/login.html";
+      }
+    </script>
   </body>
 </html>

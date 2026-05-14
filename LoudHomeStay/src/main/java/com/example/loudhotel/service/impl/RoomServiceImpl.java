@@ -92,8 +92,8 @@ public class RoomServiceImpl implements RoomService {
                 .area(room.getRoomType().getArea())
                 .createdAt(room.getCreatedAt())
                 .updatedAt(room.getUpdatedAt())
-                .hotelId(room.getHotel().getHotelId())
-                .hotelStatus(room.getHotel().getHotelStatus().name())
+                .hotelId(room.getRoomType().getHotel().getHotelId())
+                .hotelStatus(room.getRoomType().getHotel().getHotelStatus().name())
                 .images(images)
                 .mainImage(mainImage)
                 .build();
@@ -106,6 +106,11 @@ public class RoomServiceImpl implements RoomService {
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<RoomResponse> getAllRooms(String keyword, org.springframework.data.domain.Pageable pageable) {
+        return roomRepository.findAllActiveRooms(keyword, pageable).map(this::map);
     }
 
     @Override
@@ -128,7 +133,7 @@ public class RoomServiceImpl implements RoomService {
             throw new RuntimeException("Không có quyền thêm room vào hotel này");
         }
 
-        if (roomRepository.existsByHotelAndRoomNumberAndIsDeletedFalse(
+        if (roomRepository.existsByRoomType_HotelAndRoomNumberAndIsDeletedFalse(
                 hotel, request.getRoomNumber())) {
             throw new BadRequestException("Số phòng đã tồn tại trong khách sạn");
         }
@@ -140,7 +145,6 @@ public class RoomServiceImpl implements RoomService {
                 .roomType(roomType)
                 .roomNumber(request.getRoomNumber())
                 .roomStatus(request.getRoomStatus())
-                .hotel(hotel)
                 .isDeleted(false)
                 .build();
 
@@ -148,7 +152,7 @@ public class RoomServiceImpl implements RoomService {
 
         /* UPDATE ROOM TOTAL */
 
-        long totalRooms = roomRepository.countByHotelAndIsDeletedFalse(hotel);
+        long totalRooms = roomRepository.countByRoomType_HotelAndIsDeletedFalse(hotel);
 
         hotel.setRoomsTotal((int) totalRooms);
 
@@ -180,7 +184,7 @@ public class RoomServiceImpl implements RoomService {
 
         boolean isAdmin = currentUser.getRole().name().equals("ADMIN");
 
-        boolean isManager = room.getHotel().getManager().getUserId()
+        boolean isManager = room.getRoomType().getHotel().getManager().getUserId()
                 .equals(currentUser.getUserId());
 
         if(!isAdmin && !isManager){
@@ -189,10 +193,10 @@ public class RoomServiceImpl implements RoomService {
         room.setIsDeleted(true);
         roomRepository.save(room);
 
-        Hotel hotel = room.getHotel();
+        Hotel hotel = room.getRoomType().getHotel();;
 
         long totalRooms = roomRepository
-                .countByHotelAndIsDeletedFalse(hotel);
+                .countByRoomType_HotelAndIsDeletedFalse(hotel);
 
         hotel.setRoomsTotal((int) totalRooms);
 
@@ -214,7 +218,7 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
-        Hotel hotel = room.getHotel();
+        Hotel hotel = room.getRoomType().getHotel();
 
         User currentUser = getCurrentUser();
 
@@ -238,7 +242,7 @@ public class RoomServiceImpl implements RoomService {
         }
 
         if (!room.getRoomNumber().equals(request.getRoomNumber()) &&
-                roomRepository.existsByHotelAndRoomNumberAndIsDeletedFalse(
+                roomRepository.existsByRoomType_HotelAndRoomNumberAndIsDeletedFalse(
                         hotel, request.getRoomNumber())) {
 
             throw new BadRequestException("Số phòng đã tồn tại trong khách sạn");
@@ -292,7 +296,7 @@ public class RoomServiceImpl implements RoomService {
 
             int totalRooms = typeRooms.size();
 
-            int bookedRooms = billRepository.countBookedRooms(
+            int bookedRooms = roomRepository.countBookedRooms(
                     typeId,
                     checkIn,
                     checkOut
@@ -322,6 +326,11 @@ public class RoomServiceImpl implements RoomService {
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<RoomResponse> getRoomsByManager(Long managerId, String keyword, org.springframework.data.domain.Pageable pageable) {
+        return roomRepository.findByManagerId(managerId, keyword, pageable).map(this::map);
     }
 
 }

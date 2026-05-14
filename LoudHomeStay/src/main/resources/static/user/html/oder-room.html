@@ -13,6 +13,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
       body {
         font-family: "Inter", sans-serif;
@@ -75,20 +79,6 @@
         font-size: 16px;
       }
 
-      .logo-link {
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .logo-text {
-        color: #0071c2;
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-      }
-
       .header-right {
         display: flex;
         align-items: center;
@@ -143,6 +133,171 @@
         height: 32px;
         border-radius: 50%;
         object-fit: cover;
+      }
+      /* ===== USER MENU ===== */
+      .user-menu {
+        position: relative;
+      }
+
+      .user-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 12px;
+        background: #f8fafc;
+        border-radius: 999px;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .user-pill:hover {
+        background: #f1f5f9;
+      }
+
+      .user-pill span {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .mini-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff;
+      }
+
+      /* ===== AVATAR CHỮ ===== */
+      .avatar-letter,
+      .mini-avatar-letter {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        user-select: none;
+        flex-shrink: 0;
+      }
+
+      /* avatar header */
+      .mini-avatar-letter {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+        background: linear-gradient(135deg, #3570ef, #60a5fa);
+      }
+
+      /* avatar user box */
+      .avatar-letter {
+        width: 42px;
+        height: 42px;
+        font-size: 17px;
+        background: linear-gradient(135deg, #2563eb, #60a5fa);
+      }
+
+      .dropdown-arrow {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* ===== DROPDOWN ===== */
+      .dropdown-menu-custom {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 240px;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: 0.2s;
+
+        z-index: 9999;
+      }
+
+      .dropdown-menu-custom.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-menu-custom a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 14px 18px;
+
+        color: #374151;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+
+        transition: 0.2s;
+      }
+
+      .dropdown-menu-custom a:hover {
+        background: #f3f4f6;
+        color: #2563eb;
+        text-decoration: none;
+      }
+
+      .dropdown-menu-custom a i {
+        width: 18px;
+        text-align: center;
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        background: #e5e7eb;
+      }
+
+      .logout-item {
+        color: #dc2626 !important;
+      }
+
+      .logout-item:hover {
+        background: #fef2f2 !important;
+        color: #dc2626 !important;
+      }
+
+      /* ===== LOGO ===== */
+      .logo-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none !important;
+        margin-top: 0;
+        padding: 0;
+      }
+
+      .logo-box:hover {
+        text-decoration: none !important;
+      }
+
+      .logo-icon {
+        color: #3570ef;
+        font-size: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo-text {
+        font-size: 24px;
+        font-weight: 800;
+        color: #3570ef;
+        font-family: "Outfit", sans-serif;
+        letter-spacing: -0.5px;
       }
 
       .container {
@@ -595,23 +750,57 @@
             <i class="fa-solid fa-arrow-left"></i>
             <span>Quay lại</span>
           </a>
-          <a href="1home.html" class="logo-link">
-            <span class="logo-text">LoudBooking.com</span>
+          <a href="home.html" class="logo-box">
+            <div class="logo-icon">
+              <i class="fas fa-paper-plane"></i>
+            </div>
+            <div class="logo-text">LoudBooking</div>
           </a>
         </div>
 
         <div class="header-right">
-          <div class="nav-item">
+          <a href="chat.html" class="nav-item">
             <i class="fa-regular fa-comment-dots"></i>
             <span>Liên hệ</span>
-          </div>
-          <div class="nav-item">
+          </a>
+
+          <a href="chat.html" class="nav-item">
             <i class="fa-regular fa-bell"></i>
             <span>Thông báo</span>
-          </div>
-          <div class="user-pill">
-            <span id="headerUsername">Vũ Xuân Bắc</span>
-            <img src="https://i.pravatar.cc/100" class="mini-avatar" />
+          </a>
+
+          <!-- USER DROPDOWN -->
+          <div class="user-menu">
+            <div class="user-pill" id="userMenuToggle">
+              <div id="headerAvatar" class="mini-avatar-letter">V</div>
+              <span id="headerUsername">Đăng nhập</span>
+
+              <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+            </div>
+
+            <div class="dropdown-menu-custom" id="dropdownMenu">
+              <a href="my-account.html">
+                <i class="fa-regular fa-user"></i>
+                Tài khoản
+              </a>
+
+              <a href="bill.html">
+                <i class="fa-solid fa-receipt"></i>
+                Đơn đặt phòng
+              </a>
+
+              <a href="chat.html">
+                <i class="fa-regular fa-comment-dots"></i>
+                Tin nhắn
+              </a>
+
+              <div class="dropdown-divider"></div>
+
+              <a href="#" onclick="logout()" class="logout-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Đăng xuất
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -651,10 +840,10 @@
         <!-- RIGHT -->
         <div class="right">
           <div class="user-box">
-            <img src="https://i.pravatar.cc/100" class="avatar" />
+            <div class="avatar-letter" id="userAvatar">V</div>
             <div>
               <div><b></b></div>
-              <div class="text-gray">vuxuanbac@gmail.com</div>
+              <div class="text-gray">name@company.com</div>
             </div>
           </div>
 
@@ -761,6 +950,26 @@
     </div>
   </body>
   <script>
+    /* ===== DROPDOWN ===== */
+    const userMenuToggle = document.getElementById("userMenuToggle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+
+    userMenuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("show");
+    });
+
+    document.addEventListener("click", () => {
+      dropdownMenu.classList.remove("show");
+    });
+
+    /* ===== LOGOUT ===== */
+    function logout() {
+      localStorage.clear();
+      window.location.href = "/login.html";
+    }
+  </script>
+  <script>
     const API_URL = "http://localhost:8080";
 
     const REVIEW_API = API_URL + "/api/reviews";
@@ -813,13 +1022,13 @@
     }
 
     function calcNights(start, end) {
-      const s = new Date(start);
-      const e = new Date(end);
-      // nâng lên 1 ngày để tránh lùi do múi giờ
-      const sAdjusted = new Date(s.getTime() + 24 * 60 * 60 * 1000);
-      const eAdjusted = new Date(e.getTime() + 24 * 60 * 60 * 1000);
+      const [sy, sm, sd] = start.split("-").map(Number);
+      const [ey, em, ed] = end.split("-").map(Number);
 
-      return Math.max(1, (eAdjusted - sAdjusted) / (1000 * 60 * 60 * 24));
+      const s = new Date(sy, sm - 1, sd);
+      const e = new Date(ey, em - 1, ed);
+
+      return Math.max(1, (e - s) / (1000 * 60 * 60 * 24));
     }
 
     function formatPrice(price) {
@@ -876,7 +1085,7 @@
           );
           const room = await res.json();
 
-          const subtotal = room.price * nights * item.quantity;
+          const subtotal = room.price * nights * (item.quantity || 1);
           totalPrice += subtotal;
 
           // lấy ảnh phòng
@@ -904,7 +1113,7 @@
   ${room.typeName}
   ${item.quantity > 1 ? `<span class="room-qty"> x${item.quantity}</span>` : ""}
 </div>
-      <div><b>Số người:</b> ${item.guestCount}</div>
+      <div><b>Số người:</b> ${item.guestCount || 1}</div>
       <div><b>Giá:</b> ${formatPrice(room.price)} / đêm</div>
       <div><b>Số đêm:</b> ${nights}</div>
       <div style="color:#e11d48;font-weight:600">
@@ -1037,7 +1246,14 @@
       if (username) {
         document.querySelector(".user-box b").innerText = username;
         document.getElementById("headerUsername").innerText = username;
+
+        // lấy chữ cái đầu
+        const firstLetter = username.trim().charAt(0).toUpperCase();
+
+        document.getElementById("headerAvatar").innerText = firstLetter;
+        document.getElementById("userAvatar").innerText = firstLetter;
       }
+
       if (email) {
         document.querySelector(".user-box .text-gray").innerText = email;
       }
@@ -1060,7 +1276,12 @@
 
       const paymentMethod = selectedPayment.value;
 
-      const userId = localStorage.getItem("userId");
+      const userId = Number(localStorage.getItem("userId"));
+
+      if (!userId || isNaN(userId)) {
+        alert("Vui lòng đăng nhập lại");
+        return;
+      }
 
       /* ========================CASE REPAY VNPAY ======================== */
       if (isRepay) {
@@ -1096,9 +1317,9 @@
           hotelId: hotelIdGlobal,
 
           rooms: selectedRooms.map((r) => ({
-            typeId: r.roomTypeId, // ✅ đúng
-            quantity: r.quantity,
-            guestCount: r.guest, // ✅ map đúng BE
+            typeId: r.roomTypeId,
+            quantity: r.quantity || 1,
+            guestCount: r.guestCount || 1,
           })),
 
           checkInDate: checkIn,
@@ -1112,6 +1333,7 @@
       });
 
       const bill = await billRes.json();
+      console.log("BILL RESPONSE =", bill);
 
       const payRes = await fetch(
         `${API_URL}/api/payments/vnpay?billId=${bill.billId}`,

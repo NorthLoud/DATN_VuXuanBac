@@ -22,7 +22,7 @@ public class RoomType {
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
-    private String typeName; // Deluxe Double
+    private String typeName;
 
     private Integer capacity;
 
@@ -47,7 +47,6 @@ public class RoomType {
     public enum BedType {
         SINGLE,
         DOUBLE,
-        TWIN,
         QUEEN,
         KING
     }

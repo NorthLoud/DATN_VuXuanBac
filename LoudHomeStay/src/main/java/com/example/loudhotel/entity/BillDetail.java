@@ -26,8 +26,9 @@ public class BillDetail {
     @JoinColumn(name = "type_id", nullable = false)
     private RoomType roomType;
 
-    @Column(nullable = false)
-    private Integer quantity;
+    @Column(name = "price_at_booking")
+    private Double priceAtBooking;
+
     private Integer nights;
 
     @Column(name = "guest_count")

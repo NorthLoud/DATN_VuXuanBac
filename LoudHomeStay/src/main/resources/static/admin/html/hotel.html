@@ -1,385 +1,227 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin LoudBooking</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <title>Admin Dashboard</title>
+
+    <!-- External Assets -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        overflow: hidden;
+      :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --bg-body: #f1f5f9;
+        --sidebar-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --radius-lg: 16px;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       }
 
-      .content {
-        margin-left: 260px;
-        padding: 20px;
-        height: 100vh;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        background: #f4f6f9;
-      }
-      .sidebar {
-        height: 100vh;
-        background: #ffffff;
-        color: #1f2937;
-        position: fixed;
-        width: 260px;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        border-right: 1px solid #e5e7eb;
-        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; }
+      .logo-text { font-family: "Outfit", sans-serif; }
+      body { background-color: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-      .sidebar.collapsed {
-        width: 0;
-        overflow: hidden;
-      }
+      /* --- Sidebar --- */
+      .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid #e2e8f0; position: fixed; height: 100vh; z-index: 1000; padding: 30px 15px; }
+      .logo-box { padding: 0 15px 40px; display: flex; align-items: center; gap: 12px; }
+      .logo-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+      .logo-text { font-size: 20px; font-weight: 800; color: var(--text-main); }
+      .nav-group-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+      .side-nav { list-style: none; }
+      .side-nav a { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-radius: 10px; color: var(--secondary); text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.2s; margin-bottom: 4px; }
+      .side-nav a:hover, .side-nav a.active { background: var(--primary-light); color: var(--primary); }
+      .side-nav a i:first-child { width: 24px; font-size: 18px; }
+      .submenu { list-style: none; padding-left: 35px; margin-top: 4px; display: none; }
+      .submenu.show { display: block; }
 
-      /* scrollbar */
-      .sidebar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .sidebar::-webkit-scrollbar-thumb {
-        background-color: #d1d5db;
-        border-radius: 10px;
-      }
+      /* --- Main Wrapper --- */
+      .main-wrapper { flex: 1; margin-left: 260px; }
+      .top-bar { height: 70px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: sticky; top: 0; z-index: 900; }
+      .content-body { padding: 32px 40px; }
 
-      /* title */
-      .sidebar h2 {
-        color: #111827;
-      }
+      /* Table Card */
+      .table-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid #e2e8f0; margin-top: 20px; }
+      .table-header { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
 
-      /* avatar text */
-      .sidebar h2.text-center {
-        font-size: 18px;
-        font-weight: 600;
-      }
+      .admin-table { width: 100%; border-collapse: collapse; }
+      .admin-table th { background: #f8fafc; padding: 10px 10px; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); border-bottom: 1.5px solid #e2e8f0; text-align: left; cursor: pointer; letter-spacing: 0.3px; }
+      .admin-table th:hover { background: #f1f5f9; }
+      .admin-table td { padding: 10px 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+      .admin-table tbody tr { transition: 0.2s; }
+      .admin-table tbody tr:hover { background-color: #f9fafb; }
 
-      /* nav link */
-      .sidebar .nav-link {
-        color: #374151;
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin: 4px 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.2s ease;
-      }
+      /* Form Styling */
+      .form-group label { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+      .form-control { border-radius: 12px; padding: 1px; border: 1.5px solid #e2e8f0; font-size: 14px; transition: 0.3s; width: 100%; }
+      .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); outline: none; }
 
-      /* hover */
-      .sidebar .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-        transform: translateX(3px);
-      }
+      /* Toolbar */
+      .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 16px; }
+      .toolbar-left { display: flex; gap: 8px; }
+      .toolbar-right { display: flex; align-items: center; min-width: 320px; }
 
-      /* active feel */
-      .sidebar .nav-link.active {
-        background: #e0edff;
-        color: #2563eb;
-        font-weight: 600;
-      }
+      /* Page Header */
+      .page-header { margin-bottom: 24px; }
+      .page-header h2 { font-size: 28px; font-weight: 700; margin-bottom: 4px; color: var(--text-main); }
+      .page-header p { font-size: 14px; color: var(--text-muted); }
 
-      /* icon size */
-      .sidebar .nav-link i {
-        width: 20px;
-        text-align: center;
-        color: #6b7280;
-      }
+      /* Search Box */
+      .search-box { display: flex; align-items: center; gap: 8px; background: white; border-radius: 12px; border: 1.5px solid #e2e8f0; padding: 0 12px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
+      .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+      .search-box input { border: none; background: transparent; flex: 1; padding: 10px 4px; font-size: 14px; outline: none; color: var(--text-main); }
+      .search-box input::placeholder { color: #cbd5e1; }
+      .search-box button { background: none; border: none; color: var(--secondary); cursor: pointer; font-size: 16px; padding: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+      .search-box button:hover { color: var(--primary); }
 
-      /* hover icon */
-      .sidebar .nav-link:hover i {
-        color: #2563eb;
-      }
+      /* Action Buttons */
+      .btn-action { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: var(--secondary); display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; margin-right: 4px; font-size: 14px; }
+      .btn-action:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+      .btn-action.text-danger:hover { border-color: var(--danger); color: var(--danger); background: #fef2f2; }
+      .btn-luxury { padding: 10px 22px; border-radius: 10px; font-weight: 600; transition: 0.3s; font-size: 14px; border: none; }
+      .badge-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; position: absolute; top: -2px; right: -2px; border: 2px solid white; }
 
-      /* submenu */
-      .sidebar .submenu {
-        list-style: none;
-        padding-left: 30px;
-        display: none;
-      }
+      /* Table Container */
+      .admin-table-wrapper { background: white; border-radius: var(--radius-lg); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); border: 1px solid #e2e8f0; overflow: hidden; }
+      .admin-table-wrapper table { margin-bottom: 0; }
 
-      .sidebar .submenu .nav-link {
-        font-size: 13px;
-        color: #6b7280;
-        padding: 6px 10px;
-        margin: 2px 7px;
-      }
+      /* Pagination */
+      .pagination { list-style: none; display: flex; gap: 4px; margin: 0; }
+      .page-item { margin: 0; }
+      .page-item .page-link { padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid #e2e8f0; color: var(--secondary); transition: 0.2s; min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: white; }
+      .page-item .page-link:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+      .page-item.active .page-link { background: var(--primary); border-color: var(--primary); color: white; }
+      .page-item.disabled .page-link { opacity: 0.5; cursor: not-allowed; }
 
-      .sidebar .submenu .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-      }
-      .nav-item .nav-link {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .content {
-        margin-left: 250px;
-        padding: 20px;
-        transition: margin-left 0.3s; /* Hiệu ứng chuyển đổi khi ẩn/hiện */
-        overflow-y: auto; /* Kích hoạt thanh cuộn dọc */
-        height: 700px;
-      }
-      .content.collapsed {
-        margin-left: 0;
-      }
-      .content::-webkit-scrollbar {
-        width: 8px; /* Độ rộng của thanh cuộn */
-      }
-      .content::-webkit-scrollbar-thumb {
-        background-color: #495057; /* Màu của thanh cuộn */
-        border-radius: 4px;
-      }
+      /* Modal Styling */
+      .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+      .modal-footer .btn { padding: 8px 16px; font-size: 14px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; }
+      .modal-footer .btn-secondary { background: #e2e8f0; color: var(--text-main); }
+      .modal-footer .btn-secondary:hover { background: #cbd5e1; }
+      .modal-footer .btn-primary { background: var(--primary); color: white; }
+      .modal-footer .btn-primary:hover { background: #4338ca; }
 
-      .footer {
-        text-align: center;
-        padding: 20px;
-        color: #999;
-      }
-    </style>
-    <style>
-      /* ===== ADMIN USER PAGE STYLE ===== */
-
-      section {
-        background: #f4f6f9;
-        font-family: "Segoe UI", Arial, sans-serif;
-      }
-
-      /* tiêu đề */
-      h1 {
-        color: #1f2937;
-        font-weight: 700;
-      }
-
-      /* thanh công cụ */
-      .container .btn-primary {
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 600;
-        transition: 0.2s;
-      }
-
-      .container .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
-      }
-
-      /* khung tìm kiếm */
-      .search-box {
-        position: relative;
-        width: 280px;
-      }
-
-      /* input */
-      .search-box input {
-        width: 100%;
-        padding: 10px 42px 10px 14px; /* chừa chỗ cho nút */
-        border-radius: 999px;
-        border: 1px solid #d1d5db;
-        outline: none;
-        transition: 0.2s;
-        font-size: 14px;
-      }
-
-      .search-box input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-      }
-
-      /* nút search nằm trong input */
-      .search-box button {
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        border: none;
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        color: white;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .search-box button:hover {
-        transform: translateY(-50%) scale(1.05);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-      }
-
-      /* bảng */
-      .table {
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      }
-
-      .table thead {
-        background: linear-gradient(135deg, #089662);
-        color: white;
-      }
-      .table th,
-      .table td {
-        vertical-align: middle !important;
-        font-size: 14px;
-      }
-
-      .table tbody tr:hover {
-        background: #f1f5f9;
-        transition: 0.15s;
-      }
-
-      /* button action */
-      .btn-warning {
-        background: #f59e0b;
-        border: none;
-        color: white;
-        border-radius: 6px;
-        padding: 4px 10px;
-      }
-
-      .btn-warning:hover {
-        background: #d97706;
-      }
-
-      .btn-danger {
-        background: #ef4444;
-        border: none;
-        border-radius: 6px;
-        padding: 4px 10px;
-      }
-
-      .btn-danger:hover {
-        background: #dc2626;
-      }
-
-      /* modal */
-      .modal-content {
-        border-radius: 14px;
-        border: none;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-      }
-
-      .modal-header {
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        color: white;
-        border-radius: 14px 14px 0 0;
-      }
-
-      .modal-title {
-        font-weight: 600;
-      }
-
-      .modal-body label {
-        font-weight: 600;
-        font-size: 13px;
-        color: #374151;
-      }
-
-      .modal-body input {
-        border-radius: 8px;
-        border: 1px solid #d1d5db;
-        padding: 10px;
-      }
-
-      .modal-body input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-      }
-
-      /* modal button */
-      .modal-footer .btn-success {
-        background: linear-gradient(135deg, #16a34a, #22c55e);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 18px;
-        font-weight: 600;
-      }
-
-      .modal-footer .btn-success:hover {
-        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
-      }
-
-      /* responsive */
-      @media (max-width: 768px) {
-        #searchInput {
-          width: 100% !important;
-          margin-top: 10px;
-        }
-      }
+      /* Badges */
+      .badge-status { padding: 5px 12px; border-radius: 30px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+      .bg-active { color: #10b981; }
+      .bg-maintenance {  color: #d97706; }
+      .bg-inactive {  color: #ef4444; }
+      .hotel-img-mini { width: 70px; height: 50px; border-radius: 8px; object-fit: cover; background: #f1f5f9; }
 
       .image-item {
-        position: relative;
-        margin: 8px;
-      }
+  position: relative;
+  margin: 8px;
+}
 
-      .image-item img {
-        width: 120px;
-        height: 90px;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 3px solid transparent;
-        cursor: pointer;
-      }
+.image-item img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 3px solid transparent;
+  cursor: pointer;
+}
 
-      .image-main {
-        border: 3px solid #28a745 !important;
-      }
+.image-main-old {
+  border: 3px solid red !important;
+}
 
-      .delete-image {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        background: red;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
-        font-size: 12px;
-        cursor: pointer;
-      }
-      /* ảnh chính cũ */
-      .image-main-old {
-        border: 3px solid red !important;
-      }
+.image-main-new {
+  border: 3px solid #28a745 !important;
+}
 
-      /* ảnh chính mới */
-      .image-main-new {
-        border: 3px solid #28a745 !important;
-      }
+.delete-image {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  cursor: pointer;
+}
 
-      /* gallery modal */
+/* gallery */
+.gallery-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-box {
+  margin-top: 3%;
+  margin-left: 20%;
+  width: 70%;
+  max-width: 900px;
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  position: relative;
+}
+
+.gallery-main img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  overflow-x: auto;
+}
+
+.gallery-thumbs img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  opacity: 0.5;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.gallery-thumbs img.active {
+  opacity: 1;
+  border: 3px solid #0071c2;
+}
+
+.g-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(72,69,69,0.5);
+  color: white;
+  border: none;
+}
+/* gallery modal */
       .btn-image {
         font-size: 25px;
         margin: 5px;
@@ -511,204 +353,155 @@
       .close:hover {
         background: #f2f2f2;
       }
+      
+      
     </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Toggle submenu display
-        const menuItems = document.querySelectorAll(".nav-item");
-        menuItems.forEach((item) => {
-          item.addEventListener("click", function () {
-            const submenu = this.querySelector(".submenu");
-            if (submenu) {
-              submenu.style.display =
-                submenu.style.display === "none" || submenu.style.display === ""
-                  ? "block"
-                  : "none";
-            }
-          });
-        });
-
-        // Toggle sidebar visibility
-        const toggleButton = document.getElementById("sidebarToggle");
-        const sidebar = document.querySelector(".sidebar");
-        const content = document.querySelector(".content");
-        toggleButton.addEventListener("click", function () {
-          sidebar.classList.toggle("collapsed");
-          content.classList.toggle("collapsed");
-        });
-      });
-    </script>
   </head>
   <body>
     <!-- Sidebar -->
-    <div class="sidebar">
-      <h2 class="text-center mb-4" style="font-size: 40px">
-        Dashboard
-        <br />
-      </h2>
-      <img
-        src="/images/loudbooking.jpg"
-        alt="Profile"
-        class="rounded-circle d-block mx-auto mb-4"
-        style="width: 100px; height: 100px; object-fit: cover"
-      />
-      <h2 class="text-center">Admin</h2>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="dashboard.html">
-            <i class="fas fa-tachometer-alt"></i>Dashboard<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="user.html">
-            <i class="fas fa-users"></i>Quản lý tài khoản<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="hotel.html">
-            <i class="fas fa-hotel"></i>Quản lý khách sạn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-bed"></i>Quản lý Phòng
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="roomtype.html"
-                >◯ Danh sách loại phòng</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room.html">◯ Danh sách phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-concierge-bell"></i>Quản lý tiện ích
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="utillity.html">◯ Danh sách tiện ích</a>
-            </li>
-            <li>
-              <a class="nav-link" href="hotel-util.html"
-                >◯ Tiện ích khách sạn</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room-util.html">◯ Tiện ích phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="review.html">
-            <i class="fas fa-star-half-alt"></i>Quản lý đánh giá
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="bill.html">
-            <i class="fas fa-clipboard-list"></i>Quản lý đơn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i>Đăng xuất<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-      <nav class="navbar navbar-expand navbar-light bg-light">
-        <button
-          id="sidebarToggle"
-          class="btn btn-outline-secondary mr-2"
-          title="Toggle Sidebar"
-        >
-          <i class="fas fa-bars"></i>
-        </button>
-        <a class="navbar-brand" href="dashboard.html">Home</a>
-        <a class="navbar-brand" href="#">Contact</a>
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-comments"></i
-              ><span class="badge badge-danger">3</span></a
-            >
+    <aside class="sidebar">
+      <div class="logo-box">
+        <div class="logo-icon"><i class="fas fa-crown"></i></div>
+        <div class="logo-text">LoudHotel</div>
+      </div>
+      <nav>
+        <div class="nav-group-label">Trung tâm điều hành</div>
+        <ul class="side-nav">
+          <li>
+            <a href="dashboard.html"
+              ><i class="fas fa-chart-pie"></i> Dashboard
+              <i class="fas fa-chevron-down-o"></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-bell"></i
-              ><span class="badge badge-warning">15</span></a
-            >
+          <li><a href="user.html"><i class="fas fa-users"></i> Quản lý tài khoản<i
+                class="fas fa-chevron-down-o"
+              ></i
+          ></a></li>
+          <li>
+            <a href="hotel.html" class="active"
+              ><i class="fas fa-hotel"></i> Quản lý khách sạn
+              <i class="fas fa-chevron-down-o"></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-th-large"></i></a>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#roomSub').toggleClass('show')"
+            >
+              <i class="fas fa-bed"></i> Quản lý phòng
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="roomSub">
+              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="room.html">Danh sách phòng</a></li>
+            </ul>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#utilSub').toggleClass('show')"
+            >
+              <i class="fas fa-concierge-bell"></i> Quản lý tiện ích
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="utilSub">
+              <li><a href="utillity.html">Danh sách tiện ích</a></li>
+              <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
+              <li><a href="room-util.html">Tiện ích phòng</a></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="nav-group-label">Kinh doanh</div>
+        <ul class="side-nav">
+          <li>
+            <a href="bill.html"
+              ><i class="fas fa-file-invoice-dollar"></i> Danh sách đơn đặt<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li>
+            <a href="review.html"
+              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          
+        </ul>
+        <div class="nav-group-label">Hệ thống</div>
+        <ul class="side-nav">
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="logout()"
+              style="color: var(--danger)"
+              ><i class="fas fa-sign-out-alt"></i> Đăng xuất<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
         </ul>
       </nav>
+    </aside>
 
-      <section>
-        <div class="container mt-4">
-          <h1 class="mb-4 text-center">
-            <b>Quản Lý Khách Sạn</b>
-          </h1>
+    <!-- Main Content -->
+    <di class="main-wrapper">
+      <header class="top-bar">
+        <div style="width: 400px; position: relative">
+        </div>
+        <div class="d-flex align-items-center gap-4">
+          <div style="position: relative; cursor: pointer">
+            <i class="fas fa-bell" style="font-size: 20px; color: var(--secondary)"></i>
+            <span class="badge-dot"></span>
+          </div>
+          <div class="d-flex align-items-center gap-2" style="cursor: pointer">
+            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800;">A</div>
+            <span style="font-weight: 600; font-size: 14px">Admin</span>
+          </div>
+        </div>
+      </header>
 
+      <div class="content-body">
+
+        <div class="page-header">
+          <div>
+            <h2>Quản Lý Khách Sạn</h2>
+            <p style="color: var(--text-muted)">Quản lý quản lý khách sạn trong hệ thống</p>
+          </div>
+        </div>
+    
           <!-- Thanh công cụ -->
-          <div class="d-flex justify-content-between mb-3">
-            <button class="btn btn-primary" onclick="openAddHotelModal()">
-              + Thêm khách sạn
-            </button>
-            <button
-              style="display: none"
-              class="btn btn-primary"
-              onclick="openAddHotelModal()"
-            >
-              + Thêm khách sạn
-            </button>
-
-            <div class="search-box">
-              <input
-                type="text"
-                id="searchHotelInput"
-                placeholder="Tìm kiếm tên, địa chỉ..."
-                onkeyup="searchHotel()"
-              />
-              <button onclick="searchHotel()">
-                <i class="fa fa-search"></i>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <button class="btn btn-primary btn-luxury" onclick="openAddHotelModal()">
+                <i class="fas fa-plus" style="margin-right: 6px;"></i>Thêm khách sạn
               </button>
+            </div>
+
+            <div class="toolbar-right">
+              <div class="search-box">
+                <i class="fas fa-search" style="color: #cbd5e1; font-size: 14px;"></i>
+                <input
+                  type="text"
+                  id="searchHotelInput"
+                  placeholder="Tên, địa chỉ..."
+                  onkeyup="searchHotel()"
+                />
+              </div>
             </div>
           </div>
 
           <!-- Bảng khách sạn -->
-          <div class="table-responsive">
-            <table
-              class="table table-bordered table-hover text-center align-middle"
-            >
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
               <thead>
-                <tr>
+                <tr >
                   <th>ID</th>
                   <th>Ảnh</th>
                   <th>Tên khách sạn</th>
-                  <th>Email Manager</th>
-                  <th>Đánh giá TB</th>
+                  <th>Email Quản lý</th>
+                  <th>Điểm tb</th>
                   <th>Số phòng</th>
                   <th>Tình trạng</th>
                   <th>Thao tác</th>
@@ -718,22 +511,25 @@
                 <!-- render bằng JS -->
               </tbody>
             </table>
-            <nav>
-              <ul
-                class="pagination justify-content-center"
-                id="pagination"
-              ></ul>
-            </nav>
+            <div
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 20px;
+              border-top: 1px solid #e2e8f0;
+              background: #f8fafc;
+            "
+          >
+            <ul class="pagination" id="pagination"></ul>
           </div>
-        </div>
-      </section>
+          </div>   
 
-      <!-- Modal thêm / sửa khách sạn -->
-      <div class="modal fade" id="hotelModal" tabindex="-1">
+    <div class="modal fade" id="hotelModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="hotelModalTitle">Thêm khách sạn</h5>
+          <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 16px 16px 0 0;">
+              <h5 class="modal-title" style="font-weight: 800;" id="hotelModalTitle">Thêm khách sạn</h5>
               <button type="button" class="close" data-dismiss="modal">
                 &times;
               </button>
@@ -780,7 +576,7 @@
                 <div id="imagePreview" class="d-flex flex-wrap mt-3"></div>
               </div>
               <div class="form-group">
-                <label>Chọn Manager</label>
+                <label>Chọn Quản lý phụ trách</label>
                 <select
                   id="managerFullName"
                   class="form-control mb-2"
@@ -815,36 +611,38 @@
               </div>
             </div>
 
-            <div class="modal-footer">
+            <div class="modal-footer" style="border-top: 1px solid #e2e8f0;">
               <button class="btn btn-secondary" data-dismiss="modal">
                 Hủy
               </button>
-              <button class="btn btn-success" onclick="saveHotel()">Lưu</button>
+              <button class="btn btn-success btn-luxury" onclick="saveHotel()">Lưu</button>
             </div>
           </div>
         </div>
+
         <!-- PREVIEW GALLERY -->
-        <div id="previewGallery" class="gallery-modal">
-          <div class="gallery-box">
-            <span class="close" onclick="closePreviewGallery()">&times;</span>
+      <div id="previewGallery" class="gallery-modal">
+        <div class="gallery-box">
+          <span class="close" onclick="closePreviewGallery()">&times;</span>
 
-            <div class="gallery-main">
-              <img id="previewMainImage" src="" />
+          <div class="gallery-main">
+            <img id="previewMainImage" src="" />
 
-              <button class="g-nav prev" onclick="changePreviewSlide(-1)">
-                <i class="fa-solid fa-chevron-left"></i>
-              </button>
+            <button class="g-nav prev" onclick="changePreviewSlide(-1)">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
 
-              <button class="g-nav next" onclick="changePreviewSlide(1)">
-                <i class="fa-solid fa-chevron-right"></i>
-              </button>
-            </div>
-
-            <div class="gallery-thumbs" id="previewThumbs"></div>
+            <button class="g-nav next" onclick="changePreviewSlide(1)">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
           </div>
+
+          <div class="gallery-thumbs" id="previewThumbs"></div>
         </div>
       </div>
-      <script>
+    </div>
+  </div>      
+<script>
         const API = "http://localhost:8080/api/hotels";
 
         let hotels = [];
@@ -855,29 +653,90 @@
         let managers = [];
         let selectedManagerId = null;
 
-        async function loadManagers() {
-          const res = await fetch("http://localhost:8080/api/admin/managers", {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        async function loadManagers(currentHotelId = null) {
+          // lấy danh sách manager
+          const managerRes = await fetch(
+            "http://localhost:8080/api/admin/managers",
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
             },
-          });
+          );
 
-          managers = await res.json();
+          // lấy danh sách khách sạn để biết manager nào đang được dùng
+          const hotelRes = await fetch(
+            "http://localhost:8080/api/hotels",
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+            },
+          );
+
+          let allManagers = await managerRes.json();
+          const allHotels = await hotelRes.json();
+
+          // chỉ lấy manager ACTIVE
+          managers = allManagers.filter(
+            (m) => m.status === "ACTIVE"
+          );
+
+          // map manager đang quản lý hotel nào
+          const usedManagerMap = {};
+
+          allHotels.forEach((h) => {
+            if (h.managerId) {
+              usedManagerMap[h.managerId] = h.hotelId;
+            }
+          });
 
           const emailSelect = document.getElementById("managerEmail");
           const phoneSelect = document.getElementById("managerPhone");
           const fullNameSelect = document.getElementById("managerFullName");
 
-          fullNameSelect.innerHTML = `<option value="">-- Chọn theo Họ tên --</option>`;
-          emailSelect.innerHTML = `<option value="">-- Chọn theo Email --</option>`;
-          phoneSelect.innerHTML = `<option value="">-- Chọn theo SĐT --</option>`;
+          fullNameSelect.innerHTML =
+            `<option value="">-- Chọn theo Họ tên --</option>`;
+
+          emailSelect.innerHTML =
+            `<option value="">-- Chọn theo Email --</option>`;
+
+          phoneSelect.innerHTML =
+            `<option value="">-- Chọn theo SĐT --</option>`;
 
           managers.forEach((m) => {
-            emailSelect.innerHTML += `<option value="${m.userId}">${m.email}</option>`;
-            phoneSelect.innerHTML += `<option value="${m.userId}">${m.phone}</option>`;
-            fullNameSelect.innerHTML += `<option value="${m.userId}">${(m.firstName || "") + " " + (m.lastName || "")}</option>`;
+            // manager đang quản lý hotel khác
+            const isUsed =
+              usedManagerMap[m.userId] &&
+              usedManagerMap[m.userId] != currentHotelId;
+
+            const disabledText = isUsed ? "disabled" : "";
+
+            const fullName =
+              `${m.firstName || ""} ${m.lastName || ""}`.trim();
+
+            const busyLabel = isUsed ? " (Đang quản lý)" : "";
+
+            fullNameSelect.innerHTML += `
+              <option value="${m.userId}" ${disabledText}>
+                ${fullName}${busyLabel}
+              </option>
+            `;
+
+            emailSelect.innerHTML += `
+              <option value="${m.userId}" ${disabledText}>
+                ${m.email}${busyLabel}
+              </option>
+            `;
+
+            phoneSelect.innerHTML += `
+              <option value="${m.userId}" ${disabledText}>
+                ${m.phone}${busyLabel}
+              </option>
+            `;
           });
         }
+        
         function selectManager(type) {
           let value;
 
@@ -900,78 +759,149 @@
           document.getElementById("managerPhone").value = manager.userId;
           document.getElementById("managerFullName").value = manager.userId;
         }
+        let currentPage = 0;
+        let totalPages = 0;
+
         /* =========================LOAD DANH SÁCH KHÁCH SẠN========================= */
-        async function loadHotels() {
-          const res = await fetch(API, {
+        async function loadHotels(page = 0) {
+          const keyword = document.getElementById("searchHotelInput").value;
+          let url = API + `/summary?page=${page}&size=5`;
+          if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+
+          const res = await fetch(url, {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
           });
 
-          hotels = await res.json();
+          const data = await res.json();
+          hotels = data.content || [];
+          currentPage = data.number;
+          totalPages = data.totalPages;
 
           renderHotels(hotels);
+          renderPagination(data);
         }
+
+        function renderPagination(data) {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        totalPages = data.totalPages;
+        currentPage = data.number; // backend bắt đầu từ 0
+
+        if (totalPages <= 1) return;
+
+        const range = 2;
+
+        // ===== Prev =====
+        const prevLi = document.createElement("li");
+        prevLi.className = "page-item " + (currentPage === 0 ? "disabled" : "");
+
+        prevLi.innerHTML = `<a class="page-link" href="#">«</a>`;
+
+        prevLi.onclick = (e) => {
+          e.preventDefault();
+
+          if (currentPage > 0) {
+            currentPage--;
+            loadHotels(currentPage);
+          }
+        };
+
+        pagination.appendChild(prevLi);
+
+        // ===== Tính khoảng trang giống file user =====
+        let startPage = currentPage - range;
+        let endPage = currentPage + range;
+
+        if (startPage < 0) {
+          startPage = 0;
+          endPage = Math.min(totalPages - 1, range * 2);
+        }
+
+        if (endPage >= totalPages) {
+          endPage = totalPages - 1;
+          startPage = Math.max(0, totalPages - 1 - range * 2);
+        }
+
+        // ===== Render số trang =====
+        for (let i = startPage; i <= endPage; i++) {
+          const li = document.createElement("li");
+
+          li.className = "page-item " + (i === currentPage ? "active" : "");
+
+          li.innerHTML = `<a class="page-link" href="#">${i + 1}</a>`;
+
+          li.onclick = (e) => {
+            e.preventDefault();
+
+            currentPage = i;
+            loadHotels(currentPage);
+          };
+
+          pagination.appendChild(li);
+        }
+
+        // ===== Next =====
+        const nextLi = document.createElement("li");
+
+        nextLi.className =
+          "page-item " + (currentPage === totalPages - 1 ? "disabled" : "");
+
+        nextLi.innerHTML = `<a class="page-link" href="#">»</a>`;
+
+        nextLi.onclick = (e) => {
+          e.preventDefault();
+
+          if (currentPage < totalPages - 1) {
+            currentPage++;
+            loadUtilities(currentPage);
+          }
+        };
+
+        pagination.appendChild(nextLi);
+      }
+
         /* =========================RENDER TABLE========================= */
         function renderHotels(data) {
           const tbody = document.getElementById("hotelTableBody");
           tbody.innerHTML = "";
 
           data.forEach((h) => {
-            console.log(h.hotelStatus);
-
-            let statusText =
+            const statusCls =
+              h.hotelStatus === "ACTIVE"
+                ? "bg-active"
+                : h.hotelStatus === "MAINTENANCE"
+                  ? "bg-maintenance"
+                  : "bg-inactive";
+            const statusText =
               h.hotelStatus === "ACTIVE"
                 ? "Hoạt động"
-                : h.hotelStatus === "INACTIVE"
-                  ? "Ngừng hoạt động"
-                  : "Bảo trì";
-
-            let statusClass =
-              "fw-bold " +
-              (h.hotelStatus === "ACTIVE"
-                ? "text-success"
-                : h.hotelStatus === "INACTIVE"
-                  ? "text-secondary"
-                  : "text-warning");
+                : h.hotelStatus === "MAINTENANCE"
+                  ? "Bảo trì"
+                  : "Ngừng hoạt động";
 
             const image = h.mainImage
-              ? `<img src="http://localhost:8080${h.mainImage}" width="80">`
-              : "Không có";
+              ? `<img src="http://localhost:8080${h.mainImage}" class="hotel-img-mini">`
+              : `<img src="https://via.placeholder.com/150?text=No+Image" class="hotel-img-mini">`;
 
             let topButtons = `
-              <button class="btn btn-sm btn-outline-info mr-1"
-                onclick="viewHotel(${h.hotelId})">
-                <i class="fa fa-eye"></i>
-              </button>
-
-              <button class="btn btn-sm btn-outline-primary mr-1"
-                onclick="editHotel(${h.hotelId})">
-                <i class="fa fa-edit"></i>
-              </button>
-
-              <button class="btn btn-sm btn-outline-danger"
-                onclick="deleteHotel(${h.hotelId})">
-                <i class="fa fa-trash"></i>
-              </button>
+              <button class="btn-action text-info" title="Xem" onclick="viewHotel(${h.hotelId})"><i class="fa fa-eye"></i></button>
+              <button class="btn-action" title="Sửa" onclick="editHotel(${h.hotelId})"><i class="fa fa-edit"></i></button>
+              <button class="btn-action text-danger" title="Xóa" onclick="deleteHotel(${h.hotelId})"><i class="fa fa-trash"></i></button>
             `;
 
             tbody.innerHTML += `
               <tr>
-                <td>${h.hotelId}</td>
+                <td style="color: var(--text-muted); font-weight: 600;">${h.hotelId}</td>
                 <td>${image}</td>
-                <td>${h.hotelName}</td>
-                <td>${h.managerEmail || ""}</td>
-                <td>${h.averageRating ? h.averageRating.toFixed(1) : 0}</td>
-                <td>${h.roomsTotal || 0}</td>
-                <td>
-                  <span class="${statusClass}">${statusText}</span>
-                </td>
-                <td>
-                  <div class="mb-1 d-flex justify-content-center">
-                    ${topButtons}
-                  </div>
-                </td>
+                <td style="font-weight: 700;">${h.hotelName}</td>
+                <td style="font-size: 13px;">${h.managerEmail || "---"}</td>
+                <td class="text-warning"><b>${(h.averageRating || 0).toFixed(1)}/10</b></td>
+                <td><span class="badge badge-light" style="font-weight: 700;">${h.roomsTotal || 0}</span></td>
+                <td><span class="badge-status ${statusCls}">${statusText}</span></td>
+                <td class="text-center">${topButtons}</td>
               </tr>`;
           });
         }
@@ -1034,21 +964,7 @@
         /* =========================TÌM KIẾM========================= */
 
         async function searchHotel() {
-          const keyword = document.getElementById("searchHotelInput").value;
-
-          if (keyword === "") {
-            loadHotels();
-            return;
-          }
-
-          const res = await fetch(API + "/search?keyword=" + keyword, {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-          });
-
-          const data = await res.json();
-          renderHotels(data);
+          loadHotels(0);
         }
 
         /* =========================MỞ MODAL THÊM========================= */
@@ -1067,7 +983,7 @@
           document.getElementById("hotelStatus").value = "ACTIVE";
 
           selectedManagerId = null;
-          await loadManagers(); // ✅ OK
+          await loadManagers(null);
 
           existingImages = [];
           existingMainIndex = -1;
@@ -1092,7 +1008,7 @@
 
           document.getElementById("hotelModalTitle").innerText =
             "Sửa khách sạn";
-          await loadManagers();
+          await loadManagers(id);
 
           const manager = managers.find((m) => m.email === h.managerEmail);
           if (manager) {
@@ -1166,106 +1082,125 @@
           const id = document.getElementById("hotelId").value;
 
           const data = {
-            hotelName: document.getElementById("hotelName").value,
-            address: document.getElementById("hotelAddress").value,
-            introduction: document.getElementById("hotelDesc").value,
+            hotelName: document.getElementById("hotelName").value.trim(),
+            address: document.getElementById("hotelAddress").value.trim(),
+            introduction: document.getElementById("hotelDesc").value.trim(),
             hotelStatus: document.getElementById("hotelStatus").value,
             managerId: selectedManagerId,
           };
 
           let hotelId = id;
+          let res;
 
-          if (id === "") {
-            const res = await fetch(API, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-              body: JSON.stringify(data),
-            });
+          try {
 
-            console.log("STATUS:", res.status);
+            // CREATE / UPDATE
+            if (id === "") {
+              res = await fetch(API, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                body: JSON.stringify(data),
+              });
+            } else {
+              res = await fetch(API + "/" + id, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                body: JSON.stringify(data),
+              });
+            }
 
-            const text = await res.text();
-            console.log("RESPONSE RAW:", text);
-
+            // ❌ lỗi backend
             if (!res.ok) {
-              alert("Lỗi BE: " + text);
+              const errorData = await res.json();
+
+              showError(
+                getFirstError(errorData)
+              );
+
               return;
             }
 
-            const hotel = JSON.parse(text);
+            // ✅ thành công
+            const hotel = await res.json();
+
             hotelId = hotel.hotelId;
-          } else {
-            await fetch(API + "/" + id, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-              body: JSON.stringify(data),
-            });
-          }
 
-          /* đổi ảnh chính */
 
-          if (
-            existingMainIndex >= 0 &&
-            existingImages.length > 0 &&
-            mainImageIndex === -1
-          ) {
-            const mainImageId = existingImages[existingMainIndex].imageId;
+            /* ================== ẢNH ================== */
 
-            await fetch(API + "/images/" + mainImageId + "/main", {
-              method: "PUT",
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-            });
-          }
+            // đổi ảnh chính cũ
+            if (
+              existingMainIndex >= 0 &&
+              existingImages.length > 0 &&
+              mainImageIndex === -1
+            ) {
+              const mainImageId = existingImages[existingMainIndex].imageId;
 
-          /* XÓA ẢNH CŨ */
-
-          for (const imageId of deletedImages) {
-            await fetch(API + "/images/" + imageId, {
-              method: "DELETE",
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-            });
-          }
-
-          /* upload ảnh */
-
-          if (selectedImages.length > 0) {
-            const formData = new FormData();
-
-            selectedImages.forEach((f) => {
-              formData.append("files", f);
-            });
-
-            let newMainIndex = -1;
-
-            /* nếu chọn ảnh mới làm main */
-            if (mainImageIndex >= existingImages.length) {
-              newMainIndex = mainImageIndex - existingImages.length;
+              await fetch(API + "/images/" + mainImageId + "/main", {
+                method: "PUT",
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+              });
             }
 
-            formData.append("mainIndex", newMainIndex);
+            // xóa ảnh cũ
+            for (const imageId of deletedImages) {
+              await fetch(API + "/images/" + imageId, {
+                method: "DELETE",
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+              });
+            }
 
-            await fetch(API + "/" + hotelId + "/images", {
-              method: "POST",
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-              body: formData,
-            });
+            // upload ảnh mới
+            if (selectedImages.length > 0) {
+
+              const formData = new FormData();
+
+              selectedImages.forEach((f) => {
+                formData.append("files", f);
+              });
+
+              let newMainIndex = -1;
+
+              if (mainImageIndex >= existingImages.length) {
+                newMainIndex =
+                  mainImageIndex - existingImages.length;
+              }
+
+              formData.append("mainIndex", newMainIndex);
+
+              await fetch(API + "/" + hotelId + "/images", {
+                method: "POST",
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                },
+                body: formData,
+              });
+            }
+
+            $("#hotelModal").modal("hide");
+
+            showSuccess(
+              id ? "Cập nhật khách sạn thành công" : "Thêm khách sạn thành công"
+            );
+
+            loadHotels(currentPage);
+
+          } catch (error) {
+
+            console.error(error);
+
+            showError("Không thể kết nối máy chủ");
           }
-
-          $("#hotelModal").modal("hide");
-
-          loadHotels();
         }
 
         /* =========================XÓA KHÁCH SẠN========================= */
@@ -1284,10 +1219,9 @@
         }
 
         /* =========================LOAD PAGE========================= */
-        loadHotels();
+        loadHotels(0);
       </script>
-
-      <script>
+  <script>
         /// ================= PREVIEW GALLERY SCRIPT =================
         let previewImagesList = [];
         let previewIndex = 0;
@@ -1412,7 +1346,7 @@
           }
         });
       </script>
-      <script>
+<script>
         /* =========================BIẾN ẢNH========================= */
         let selectedImages = [];
         let mainImageIndex = -1;
@@ -1518,6 +1452,58 @@
           selectedImages.splice(index, 1);
           renderPreview();
         }
+        // 🎨 SweetAlert2 Theme (Thông báo)
+          const ToastSuccess = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2200,
+            timerProgressBar: true,
+            background: "#ffffff",
+            color: "#333",
+            iconColor: "#22c55e",
+            customClass: {
+              popup: "swal2-toast-custom",
+              title: "swal2-title-custom",
+            },
+          });
+
+          const PopupError = Swal.mixin({
+            icon: "error",
+            confirmButtonText: "OK",
+            confirmButtonColor: "#ef4444",
+            background: "#ffffff",
+            color: "#111827",
+            customClass: {
+              popup: "swal2-popup-custom",
+              title: "swal2-title-custom",
+              htmlContainer: "swal2-text-custom",
+            },
+          });
+
+          // ✅ Toast thành công (góc phải trên)
+          function showSuccess(message) {
+            ToastSuccess.fire({
+              icon: "success",
+              title: message,
+            });
+          }
+
+          // ❌ Popup lỗi (giữa màn hình)
+          function showError(message) {
+            PopupError.fire({
+              title: "Có lỗi xảy ra",
+              html: message,
+            });
+          }
+
+          // lấy lỗi đầu tiên từ backend validation
+          function getFirstError(obj) {
+            if (!obj) return "Có lỗi xảy ra";
+            if (obj.message) return obj.message;
+            if (typeof obj === "object") return Object.values(obj)[0];
+            return "Có lỗi xảy ra";
+          }
       </script>
       <script>
         function logout() {
@@ -1544,11 +1530,5 @@
           });
         }
       </script>
-
-      <div class="footer">
-        <p>Copyright © VXB-2026 AdminDashboard. All rights reserved.</p>
-        <p>Version 8.8.4-rc</p>
-      </div>
-    </div>
   </body>
 </html>

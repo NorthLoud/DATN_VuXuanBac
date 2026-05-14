@@ -35,8 +35,7 @@ public class UtilitiesRoomTypeServiceImpl implements UtilitiesRoomTypeService {
             }
         }
 
-        Utilities utility = utilitiesRepository
-                .findByUtilitiesIdAndIsDeletedFalse(utilityId)
+        Utilities utility = utilitiesRepository.findById(utilityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utility không tồn tại"));
 
         UtilitiesRoomTypeId id = new UtilitiesRoomTypeId(typeId, utilityId);
@@ -139,10 +138,26 @@ public class UtilitiesRoomTypeServiceImpl implements UtilitiesRoomTypeService {
             }
         }
 
-        // 🔥 PAGINATION TAY
+        //  PAGINATION TAY
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), list.size());
 
         return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
+
+    @Override
+    public List<RoomTypeUtilitySummaryResponse> getSummaryByHotelId(Long hotelId) {
+
+        return repository.getSummaryByHotelId(hotelId)
+                .stream()
+                .map(r -> new RoomTypeUtilitySummaryResponse(
+                        ((Number) r[0]).longValue(),
+                        (String) r[1],
+                        ((Number) r[2]).longValue(),
+                        (String) r[3],
+                        ((Number) r[4]).longValue()
+                ))
+                .toList();
+    }
+
 }

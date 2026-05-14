@@ -16,7 +16,27 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
     Optional<RoomType> findByTypeIdAndIsDeletedFalse(Long id);
 
     List<RoomType> findByIsDeletedFalse();
+    org.springframework.data.domain.Page<RoomType> findByIsDeletedFalse(org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT rt FROM RoomType rt WHERE rt.isDeleted = false AND LOWER(rt.typeName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    org.springframework.data.domain.Page<RoomType> searchAll(@Param("keyword") String keyword, org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT rt FROM RoomType rt WHERE rt.hotel.manager.userId = :userId AND rt.isDeleted = false")
+    org.springframework.data.domain.Page<RoomType> findByManagerUserId(@Param("userId") Long userId, org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT rt FROM RoomType rt WHERE rt.hotel.manager.userId = :userId AND rt.isDeleted = false AND LOWER(rt.typeName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    org.springframework.data.domain.Page<RoomType> searchByManagerUserId(@Param("userId") Long userId, @Param("keyword") String keyword, org.springframework.data.domain.Pageable pageable);
     boolean existsByHotel_HotelIdAndTypeNameAndIsDeletedFalse(Long hotelId, String typeName);
 
     boolean existsByHotel_HotelIdAndIsDeletedFalse(Long hotelId);
+
+    @Query("""
+SELECT MIN(rt.price)
+FROM RoomType rt
+
+WHERE rt.hotel.hotelId = :hotelId
+AND rt.isDeleted = false
+""")
+    Double findMinPriceByHotelId(@Param("hotelId") Long hotelId);
+
 }

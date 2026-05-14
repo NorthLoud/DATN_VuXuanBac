@@ -53,12 +53,12 @@ public class Hotel {
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
     private List<HotelImage> images;
 
-    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-    private List<Room> rooms;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id", nullable = false)
     private User manager;
+
+    @OneToMany(mappedBy = "hotel")
+    private List<RoomType> roomTypes;
 
     @PrePersist
     protected void onCreate() {
@@ -71,5 +71,6 @@ public class Hotel {
         this.updatedAt = LocalDateTime.now();
     }
 
-
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    private List<UtilitiesHotel> utilitiesHotels;
 }

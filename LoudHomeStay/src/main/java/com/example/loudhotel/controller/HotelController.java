@@ -2,11 +2,13 @@ package com.example.loudhotel.controller;
 
 import com.example.loudhotel.dto.request.HotelRequest;
 import com.example.loudhotel.dto.response.HotelResponse;
+import com.example.loudhotel.dto.response.HotelSearchResponse;
 import com.example.loudhotel.dto.response.ImageResponse;
 import com.example.loudhotel.dto.response.UtilitiesResponse;
 import com.example.loudhotel.service.HotelService;
 import com.example.loudhotel.service.ImageService;
 import com.example.loudhotel.service.UtilitiesHotelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,10 +35,28 @@ public class HotelController {
 
     }
 
+    @GetMapping("/my/summary")
+    @PreAuthorize("hasAnyRole('MANAGER','ADMIN')")
+    public org.springframework.data.domain.Page<HotelResponse> getMyHotelsSummary(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "hotelId") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        return hotelService.getMyHotels(keyword, pageable);
+    }
+
     // CREATE -> chỉ MANAGER
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public HotelResponse create(@RequestBody HotelRequest request) {
+    public HotelResponse create(
+            @Valid @RequestBody HotelRequest request) {
+
         return hotelService.createHotel(request);
     }
 
@@ -45,7 +65,7 @@ public class HotelController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public HotelResponse update(
             @PathVariable Long id,
-            @RequestBody HotelRequest request) {
+            @Valid @RequestBody HotelRequest request) {
 
         return hotelService.updateHotel(id, request);
     }
@@ -66,6 +86,24 @@ public class HotelController {
     @GetMapping
     public List<HotelResponse> getAll() {
         return hotelService.getAll();
+    }
+
+    @GetMapping("/summary")
+    public org.springframework.data.domain.Page<HotelResponse> summary(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "hotelId") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return hotelService.searchAll(keyword, pageable);
+        }
+        return hotelService.getAll(pageable);
     }
 
     @GetMapping("/search")
@@ -107,6 +145,24 @@ public class HotelController {
     @GetMapping("/{id}/utilities")
     public List<UtilitiesResponse> getUtilitiesByHotel(@PathVariable Long id) {
         return utilitiesHotelService.getUtilitiesByHotelPublic(id);
+    }
+
+    @GetMapping("/search-available")
+    public ResponseEntity<List<HotelSearchResponse>> searchAvailable(
+            @RequestParam String keyword,
+            @RequestParam String checkIn,
+            @RequestParam String checkOut,
+            @RequestParam Integer roomCount
+    ) {
+
+        return ResponseEntity.ok(
+                hotelService.searchAvailableHotels(
+                        keyword,
+                        java.time.LocalDate.parse(checkIn),
+                        java.time.LocalDate.parse(checkOut),
+                        roomCount
+                )
+        );
     }
 
 }

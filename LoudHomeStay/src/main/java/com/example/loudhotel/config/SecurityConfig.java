@@ -32,13 +32,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ FIX 403 OPTIONS
                         .requestMatchers("/api/auth/**").permitAll()
-
                         .requestMatchers("/api/payments/**").permitAll()
-
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
                         .requestMatchers("/images/**").permitAll()
-
                         .requestMatchers("/api/chat/**").authenticated()
                         .requestMatchers("/chat-socket/**").permitAll()
                         .requestMatchers(
@@ -55,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**").permitAll()
 
                         // PROTECTED
+                        .requestMatchers(HttpMethod.DELETE, "/api/hotels/images/**")
+                        .hasAnyRole("ADMIN","MANAGER")
                         .requestMatchers(HttpMethod.POST, "/api/hotels").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/hotels/**").hasAnyRole("ADMIN","MANAGER")
                         .requestMatchers(HttpMethod.DELETE, "/api/hotels/**").hasRole("ADMIN")
@@ -64,12 +62,12 @@ public class SecurityConfig {
                         //Room
                         .requestMatchers(HttpMethod.POST,"/api/rooms/hotel/*")
                         .hasAnyRole("ADMIN","MANAGER")
+
                         // admin
                         .requestMatchers(HttpMethod.PUT, "/api/rooms/*/block").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/rooms/*/unblock").hasRole("ADMIN")
                         /* MANAGER only */
                         .requestMatchers(HttpMethod.GET,"/api/rooms/my").hasRole("MANAGER")
-
                         /* room cho cả admin + manager */
                         .requestMatchers(HttpMethod.DELETE,"/api/rooms/*")
                         .hasAnyRole("ADMIN","MANAGER")
@@ -79,7 +77,6 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN","MANAGER")
                         .requestMatchers(HttpMethod.DELETE,"/api/rooms/images/*")
                         .hasAnyRole("ADMIN","MANAGER")
-
                         /* public xem room */
                         .requestMatchers(HttpMethod.GET,"/api/rooms/**")
                         .permitAll()
@@ -103,10 +100,10 @@ public class SecurityConfig {
                         // ===== Utilities theo hotel =====
                         // MANAGER
                         .requestMatchers("/api/manager/**").hasRole("MANAGER")
-
                         // ===== Utilities theo RoomType =====
                         .requestMatchers("/api/manager/room-type-utilities/**").hasRole("MANAGER")
                         .requestMatchers("/api/admin/room-type-utilities/**").hasRole("ADMIN")
+                        .requestMatchers("/api/utilities-room-types/**").permitAll()
 
 
                         //Đánh giá
@@ -135,8 +132,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/bills/*/hold").hasAnyRole("USER","MANAGER")
 
                         // admin không được thao tác trạng thái
-
-
+                        // User sửa tài khoản
+                        .requestMatchers("/api/users/me")
+                        .authenticated()
 
                         .anyRequest().authenticated()
                 )

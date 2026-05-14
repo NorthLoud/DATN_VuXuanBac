@@ -26,7 +26,7 @@ public class UserController {
     @GetMapping
     public Page<UserResponse> getUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size
+            @RequestParam(defaultValue = "5") int size
     ) {
         return userService.getUsersPage(page, size);
     }
@@ -61,6 +61,5 @@ public class UserController {
     ) {
         return userService.searchUsers(keyword, page, size, sortBy, sortDir);
     }
-
 
 }

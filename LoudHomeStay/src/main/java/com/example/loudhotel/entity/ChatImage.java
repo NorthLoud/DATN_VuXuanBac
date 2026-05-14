@@ -17,7 +17,7 @@ public class ChatImage {
 
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
-    private ChatMessage chatMessage;
+    private Chat chat;
 
     private String imageUrl;
 }

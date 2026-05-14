@@ -21,8 +21,9 @@ public class UtilitiesController {
     @GetMapping
     public Page<UtilitiesResponse> getAll(
             @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(required = false) com.example.loudhotel.enums.UtilityType utilityType,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "utilitiesId") String sortBy,
             @RequestParam(defaultValue = "asc") String direction
     ) {
@@ -33,7 +34,7 @@ public class UtilitiesController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return utilitiesService.getAllUtilities(keyword, pageable);
+        return utilitiesService.getAllUtilities(keyword, utilityType, pageable);
     }
 
     @PostMapping

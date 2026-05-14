@@ -14,4 +14,6 @@ public interface RoomAssignmentService {
     void assignRoom(BillDetail billDetail, Room room);
 
     boolean existsByBillDetail(BillDetail billDetail);
+
+    void deleteByBill(Bill bill);
 }

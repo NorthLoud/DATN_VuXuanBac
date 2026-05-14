@@ -19,4 +19,7 @@ public interface RoomTypeService {
     RoomTypeResponse getById(Long id);
 
     List<RoomTypeResponse> getRoomTypesByManager(Long managerId);
+    org.springframework.data.domain.Page<RoomTypeResponse> getRoomTypesByManager(Long managerId, String keyword, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<RoomTypeResponse> getAll(String keyword, org.springframework.data.domain.Pageable pageable);
 }

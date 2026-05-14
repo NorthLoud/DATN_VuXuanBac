@@ -23,11 +23,6 @@ public class Room {
     @JoinColumn(name = "type_id", nullable = false)
     private RoomType roomType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotel_id")
-    @JsonIgnore
-    private Hotel hotel;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoomStatus roomStatus = RoomStatus.ACTIVE;

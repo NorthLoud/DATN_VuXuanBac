@@ -40,9 +40,44 @@ public class RoomController {
         return roomService.getRoomsByManager(user.getUserId());
     }
 
+    @GetMapping("/my/summary")
+    @PreAuthorize("hasRole('MANAGER')")
+    public org.springframework.data.domain.Page<RoomResponse> getMyRoomsSummary(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "roomId") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow();
+        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        return roomService.getRoomsByManager(user.getUserId(), keyword, pageable);
+    }
+
     @GetMapping
     public List<RoomResponse> getAllRooms() {
         return roomService.getAllRooms();
+    }
+
+    @GetMapping("/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public org.springframework.data.domain.Page<RoomResponse> summary(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "roomId") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        return roomService.getAllRooms(keyword, pageable);
     }
 
     @GetMapping("/hotels/{hotelId}")

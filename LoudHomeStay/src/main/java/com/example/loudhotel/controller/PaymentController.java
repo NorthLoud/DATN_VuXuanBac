@@ -6,10 +6,12 @@ import com.example.loudhotel.service.VNPayService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -29,60 +31,71 @@ public class PaymentController {
     }
 
     @GetMapping("/vnpay-return")
-    public String paymentReturn(@RequestParam Map<String, String> params) {
+    public void paymentReturn(
+            @RequestParam Map<String, String> params,
+            HttpServletResponse response
+    ) throws IOException {
 
         boolean valid = vnPayService.verifyPayment(params);
 
         if (!valid) {
-            return "Sai chữ ký VNPay";
+            response.sendRedirect(
+                    "http://localhost:8080/user/html/bill.html?payment=invalid"
+            );
+            return;
         }
 
-        String responseCode =
-                params.get("vnp_ResponseCode");
+        String responseCode = params.get("vnp_ResponseCode");
+        String txnRef = params.get("vnp_TxnRef");
 
-        String txnRef =
-                params.get("vnp_TxnRef");
+        Bill bill = billRepository.findByVnpTxnRef(txnRef)
+                .orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy bill")
+                );
 
-        Bill bill =
-                billRepository.findByVnpTxnRef(txnRef)
-                        .orElseThrow(
-                                () -> new RuntimeException("Không tìm thấy bill")
-                        );
+        // tránh xử lý lại
+        if (bill.getBillStatus() == Bill.BillStatus.PENDING) {
 
-        // tránh ghi đè bill đã bị scheduler cancel
-        if (bill.getBillStatus() != Bill.BillStatus.PENDING) {
-            return "Bill đã được xử lý trước đó";
-        }
+            if ("00".equals(responseCode)) {
 
-        if ("00".equals(responseCode)) {
+                bill.setBillStatus(
+                        Bill.BillStatus.PAID
+                );
 
-            bill.setBillStatus(
-                    Bill.BillStatus.PAID
+            } else {
+
+                bill.setBillStatus(
+                        Bill.BillStatus.CANCELED
+                );
+
+                bill.setCancelReason(
+                        Bill.CancelReason.VNPAY_CANCEL
+                );
+            }
+
+            bill.setVnpTransactionNo(
+                    params.get("vnp_TransactionNo")
             );
 
+            bill.setUpdatedAt(
+                    LocalDateTime.now()
+            );
+
+            billRepository.save(bill);
+        }
+
+        // redirect về FE
+        if ("00".equals(responseCode)) {
+
+            response.sendRedirect(
+                    "http://localhost:8080/user/html/bill.html?payment=success"
+            );
 
         } else {
 
-            bill.setBillStatus(
-                    Bill.BillStatus.CANCELED
-            );
-
-
-            bill.setCancelReason(
-                    Bill.CancelReason.VNPAY_CANCEL
+            response.sendRedirect(
+                    "http://localhost:8080/user/html/bill.html?payment=failed"
             );
         }
-
-        bill.setVnpTransactionNo(
-                params.get("vnp_TransactionNo")
-        );
-
-        bill.setUpdatedAt(
-                LocalDateTime.now()
-        );
-
-        billRepository.save(bill);
-
-        return "Thanh toán đặt phòng thành công! Vui lòng kiểm tra lại thông tin đặt phòng!";
     }
 }

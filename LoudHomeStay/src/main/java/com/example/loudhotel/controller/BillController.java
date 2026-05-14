@@ -47,14 +47,37 @@ public class BillController {
         return billService.cancel(id);
     }
 
+    @PutMapping("/{id}/assign-rooms")
+    public Object assignRooms(@PathVariable Long id,
+                          @RequestBody com.example.loudhotel.dto.request.CheckInRequest request) {
+        return billService.assignRooms(id, request);
+    }
+
     @PutMapping("/{id}/check-in")
-    public Object checkIn(@PathVariable Long id) {
-        return billService.checkIn(id);
+    public Object checkIn(@PathVariable Long id,
+                          @RequestBody com.example.loudhotel.dto.request.CheckInRequest request) {
+        return billService.checkIn(id, request);
+    }
+
+    @PostMapping("/{id}/extra-fee")
+    public Object addExtraFee(@PathVariable Long id,
+                              @RequestBody com.example.loudhotel.dto.request.ExtraFeeRequest request) {
+        return billService.addExtraFee(id, request);
     }
 
     @PutMapping("/{id}/check-out")
     public Object checkOut(@PathVariable Long id) {
         return billService.checkOut(id);
+    }
+
+    @PutMapping("/{id}/pay")
+    public Object pay(@PathVariable Long id) {
+        return billService.pay(id);
+    }
+
+    @PutMapping("/{id}/pay-extra-fee/{feeId}")
+    public Object payExtraFee(@PathVariable Long id, @PathVariable Long feeId) {
+        return billService.payExtraFee(id, feeId);
     }
 
     @GetMapping("/manager")

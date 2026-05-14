@@ -49,10 +49,17 @@ JOIN ra.billDetail bd
 JOIN bd.bill b
 WHERE ra.room.roomId = :roomId
 AND b.billId <> :billId
+AND b.billStatus <> 'CANCELED'
+
 AND (
-    b.checkInDate < :checkOut
-    AND b.checkOutDate > :checkIn
-)
+    CASE
+        WHEN b.actualCheckOutTime IS NOT NULL
+        THEN FUNCTION('DATE', b.actualCheckOutTime)
+        ELSE b.checkOutDate
+    END
+) > :checkIn
+
+AND b.checkInDate < :checkOut
 """)
     boolean existsActiveBooking(
             @Param("roomId") Long roomId,
@@ -82,20 +89,5 @@ AND b.actualCheckOutTime IS NULL
     );
 
     boolean existsByBillCode(String billCode);
-
-    @Query("""
-SELECT COALESCE(SUM(bd.quantity), 0)
-FROM BillDetail bd
-JOIN bd.bill b
-WHERE bd.roomType.typeId = :typeId
-AND b.billStatus <> 'CANCELED'
-AND b.checkInDate < :checkOut
-AND b.checkOutDate > :checkIn
-""")
-    int countBookedRooms(
-            @Param("typeId") Long typeId,
-            @Param("checkIn") LocalDate checkIn,
-            @Param("checkOut") LocalDate checkOut
-    );
 
 }

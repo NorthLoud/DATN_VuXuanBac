@@ -1,394 +1,389 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manager LoudBooking</title>
+    <title>Quản lý khách sạn | Manager</title>
+
+    <!-- External Assets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-      body {
-        font-family: Arial, sans-serif;
+      :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --bg-body: #f1f5f9;
+        --sidebar-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --radius-lg: 16px;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
         margin: 0;
-        overflow: hidden;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
       }
 
-      .content {
-        margin-left: 260px;
-        padding: 20px;
-        height: 100vh;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        background: #f4f6f9;
+      .logo-text {
+        font-family: "Outfit", sans-serif;
       }
+      body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* --- Sidebar (Same as Bill) --- */
       .sidebar {
-        height: 100vh;
-        background: #ffffff;
-        color: #1f2937;
-        position: fixed;
         width: 260px;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-        border-right: 1px solid #e5e7eb;
-        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+        background: var(--sidebar-bg);
+        border-right: 1px solid #e2e8f0;
+        position: fixed;
+        height: 100vh;
+        z-index: 1000;
+        padding: 30px 15px;
       }
-
-      .sidebar.collapsed {
-        width: 0;
-        overflow: hidden;
-      }
-
-      /* scrollbar */
-      .sidebar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .sidebar::-webkit-scrollbar-thumb {
-        background-color: #d1d5db;
-        border-radius: 10px;
-      }
-
-      /* title */
-      .sidebar h2 {
-        color: #111827;
-      }
-
-      /* avatar text */
-      .sidebar h2.text-center {
-        font-size: 18px;
-        font-weight: 600;
-      }
-
-      /* nav link */
-      .sidebar .nav-link {
-        color: #374151;
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin: 4px 10px;
+      .logo-box {
+        padding: 0 15px 40px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        transition: all 0.2s ease;
+        gap: 12px;
       }
-
-      /* hover */
-      .sidebar .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-        transform: translateX(3px);
-      }
-
-      /* active feel */
-      .sidebar .nav-link.active {
-        background: #e0edff;
-        color: #2563eb;
-        font-weight: 600;
-      }
-
-      /* icon size */
-      .sidebar .nav-link i {
-        width: 20px;
-        text-align: center;
-        color: #6b7280;
-      }
-
-      /* hover icon */
-      .sidebar .nav-link:hover i {
-        color: #2563eb;
-      }
-
-      /* submenu */
-      .sidebar .submenu {
-        list-style: none;
-        padding-left: 30px;
-        display: none;
-      }
-
-      .sidebar .submenu .nav-link {
-        font-size: 13px;
-        color: #6b7280;
-        padding: 6px 10px;
-        margin: 2px 10px;
-      }
-
-      .sidebar .submenu .nav-link:hover {
-        background: #f3f4f6;
-        color: #2563eb;
-      }
-      .nav-item .nav-link {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .content {
-        margin-left: 250px;
-        padding: 20px;
-        transition: margin-left 0.3s; /* Hiệu ứng chuyển đổi khi ẩn/hiện */
-        overflow-y: auto; /* Kích hoạt thanh cuộn dọc */
-        height: 700px;
-      }
-      .content.collapsed {
-        margin-left: 0;
-      }
-      .content::-webkit-scrollbar {
-        width: 8px; /* Độ rộng của thanh cuộn */
-      }
-      .content::-webkit-scrollbar-thumb {
-        background-color: #495057; /* Màu của thanh cuộn */
-        border-radius: 4px;
-      }
-
-      .footer {
-        text-align: center;
-        padding: 20px;
-        color: #999;
-      }
-    </style>
-    <style>
-      /* ===== Manager USER PAGE STYLE ===== */
-
-      section {
-        background: #f4f6f9;
-        font-family: "Segoe UI", Arial, sans-serif;
-      }
-
-      /* tiêu đề */
-      h1 {
-        color: #1f2937;
-        font-weight: 700;
-      }
-
-      /* thanh công cụ */
-      .container .btn-primary {
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 600;
-        transition: 0.2s;
-      }
-
-      .container .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
-      }
-
-      /* khung tìm kiếm */
-      .search-box {
-        position: relative;
-        width: 280px;
-      }
-
-      /* input */
-      .search-box input {
-        width: 100%;
-        padding: 10px 42px 10px 14px; /* chừa chỗ cho nút */
-        border-radius: 999px;
-        border: 1px solid #d1d5db;
-        outline: none;
-        transition: 0.2s;
-        font-size: 14px;
-      }
-
-      .search-box input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-      }
-
-      /* nút search nằm trong input */
-      .search-box button {
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        border: none;
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        color: white;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: 0.2s;
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-
-      .search-box button:hover {
-        transform: translateY(-50%) scale(1.05);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-      }
-
-      /* bảng */
-      .table {
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      }
-
-      .table thead {
-        background: linear-gradient(135deg, #089662);
         color: white;
+        font-size: 20px;
       }
-      .table th,
-      .table td {
-        vertical-align: middle !important;
+      .logo-text {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--text-main);
+      }
+      .nav-group-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+      }
+      .side-nav {
+        list-style: none;
+      }
+      .side-nav a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 15px;
+        border-radius: 10px;
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 500;
         font-size: 14px;
+        transition: 0.2s;
+        margin-bottom: 4px;
+      }
+      .side-nav a:hover,
+      .side-nav a.active {
+        background: var(--primary-light);
+        color: var(--primary);
+      }
+      .side-nav a i:first-child {
+        width: 24px;
+        font-size: 18px;
+      }
+      .submenu {
+        list-style: none;
+        padding-left: 35px;
+        margin-top: 4px;
+        display: none;
+      }
+      .submenu.show {
+        display: block;
       }
 
-      .table tbody tr:hover {
-        background: #f1f5f9;
-        transition: 0.15s;
+      /* --- Main Wrapper --- */
+      .main-wrapper {
+        flex: 1;
+        margin-left: 260px;
+      }
+      .top-bar {
+        height: 70px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
+      .content-body {
+        padding: 40px;
       }
 
-      /* button action */
-      .btn-warning {
-        background: #f59e0b;
-        border: none;
-        color: white;
-        border-radius: 6px;
-        padding: 4px 10px;
+      .page-header {
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .page-header h2 {
+        font-size: 28px;
+        font-weight: 800;
       }
 
-      .btn-warning:hover {
-        background: #d97706;
+      /* Table Card */
+      .table-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+      }
+      .table-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8fafc;
       }
 
-      .btn-danger {
-        background: #ef4444;
-        border: none;
-        border-radius: 6px;
-        padding: 4px 10px;
+      .admin-table {
+        width: 100%;
+        border-collapse: collapse;
       }
-
-      .btn-danger:hover {
-        background: #dc2626;
+      .admin-table th {
+        background: #f8fafc;
+        padding: 15px 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
       }
-
-      /* modal */
-      .modal-content {
-        border-radius: 14px;
-        border: none;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      .admin-table td {
+        padding: 15px 15px;
+        font-size: 14px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
       }
-
-      .modal-header {
-        background: linear-gradient(135deg, #2563eb, #3b82f6);
-        color: white;
-        border-radius: 14px 14px 0 0;
-      }
-
-      .modal-title {
-        font-weight: 600;
-      }
-
-      .modal-body label {
-        font-weight: 600;
-        font-size: 13px;
-        color: #374151;
-      }
-
-      .modal-body input {
+      .hotel-img-mini {
+        width: 70px;
+        height: 50px;
         border-radius: 8px;
-        border: 1px solid #d1d5db;
-        padding: 10px;
-      }
-
-      .modal-body input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-      }
-
-      /* modal button */
-      .modal-footer .btn-success {
-        background: linear-gradient(135deg, #16a34a, #33bd65);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 18px;
-        font-weight: 600;
-      }
-
-      .modal-footer .btn-success:hover {
-        box-shadow: 0 8px 20px rgba(59, 180, 103, 0.35);
-      }
-
-      /* responsive */
-      @media (max-width: 768px) {
-        #searchInput {
-          width: 100% !important;
-          margin-top: 10px;
-        }
-      }
-
-      .image-item {
-        position: relative;
-        margin: 8px;
-      }
-
-      .image-item img {
-        width: 120px;
-        height: 90px;
         object-fit: cover;
-        border-radius: 6px;
-        border: 3px solid transparent;
-        cursor: pointer;
+        background: #f1f5f9;
       }
 
-      .image-main {
-        border: 3px solid #28a745 !important;
+      /* Badges */
+      .badge-status {
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .badge-pill-custom {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .bg-active {
+        color: #10b981;
+      }
+      .bg-maintenance {
+        color: #d97706;
+      }
+      .bg-inactive {
+        color: #ef4444;
       }
 
-      .delete-image {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        background: red;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
+      /* Form Styling */
+      .form-group label {
         font-size: 12px;
-        cursor: pointer;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
-      /* ảnh chính cũ */
-      .image-main-old {
-        border: 3px solid red !important;
+      .form-control {
+        border-radius: 12px;
+        border: 1.5px solid #e2e8f0;
+        font-size: 14px;
+        transition: 0.3s;
+      }
+      .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
       }
 
-      /* ảnh chính mới */
-      .image-main-new {
-        border: 3px solid #28a745 !important;
+      /* Modal Image Preview */
+      .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
       }
-
-      /* gallery modal */
-      .btn-image {
-        font-size: 25px;
-        margin: 5px;
-        color: #007bff;
-        border: none;
-        background: none;
+      .preview-item {
+        width: 100px;
+        height: 80px;
+        border-radius: 10px;
+        position: relative;
+        border: 2px solid transparent;
+        overflow: hidden;
         cursor: pointer;
       }
-      /* modal nền */
+      .preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .preview-item.main-img {
+        border-color: var(--success);
+      }
+      .preview-item .remove-btn {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 20px;
+        height: 20px;
+        background: var(--danger);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        cursor: pointer;
+      }
+
+      .btn-luxury {
+        padding: 10px 25px;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: 0.3s;
+      }
+
+      /* Badge dot for notification */
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--danger);
+        border-radius: 50%;
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        border: 2px solid white;
+      }
+
+      /* Gallery Modal Overlay */
+      .gallery-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+      }
+      .gallery-main-img {
+        width: 100%;
+        height: 450px;
+        object-fit: cover;
+        border-radius: 15px;
+      }
+
+      /* Action Buttons */
+      .btn-action {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: var(--secondary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 0 2px;
+      }
+      .btn-action:hover {
+        background: #f8fafc;
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .btn-action.text-danger:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: #fef2f2;
+      }
+      .preview-thumb {
+        width: 70px;
+        height: 50px;
+        border-radius: 8px;
+        object-fit: cover;
+        cursor: pointer;
+        opacity: 0.6;
+        border: 2px solid transparent;
+        transition: 0.2s;
+      }
+
+      .preview-thumb:hover {
+        opacity: 1;
+      }
+
+      .preview-thumb.active {
+        opacity: 1;
+        border-color: var(--primary);
+      }
       .gallery-modal {
         display: none;
         position: fixed;
@@ -398,15 +393,13 @@
         height: 100%;
         background: rgba(0, 0, 0, 0.85);
         z-index: 99999;
-
         justify-content: center;
         align-items: center;
       }
 
-      /* khung chính */
       .gallery-box {
         margin-top: 3%;
-        margin-left: 20%;
+
         width: 70%;
         max-width: 900px;
         background: white;
@@ -415,47 +408,32 @@
         position: relative;
       }
 
-      /* ảnh lớn */
-      .gallery-main {
-        position: relative;
-      }
-
       .gallery-main img {
         width: 100%;
         height: 500px;
         object-fit: cover;
         border-radius: 10px;
-        transition: all 0.4s ease;
       }
 
-      /* nút trái phải giống hotel */
       .g-nav {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         width: 45px;
         height: 45px;
-        border: none;
         border-radius: 50%;
         background: rgba(72, 69, 69, 0.5);
-        color: rgb(255, 255, 255);
-        font-size: 18px;
-        cursor: pointer;
-      }
-
-      .g-nav:hover {
-        background: rgba(35, 34, 34, 0.8);
+        color: white;
+        border: none;
       }
 
       .g-nav.prev {
         left: 15px;
       }
-
       .g-nav.next {
         right: 15px;
       }
 
-      /* thumbnail giống hotel */
       .gallery-thumbs {
         display: flex;
         gap: 10px;
@@ -467,308 +445,221 @@
         width: 120px;
         height: 80px;
         object-fit: cover;
-        cursor: pointer;
-        border-radius: 6px;
-
         opacity: 0.5;
-        transition: 0.3s;
-        border: 2px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
       }
 
-      /* hover */
-      .gallery-thumbs img:hover {
-        opacity: 0.8;
-      }
-
-      /* active giống hotel */
       .gallery-thumbs img.active {
         opacity: 1;
         border: 3px solid #0071c2;
         transform: scale(1.08);
       }
-
-      /* nút đóng */
-      .gallery-box .close {
-        position: absolute;
-        top: -10px;
-        right: -10px;
-
-        width: 35px;
-        height: 35px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        font-size: 20px;
-        color: #333;
-        background: white;
-
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      }
-      .close:hover {
-        background: #f2f2f2;
-      }
     </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Toggle submenu display
-        const menuItems = document.querySelectorAll(".nav-item");
-        menuItems.forEach((item) => {
-          item.addEventListener("click", function () {
-            const submenu = this.querySelector(".submenu");
-            if (submenu) {
-              submenu.style.display =
-                submenu.style.display === "none" || submenu.style.display === ""
-                  ? "block"
-                  : "none";
-            }
-          });
-        });
-
-        // Toggle sidebar visibility
-        const toggleButton = document.getElementById("sidebarToggle");
-        const sidebar = document.querySelector(".sidebar");
-        const content = document.querySelector(".content");
-        toggleButton.addEventListener("click", function () {
-          sidebar.classList.toggle("collapsed");
-          content.classList.toggle("collapsed");
-        });
-      });
-    </script>
   </head>
   <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <h2 class="text-center mb-4" style="font-size: 40px">
-        Dashboard
-        <br />
-      </h2>
-      <img
-        src="/images/loudbooking.jpg"
-        alt="Profile"
-        class="rounded-circle d-block mx-auto mb-4"
-        style="width: 100px; height: 100px; object-fit: cover"
-      />
-      <h2 class="text-center">Manager</h2>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="dashboard.html">
-            <i class="fas fa-tachometer-alt"></i>Dashboard
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="hotel.html">
-            <i class="fas fa-hotel"></i>Quản lý khách sạn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-bed"></i>Quản lý phòng
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="roomtype.html"
-                >◯ Danh sách loại phòng</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room.html">◯ Danh sách phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="fas fa-concierge-bell"></i>Quản lý tiện ích
-            <i class="fas fa-chevron-down"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a class="nav-link" href="hotel-util.html"
-                >◯ Tiện ích khách sạn</a
-              >
-            </li>
-            <li>
-              <a class="nav-link" href="room-util.html">◯ Tiện ích phòng</a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="review.html">
-            <i class="fas fa-star-half-alt"></i>Quản lý đánh giá
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="bill.html">
-            <i class="fas fa-clipboard-list"></i>Quản lý đơn
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="chat.html">
-            <i class="fas fa-comments"></i>Liên hệ
-            <i class="fas fa-chevron-down-o"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i>Đăng xuất<i
-              class="fas fa-chevron-down-o"
-            ></i>
-          </a>
-        </li>
-      </ul>
-    </div>
+    <aside class="sidebar">
+      <div class="logo-box">
+        <div class="logo-icon"><i class="fas fa-paper-plane"></i></div>
+        <div class="logo-text">LoudHotel</div>
+      </div>
+      <nav>
+        <div class="nav-group-label">Trung tâm điều hành</div>
+        <ul class="side-nav">
+          <li>
+            <a href="dashboard.html"
+              ><i class="fas fa-chart-pie"></i> Dashboard
+              <i class="fas fa-chevron-down-o"></i
+            ></a>
+          </li>
+          <li>
+            <a href="hotel.html" class="active"
+              ><i class="fas fa-hotel"></i> Khách sạn của tôi
+              <i class="fas fa-chevron-down-o"></i
+            ></a>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#roomSub').toggleClass('show')"
+            >
+              <i class="fas fa-bed"></i> Quản lý phòng
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="roomSub">
+              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="room.html">Danh sách phòng</a></li>
+            </ul>
+          </li>
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="$('#utilSub').toggleClass('show')"
+            >
+              <i class="fas fa-concierge-bell"></i> Quản lý tiện ích
 
-    <!-- Content -->
-    <div class="content">
-      <nav class="navbar navbar-expand navbar-light bg-light">
-        <button
-          id="sidebarToggle"
-          class="btn btn-outline-secondary mr-2"
-          title="Toggle Sidebar"
-        >
-          <i class="fas fa-bars"></i>
-        </button>
-        <a class="navbar-brand" href="dashboard.html">Home</a>
-        <a class="navbar-brand" href="#">Contact</a>
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-comments"></i
-              ><span class="badge badge-danger">3</span></a
-            >
+              <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+            </a>
+            <ul class="submenu" id="utilSub">
+              <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
+              <li><a href="room-util.html">Tiện ích phòng</a></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-bell"></i
-              ><span class="badge badge-warning">15</span></a
-            >
+        </ul>
+        <div class="nav-group-label">Kinh doanh</div>
+        <ul class="side-nav">
+          <li>
+            <a href="bill.html"
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-th-large"></i></a>
+          <li>
+            <a href="review.html"
+              ><i class="fas fa-comment-alt"></i> Đánh giá của khách<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <li>
+            <a href="chat.html"
+              ><i class="fas fa-comments"></i> Hỗ trợ khách hàng<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+        </ul>
+        <div class="nav-group-label">Hệ thống</div>
+        <ul class="side-nav">
+          <li>
+            <a
+              href="javascript:void(0)"
+              onclick="logout()"
+              style="color: var(--danger)"
+              ><i class="fas fa-sign-out-alt"></i> Đăng xuất<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
           </li>
         </ul>
       </nav>
+    </aside>
 
-
-      <section>
-        <div class="container mt-4">
-          <h1 class="mb-4 text-center">
-            <b>Quản Lý Khách Sạn</b>
-          </h1>
-
-          <!-- Thanh công cụ -->
-          <div class="d-flex justify-content-between mb-3">
-            <div></div>
-            <div class="search-box">
-              <input
-                type="text"
-                id="searchHotelInput"
-                placeholder="Tìm kiếm tên, địa chỉ..."
-                onkeyup="searchHotel()"
-              />
-              <button onclick="searchHotel()">
-                <i class="fa fa-search"></i>
-              </button>
-            </div>
+    <div class="main-wrapper">
+      <header class="top-bar">
+        <div style="width: 400px; position: relative">
+          <input
+            type="text"
+            id="searchHotelInput"
+            placeholder="Tìm kiếm tên, địa chỉ..."
+            class="form-control"
+            style="
+              padding-left: 45px;
+              height: 40px;
+              border-radius: 12px;
+              border: none;
+              background: #f8fafc;
+            "
+            onkeyup="searchHotel()"
+          />
+        </div>
+        <div class="d-flex align-items-center gap-4">
+          <div style="position: relative; cursor: pointer">
+            <i
+              class="fas fa-bell"
+              style="font-size: 20px; color: var(--secondary)"
+            ></i>
+            <span class="badge-dot"></span>
           </div>
-
-          <!-- Bảng khách sạn -->
-          <div class="table-responsive">
-            <table
-              class="table table-bordered table-hover text-center align-middle"
+          <div class="d-flex align-items-center gap-2" style="cursor: pointer">
+            <div
+              style="
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                background: var(--primary-light);
+                color: var(--primary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+              "
             >
-              <thead>
-                <tr>
-                  <th>Ảnh</th>
-                  <th>Tên khách sạn</th>
-                  <th>Địa chỉ</th>
-                  <th>Đánh giá TB</th>
-                  <th>Số phòng</th>
-                  <th>Tình trạng</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody id="hotelTableBody">
-                <!-- render bằng JS -->
-              </tbody>
-            </table>
-            <nav>
-              <ul
-                class="pagination justify-content-center"
-                id="pagination"
-              ></ul>
-            </nav>
+              M
+            </div>
+            <span style="font-weight: 600; font-size: 14px">Quản lý viên</span>
           </div>
         </div>
-      </section>
+      </header>
 
-      <!-- Modal thêm / sửa khách sạn -->
-      <div class="modal fade" id="hotelModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="hotelModalTitle">Thêm khách sạn</h5>
-              <button type="button" class="close" data-dismiss="modal">
-                &times;
-              </button>
-            </div>
+      <div class="content-body">
+        <div class="page-header">
+          <div>
+            <h2>Khách Sạn Của Tôi</h2>
+            <p style="color: var(--text-muted)">
+              Quản lý thông tin, mô tả và hình ảnh khách sạn được phân quyền.
+            </p>
+          </div>
+        </div>
 
-            <div class="modal-body">
-              <input type="hidden" id="hotelId" />
+        <div class="table-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ảnh</th>
+                <th>Tên khách sạn</th>
+                <th>Địa chỉ</th>
+                <th>Đánh giá TB</th>
+                <th>Số phòng</th>
+                <th>Tình trạng</th>
+                <th style="text-align: center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="hotelTableBody">
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <i class="fas fa-spinner fa-spin mr-2"></i> Đang tải...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-              <div class="form-group">
+    <!-- Hotel Modal -->
+    <div class="modal fade" id="hotelModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="hotelModalTitle">Thêm Khách Sạn</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="hotelId" />
+            <div class="row">
+              <div class="col-md-12 form-group">
                 <label>Tên khách sạn</label>
-                <input type="text" id="hotelName" class="form-control" />
-              </div>
-
-              <div class="form-group">
-                <label>Địa chỉ</label>
-                <input type="text" id="hotelAddress" class="form-control" />
-              </div>
-
-              <div class="form-group">
-                <label>Mô tả</label>
-                <textarea
-                  id="hotelDesc"
-                  class="form-control"
-                  rows="6"
-                  style="resize: vertical; overflow-y: auto"
-                  placeholder="Nhập mô tả khách sạn..."
-                ></textarea>
-              </div>
-
-              <div class="form-group">
-                <label>Ảnh khách sạn</label>
-
                 <input
-                  type="file"
-                  id="hotelImages"
+                  type="text"
+                  id="hotelName"
                   class="form-control"
-                  multiple
-                  accept="image/*"
-                  onchange="previewImages()"
+                  placeholder="Nhập tên khách sạn..."
                 />
-                <button
-                  class="btn-image"
-                  onclick="openPreviewGallery()"
-                  title="Xem ảnh"
-                >
-                  <i class="fas fa-images"></i>
-                </button>
-                <div id="imagePreview" class="d-flex flex-wrap mt-3"></div>
               </div>
-
-              <div class="form-group">
+              <div class="col-md-6 form-group">
+                <label>Địa chỉ</label>
+                <input
+                  type="text"
+                  id="hotelAddress"
+                  class="form-control"
+                  placeholder="Số nhà, tên đường, khu vực..."
+                />
+              </div>
+              <div class="col-md-6 form-group">
                 <label>Tình trạng</label>
                 <select id="hotelStatus" class="form-control">
                   <option value="ACTIVE">Hoạt động</option>
@@ -776,295 +667,299 @@
                   <option value="MAINTENANCE">Bảo trì</option>
                 </select>
               </div>
-            </div>
-
-            <div class="modal-footer">
-              <button class="btn btn-secondary" data-dismiss="modal">
-                Hủy
-              </button>
-              <button class="btn btn-success" onclick="saveHotel()">Lưu</button>
+              <div class="col-md-12 form-group">
+                <label>Mô tả chi tiết</label>
+                <textarea
+                  id="hotelDesc"
+                  class="form-control"
+                  rows="4"
+                  placeholder="Giới thiệu về khách sạn..."
+                ></textarea>
+              </div>
+              <div class="col-md-12 form-group">
+                <label>Hình ảnh khách sạn (Có thể chọn nhiều)</label>
+                <div class="d-flex gap-2">
+                  <input
+                    type="file"
+                    id="hotelImages"
+                    class="form-control"
+                    multiple
+                    accept="image/*"
+                    onchange="previewImages()"
+                  />
+                  <button
+                    class="btn btn-outline-primary"
+                    style="border-radius: 12px"
+                    onclick="openPreviewGallery()"
+                  >
+                    <i class="fas fa-images"></i>
+                  </button>
+                </div>
+                <div id="imagePreview" class="preview-container"></div>
+              </div>
             </div>
           </div>
-        </div>
-        <!-- PREVIEW GALLERY -->
-        <div id="previewGallery" class="gallery-modal">
-          <div class="gallery-box">
-            <span class="close" onclick="closePreviewGallery()">&times;</span>
-
-            <div class="gallery-main">
-              <img id="previewMainImage" src="" />
-
-              <button class="g-nav prev" onclick="changePreviewSlide(-1)">
-                <i class="fa-solid fa-chevron-left"></i>
-              </button>
-
-              <button class="g-nav next" onclick="changePreviewSlide(1)">
-                <i class="fa-solid fa-chevron-right"></i>
-              </button>
-            </div>
-
-            <div class="gallery-thumbs" id="previewThumbs"></div>
+          <div class="modal-footer">
+            <button class="btn btn-light btn-luxury" data-dismiss="modal">
+              Hủy
+            </button>
+            <button class="btn btn-primary btn-luxury" onclick="saveHotel()">
+              Lưu
+            </button>
           </div>
         </div>
       </div>
-      <script>
-        const API = "http://localhost:8080/api/hotels";
+    </div>
 
-        let hotels = [];
-        let existingImages = [];
-        let existingMainIndex = 0;
-        let deletedImages = [];
-        /* =========================LOAD DANH SÁCH KHÁCH SẠN========================= */
-        async function loadHotels() {
-          const token = localStorage.getItem("accessToken");
+    <!-- Gallery Overlay (Same as detail) -->
+    <div id="previewGallery" class="gallery-modal">
+      <div class="gallery-box">
+        <span
+          class="close"
+          style="cursor: pointer"
+          onclick="closePreviewGallery()"
+          >&times;</span
+        >
 
-          const res = await fetch(API + "/my", {
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-          });
+        <div class="gallery-main">
+          <img id="previewMainImage" src="" />
 
-          hotels = await res.json();
+          <button class="g-nav prev" onclick="changePreviewSlide(-1)">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
 
-          renderHotels(hotels);
-        }
-        /* =========================RENDER TABLE========================= */
-        function renderHotels(data) {
-          const tbody = document.getElementById("hotelTableBody");
-          tbody.innerHTML = "";
+          <button class="g-nav next" onclick="changePreviewSlide(1)">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
 
-          data.forEach((h) => {
-            // =================== Trạng thái ===================
-            let statusText =
-              h.hotelStatus === "ACTIVE"
-                ? "Hoạt động"
-                : h.hotelStatus === "INACTIVE"
-                  ? "Ngừng hoạt động"
-                  : "Bảo trì";
+        <div class="gallery-thumbs" id="previewThumbs"></div>
+      </div>
+    </div>
+    <script>
+      const API_HOTEL = "http://localhost:8080/api/hotels";
+      const API_IMG = "http://localhost:8080/api/images";
+      const token = localStorage.getItem("accessToken");
 
-            let statusClass =
-              "fw-bold " +
-              (h.hotelStatus === "ACTIVE"
-                ? "text-success"
-                : h.hotelStatus === "INACTIVE"
-                  ? "text-secondary"
-                  : "text-warning");
+      let hotelList = [];
+      let selectedImages = []; // ảnh mới
+      let existingImages = []; // ảnh cũ
+      let existingMainIndex = -1; // index ảnh chính cũ
+      let mainImageIndex = -1; // index ảnh chính (tổng)
+      let deletedImages = [];
+      let previewImagesListGlobal = [];
+      let previewIdx = 0;
+      let previewImagesList = [];
+      let previewIndex = 0;
 
-            // =================== Ảnh ===================
-            const image = h.mainImage
-              ? `<img src="http://localhost:8080${h.mainImage}" width="80">`
-              : "Không có";
-
-            // =================== Nút ===================
-            let actionButtons = `
-      <button class="btn btn-sm btn-outline-info mr-1"
-        onclick="viewHotel(${h.hotelId})">
-        <i class="fa fa-eye"></i>
-      </button>
-
-      <button class="btn btn-sm btn-outline-primary mr-1"
-        onclick="editHotel(${h.hotelId})">
-        <i class="fa fa-edit"></i>
-      </button>
-    `;
-
-            // =================== Render ===================
-            tbody.innerHTML += `
-      <tr>
-        <td>${image}</td>
-        <td>${h.hotelName}</td>
-        <td>${h.address || ""}</td>
-        <td>${h.averageRating ? h.averageRating.toFixed(1) : 0}</td>
-        <td>${h.roomsTotal || 0}</td>
-        <td><span class="${statusClass}">${statusText}</span></td>
-        <td>
-          <div class="d-flex justify-content-center">
-            ${actionButtons}
-          </div>
-        </td>
-      </tr>
-    `;
-          });
-        }
-        async function viewHotel(id) {
-          const res = await fetch(API + "/" + id);
-          const h = await res.json();
-          document.getElementById("hotelModalTitle").innerText =
-            "Xem khách sạn";
-          document.getElementById("hotelId").value = h.hotelId;
-          document.getElementById("hotelName").value = h.hotelName;
-          document.getElementById("hotelAddress").value = h.address;
-          document.getElementById("hotelDesc").value = h.introduction;
-          document.getElementById("hotelStatus").value =
-            h.hotelStatus || "ACTIVE";
-          existingImages = h.images || [];
-          existingMainIndex = existingImages.findIndex((i) => i.main);
-          if (existingMainIndex === -1) existingMainIndex = 0;
-
-          selectedImages = [];
-          mainImageIndex = -1;
-          deletedImages = [];
-          renderPreview();
-
-          /* khóa input */
-          document
-            .querySelectorAll(
-              "#hotelModal input, #hotelModal textarea, #hotelModal select",
-            )
-            .forEach((el) => (el.disabled = true));
-
-          /* ẩn nút lưu */
-          document.querySelector("#hotelModal .btn-success").style.display =
-            "none";
-          $("#hotelModal").modal("show");
-        }
-        /* =========================TÌM KIẾM========================= */
-        async function searchHotel() {
+      async function loadHotels(page = 0) {
+        try {
           const keyword = document.getElementById("searchHotelInput").value;
+          let url = API_HOTEL + `/my/summary?page=${page}&size=5`;
+          if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
 
-          if (keyword === "") {
-            loadHotels();
-            return;
-          }
-
-          const res = await fetch(API + "/search?keyword=" + keyword);
-
+          const res = await fetch(url, {
+            headers: { Authorization: "Bearer " + token },
+          });
           const data = await res.json();
+          hotelList = data.content || [];
+          renderHotels();
+        } catch (e) {
+          console.error(e);
+        }
+      }
 
-          renderHotels(data);
+      function renderHotels() {
+        const tbody = document.getElementById("hotelTableBody");
+        tbody.innerHTML = "";
+        hotelList.forEach((h) => {
+          const statusCls =
+            h.hotelStatus === "ACTIVE"
+              ? "bg-active"
+              : h.hotelStatus === "MAINTENANCE"
+                ? "bg-maintenance"
+                : "bg-inactive";
+          const statusText =
+            h.hotelStatus === "ACTIVE"
+              ? "Hoạt động"
+              : h.hotelStatus === "MAINTENANCE"
+                ? "Bảo trì"
+                : "Ngừng hoạt động";
+
+          tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${getImgUrl(h.mainImage)}" class="hotel-img-mini"></td>
+                        <td style="font-weight: 700;">${h.hotelName}</td>
+                        <td style="font-size: 13px; max-width: 250px;">${h.address}</td>
+                        <td class="text-warning"><b>${(h.averageRating || 0).toFixed(1)}</b></td>
+                        <td><span class="badge badge-light" style="font-weight: 800;">${h.roomsTotal || 0}</span></td>
+                        <td><span class="badge-status ${statusCls}">${statusText}</span></td>
+                        <td class="text-center">
+                            <button class="btn-action" title="Sửa thông tin" onclick="editHotel(${h.hotelId})"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                `;
+        });
+      }
+
+      function getImgUrl(path) {
+        if (!path) return "https://via.placeholder.com/150?text=No+Image";
+        if (path.startsWith("http")) return path;
+        return `http://localhost:8080${path}`;
+      }
+
+      function previewImages() {
+        const files = Array.from(document.getElementById("hotelImages").files);
+
+        files.forEach((file) => selectedImages.push(file));
+
+        renderPreview();
+
+        document.getElementById("hotelImages").value = "";
+      }
+      function setMainImage(index) {
+        mainImageIndex = index;
+        previewImages(); // render lại
+      }
+
+      function removeExistingImage(index) {
+        const img = existingImages[index];
+        deletedImages.push(img.imageId);
+
+        existingImages.splice(index, 1);
+
+        if (index === existingMainIndex) {
+          existingMainIndex = existingImages.length > 0 ? 0 : -1;
+        } else if (index < existingMainIndex) {
+          existingMainIndex--;
         }
 
-        /* =========================MỞ MODAL THÊM========================= */
+        renderPreview();
+      }
 
-        function openAddHotelModal() {
-          document.getElementById("hotelModalTitle").innerText =
-            "Thêm khách sạn";
+      function removeNewImage(index) {
+        const realIndex = existingImages.length + index;
 
-          document.getElementById("hotelId").value = "";
-
-          document.getElementById("hotelName").value = "";
-          document.getElementById("hotelAddress").value = "";
-          document.getElementById("hotelDesc").value = "";
-
-          document.getElementById("hotelImages").value = "";
-          document.getElementById("hotelStatus").value = "ACTIVE";
-
-          /* RESET TOÀN BỘ ẢNH */
-
-          existingImages = [];
-          existingMainIndex = -1;
-
-          selectedImages = [];
+        if (mainImageIndex === realIndex) {
           mainImageIndex = -1;
-          deletedImages = [];
-
-          document.getElementById("imagePreview").innerHTML = "";
-
-          $("#hotelModal").modal("show");
+        } else if (mainImageIndex > realIndex) {
+          mainImageIndex--;
         }
 
-        /* =========================MỞ MODAL SỬA========================= */
+        selectedImages.splice(index, 1);
 
-        async function editHotel(id) {
-          const res = await fetch(API + "/" + id);
-          const h = await res.json();
+        renderPreview();
+      }
 
-          document.getElementById("hotelModalTitle").innerText =
-            "Sửa khách sạn";
+      function renderPreview() {
+        const container = document.getElementById("imagePreview");
+        container.innerHTML = "";
 
-          document.getElementById("hotelId").value = h.hotelId;
-          document.getElementById("hotelName").value = h.hotelName;
-          document.getElementById("hotelAddress").value = h.address;
-          document.getElementById("hotelDesc").value = h.introduction;
-          document.getElementById("hotelStatus").value =
-            h.hotelStatus || "ACTIVE";
+        // ===== ẢNH CŨ =====
+        existingImages.forEach((img, index) => {
+          const div = document.createElement("div");
+          div.className = "preview-item";
 
-          existingImages = h.images || [];
+          const image = document.createElement("img");
+          image.src = getImgUrl(img.imageUrl);
 
-          existingMainIndex = existingImages.findIndex((i) => i.main);
-
-          if (existingMainIndex === -1) {
-            existingMainIndex = 0;
+          if (index === existingMainIndex && mainImageIndex === -1) {
+            div.classList.add("main-img");
           }
 
-          selectedImages = [];
-          mainImageIndex = -1;
-          deletedImages = [];
-          renderPreview();
-          /* mở khóa input khi sửa */
-          document
-            .querySelectorAll(
-              "#hotelModal input, #hotelModal textarea, #hotelModal select",
-            )
-            .forEach((el) => (el.disabled = false));
-          /* hiện lại nút lưu */
-          document.querySelector("#hotelModal .btn-success").style.display =
-            "inline-block";
-          $("#hotelModal").modal("show");
-        }
+          image.onclick = () => {
+            existingMainIndex = index;
+            mainImageIndex = -1;
+            renderPreview();
+          };
 
-        // Xóa ảnh cũ
-        function removeExistingImage(index) {
-          const image = existingImages[index];
+          const del = document.createElement("div");
+          del.className = "remove-btn";
+          del.innerHTML = "×";
+          del.onclick = (e) => {
+            e.stopPropagation();
+            removeExistingImage(index);
+          };
 
-          deletedImages.push(image.imageId);
+          div.appendChild(image);
+          div.appendChild(del);
+          container.appendChild(div);
+        });
 
-          existingImages.splice(index, 1);
+        // ===== ẢNH MỚI =====
+        selectedImages.forEach((file, index) => {
+          const reader = new FileReader();
 
-          /* Nếu xóa ảnh chính */
-          if (index === existingMainIndex) {
-            if (existingImages.length > 0) {
-              existingMainIndex = 0; // chọn ảnh đầu tiên làm ảnh chính
-            } else {
-              existingMainIndex = -1;
+          reader.onload = (e) => {
+            const div = document.createElement("div");
+            div.className = "preview-item";
+
+            const img = document.createElement("img");
+            img.src = e.target.result;
+
+            const realIndex = existingImages.length + index;
+
+            if (realIndex === mainImageIndex) {
+              div.classList.add("main-img");
             }
-          } else if (index < existingMainIndex) {
-            /* Nếu xóa ảnh trước ảnh chính */
-            existingMainIndex--;
-          }
 
-          renderPreview();
-        }
+            img.onclick = () => {
+              existingMainIndex = -1;
+              mainImageIndex = realIndex;
+              renderPreview();
+            };
 
-        /* =========================LƯU KHÁCH SẠN========================= */
+            const del = document.createElement("div");
+            del.className = "remove-btn";
+            del.innerHTML = "×";
+            del.onclick = (e) => {
+              e.stopPropagation();
+              removeNewImage(index);
+            };
 
-        async function saveHotel() {
+            div.appendChild(img);
+            div.appendChild(del);
+            container.appendChild(div);
+          };
+
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function saveHotel() {
+        try {
           const id = document.getElementById("hotelId").value;
 
-          const data = {
-            hotelName: document.getElementById("hotelName").value,
-            address: document.getElementById("hotelAddress").value,
-            introduction: document.getElementById("hotelDesc").value,
+          const body = {
+            hotelName: document.getElementById("hotelName").value.trim(),
+            address: document.getElementById("hotelAddress").value.trim(),
+            introduction: document.getElementById("hotelDesc").value.trim(),
             hotelStatus: document.getElementById("hotelStatus").value,
           };
 
-          let hotelId = id;
+          const method = id ? "PUT" : "POST";
+          const url = id ? `${API_HOTEL}/${id}` : API_HOTEL;
 
-          if (id === "") {
-            const res = await fetch(API, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-              body: JSON.stringify(data),
-            });
+          const res = await fetch(url, {
+            method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify(body),
+          });
 
-            const hotel = await res.json();
-            hotelId = hotel.hotelId;
-          } else {
-            await fetch(API + "/" + id, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
-              },
-              body: JSON.stringify(data),
-            });
+          // ❌ Backend trả lỗi
+          if (!res.ok) {
+            const errorData = await res.json();
+            showError(getFirstError(errorData));
+            return;
           }
 
-          /* đổi ảnh chính */
+          // ✅ Thành công
+          const savedHotel = await res.json();
 
+          /* ===== đổi ảnh chính ===== */
           if (
             existingMainIndex >= 0 &&
             existingImages.length > 0 &&
@@ -1072,338 +967,286 @@
           ) {
             const mainImageId = existingImages[existingMainIndex].imageId;
 
-            await fetch(API + "/images/" + mainImageId + "/main", {
+            await fetch(`${API_HOTEL}/images/${mainImageId}/main`, {
               method: "PUT",
               headers: {
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                Authorization: "Bearer " + token,
               },
             });
           }
 
-          /* XÓA ẢNH CŨ */
-
+          /* ===== xóa ảnh ===== */
           for (const imageId of deletedImages) {
-            await fetch(API + "/images/" + imageId, {
+            await fetch(`${API_HOTEL}/images/${imageId}`, {
               method: "DELETE",
               headers: {
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                Authorization: "Bearer " + token,
               },
             });
           }
 
-          /* upload ảnh */
-
+          /* ===== upload ảnh mới ===== */
           if (selectedImages.length > 0) {
             const formData = new FormData();
 
-            selectedImages.forEach((f) => {
-              formData.append("files", f);
+            selectedImages.forEach((file) => {
+              formData.append("files", file);
             });
 
             let newMainIndex = -1;
 
-            /* nếu chọn ảnh mới làm main */
             if (mainImageIndex >= existingImages.length) {
               newMainIndex = mainImageIndex - existingImages.length;
             }
 
             formData.append("mainIndex", newMainIndex);
 
-            await fetch(API + "/" + hotelId + "/images", {
+            await fetch(`${API_HOTEL}/${savedHotel.hotelId}/images`, {
               method: "POST",
               headers: {
-                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                Authorization: "Bearer " + token,
               },
               body: formData,
             });
           }
 
+          showSuccess("Lưu khách sạn thành công");
+
           $("#hotelModal").modal("hide");
 
           loadHotels();
+        } catch (error) {
+          console.error(error);
+
+          showError("Không thể kết nối tới máy chủ");
         }
-        /* =========================LOAD PAGE========================= */
-        loadHotels();
-      </script>
-      <script>
-        /// ================= PREVIEW GALLERY SCRIPT =================
-        let previewImagesList = [];
-        let previewIndex = 0;
+      }
 
-        /* ===== OPEN ===== */
-        function openPreviewGallery() {
-          previewImagesList = [];
+      async function editHotel(id) {
+        mainImageIndex = -1;
+        const h = hotelList.find((x) => x.hotelId === id);
+        document.getElementById("hotelId").value = h.hotelId;
+        document.getElementById("hotelName").value = h.hotelName;
+        document.getElementById("hotelAddress").value = h.address;
+        document.getElementById("hotelDesc").value = h.introduction || "";
+        document.getElementById("hotelStatus").value = h.hotelStatus;
+        document.getElementById("hotelModalTitle").innerText = "Sửa Khách Sạn";
 
-          let mainImage = null;
+        // Load ảnh hiện tại
+        const imgRes = await fetch(`${API_HOTEL}/${id}/images`, {
+          headers: { Authorization: "Bearer " + token },
+        });
+        existingImages = await imgRes.json();
 
-          /* ===== ẢNH CŨ ===== */
-          existingImages.forEach((img, index) => {
-            const url = "http://localhost:8080" + img.imageUrl;
+        existingMainIndex = existingImages.findIndex((i) => i.main);
+        if (existingMainIndex === -1) existingMainIndex = 0;
 
-            // nếu là ảnh chính cũ
-            if (index === existingMainIndex && mainImageIndex === -1) {
-              mainImage = url;
-            } else {
-              previewImagesList.push(url);
-            }
-          });
+        selectedImages = [];
+        mainImageIndex = -1;
+        deletedImages = [];
 
-          /* ===== ẢNH MỚI ===== */
-          selectedImages.forEach((file, index) => {
-            const url = URL.createObjectURL(file);
+        renderPreview();
+        $("#hotelModal").modal("show");
+      }
 
-            const realIndex = existingImages.length + index;
-
-            // nếu là ảnh chính mới
-            if (realIndex === mainImageIndex) {
-              mainImage = url;
-            } else {
-              previewImagesList.push(url);
-            }
-          });
-
-          // 👉 nếu có ảnh chính → đưa lên đầu
-          if (mainImage) {
-            previewImagesList.unshift(mainImage);
-          }
-
-          if (previewImagesList.length === 0) {
-            alert("Chưa có ảnh nào!");
-            return;
-          }
-
-          previewIndex = 0; // luôn hiển thị ảnh chính
-
-          document.getElementById("previewGallery").style.display = "block";
-
-          renderPreviewGallery();
+      async function deleteExistingImg(imgId) {
+        if (!confirm("Xóa ảnh này?")) return;
+        const res = await fetch(`${API_IMG}/${imgId}`, {
+          method: "DELETE",
+          headers: { Authorization: "Bearer " + token },
+        });
+        if (res.ok) {
+          currentHotelImages = currentHotelImages.filter(
+            (i) => i.imageId !== imgId,
+          );
+          renderPreviewGrid();
         }
+      }
 
-        /* ===== CLOSE ===== */
-        function closePreviewGallery() {
-          document.getElementById("previewGallery").style.display = "none";
-        }
+      function openPreviewGallery() {
+        previewImagesList = [];
+        let mainImage = null;
 
-        /* ===== RENDER ===== */
-        function renderPreviewGallery() {
-          const main = document.getElementById("previewMainImage");
-          const thumbs = document.getElementById("previewThumbs");
+        // ảnh cũ
+        existingImages.forEach((img, index) => {
+          const url = getImgUrl(img.imageUrl);
 
-          thumbs.innerHTML = "";
-
-          previewImagesList.forEach((img, index) => {
-            const el = document.createElement("img");
-            el.src = img;
-
-            el.onclick = () => {
-              previewIndex = index;
-              updateMainImage(); // 👉 KHÔNG render lại nữa
-            };
-
-            thumbs.appendChild(el);
-          });
-
-          updateMainImage();
-        }
-        function updateMainImage() {
-          const main = document.getElementById("previewMainImage");
-
-          main.src = previewImagesList[previewIndex];
-
-          updateActiveThumb();
-        }
-        function updateActiveThumb() {
-          const thumbs = document.getElementById("previewThumbs");
-
-          [...thumbs.children].forEach((img, i) => {
-            img.classList.toggle("active", i === previewIndex);
-          });
-
-          // 👉 auto scroll tới ảnh đang chọn (giống hotel xịn)
-          thumbs.children[previewIndex].scrollIntoView({
-            behavior: "smooth",
-            inline: "center",
-            block: "nearest",
-          });
-        }
-
-        /* ===== NEXT / PREV ===== */
-        function changePreviewSlide(step) {
-          previewIndex =
-            (previewIndex + step + previewImagesList.length) %
-            previewImagesList.length;
-
-          updateMainImage(); // 👉 không render lại
-        }
-        document.getElementById("previewGallery").onclick = function (e) {
-          if (e.target.id === "previewGallery") {
-            closePreviewGallery();
-          }
-        };
-        document.addEventListener("keydown", function (e) {
-          if (
-            document.getElementById("previewGallery").style.display === "block"
-          ) {
-            if (e.key === "ArrowRight") changePreviewSlide(1);
-            if (e.key === "ArrowLeft") changePreviewSlide(-1);
-            if (e.key === "Escape") closePreviewGallery();
+          if (index === existingMainIndex && mainImageIndex === -1) {
+            mainImage = url;
+          } else {
+            previewImagesList.push(url);
           }
         });
-      </script>
-      <script>
-        /* =========================BIẾN ẢNH========================= */
 
-        let selectedImages = [];
-        let mainImageIndex = -1;
-
-        /* =========================CHỌN ẢNH========================= */
-
-        function previewImages() {
-          const input = document.getElementById("hotelImages");
-          const files = Array.from(input.files);
-
-          if (files.length === 0) return;
-
-          files.forEach((file) => {
-            selectedImages.push(file);
-          });
-
-          renderPreview();
-
-          // reset input để có thể chọn tiếp ảnh
-          input.value = "";
-        }
-
-        /* =========================HIỂN THỊ PREVIEW========================= */
-
-        function renderPreview() {
-          const preview = document.getElementById("imagePreview");
-          preview.innerHTML = "";
-
-          /* HIỂN THỊ ẢNH CŨ */
-
-          existingImages.forEach((img, index) => {
-            const div = document.createElement("div");
-            div.className = "image-item";
-
-            const image = document.createElement("img");
-            image.src = "http://localhost:8080" + img.imageUrl;
-
-            if (index === existingMainIndex && mainImageIndex === -1) {
-              image.classList.add("image-main-old");
-            }
-
-            image.onclick = () => {
-              existingMainIndex = index;
-              mainImageIndex = -1; // bỏ main ảnh mới
-
-              renderPreview();
-            };
-
-            const del = document.createElement("button");
-            del.className = "delete-image";
-            del.innerHTML = "×";
-
-            del.onclick = (e) => {
-              e.stopPropagation();
-              removeExistingImage(index);
-            };
-
-            div.appendChild(image);
-            div.appendChild(del);
-
-            preview.appendChild(div);
-          });
-
-          /* HIỂN THỊ ẢNH MỚI */
-
-          selectedImages.forEach((file, index) => {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-              const div = document.createElement("div");
-              div.className = "image-item";
-
-              const img = document.createElement("img");
-              img.src = e.target.result;
-
-              const realIndex = existingImages.length + index;
-
-              if (realIndex === mainImageIndex) {
-                img.classList.add("image-main-new");
-              }
-
-              img.onclick = () => {
-                existingMainIndex = -1; // bỏ main ảnh cũ
-                mainImageIndex = realIndex;
-
-                renderPreview();
-              };
-
-              const del = document.createElement("button");
-              del.className = "delete-image";
-              del.innerHTML = "×";
-
-              del.onclick = (event) => {
-                event.stopPropagation();
-                removeImage(index);
-              };
-
-              div.appendChild(img);
-              div.appendChild(del);
-
-              preview.appendChild(div);
-            };
-
-            reader.readAsDataURL(file);
-          });
-        }
-        /* =========================XÓA ẢNH========================= */
-
-        function removeImage(index) {
+        // ảnh mới
+        selectedImages.forEach((file, index) => {
+          const url = URL.createObjectURL(file);
           const realIndex = existingImages.length + index;
 
-          if (mainImageIndex === realIndex) {
-            mainImageIndex = -1;
-          } else if (mainImageIndex > realIndex) {
-            mainImageIndex--;
+          if (realIndex === mainImageIndex) {
+            mainImage = url;
+          } else {
+            previewImagesList.push(url);
           }
+        });
 
-          selectedImages.splice(index, 1);
+        if (mainImage) previewImagesList.unshift(mainImage);
 
-          renderPreview();
+        if (previewImagesList.length === 0) {
+          alert("Chưa có ảnh nào!");
+          return;
         }
-      </script>
-      <script>
+
+        previewIndex = 0;
+
+        document.getElementById("previewGallery").style.display = "flex";
+        renderPreviewGallery();
+      }
+      function renderPreviewGallery() {
+        const thumbs = document.getElementById("previewThumbs");
+        thumbs.innerHTML = "";
+
+        previewImagesList.forEach((img, index) => {
+          const el = document.createElement("img");
+          el.src = img;
+
+          el.onclick = () => {
+            previewIndex = index;
+            updateMainImage();
+          };
+
+          thumbs.appendChild(el);
+        });
+
+        updateMainImage();
+      }
+      function updateMainImage() {
+        const main = document.getElementById("previewMainImage");
+        main.src = previewImagesList[previewIndex];
+
+        const thumbs = document.getElementById("previewThumbs");
+        [...thumbs.children].forEach((img, i) => {
+          img.classList.toggle("active", i === previewIndex);
+        });
+
+        thumbs.children[previewIndex].scrollIntoView({
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
+        });
+      }
+      function changePreviewSlide(step) {
+        previewIndex =
+          (previewIndex + step + previewImagesList.length) %
+          previewImagesList.length;
+
+        updateMainImage();
+      }
+
+      function closePreviewGallery() {
+        document.getElementById("previewGallery").style.display = "none";
+      }
+
+      function searchHotel() {
+        const val = document
+          .getElementById("searchHotelInput")
+          .value.toLowerCase();
+        const filtered = hotelList.filter(
+          (h) =>
+            h.hotelName.toLowerCase().includes(val) ||
+            h.hotelAddress.toLowerCase().includes(val),
+        );
+        renderHotelsFiltered(filtered);
+      }
+      function renderHotelsFiltered(data) {
+        const tbody = document.getElementById("hotelTableBody");
+        tbody.innerHTML = "";
+        data.forEach((h) => {
+          const statusCls =
+            h.hotelStatus === "ACTIVE"
+              ? "bg-active"
+              : h.hotelStatus === "MAINTENANCE"
+                ? "bg-maintenance"
+                : "bg-inactive";
+          const statusText =
+            h.hotelStatus === "ACTIVE"
+              ? "Hoạt động"
+              : h.hotelStatus === "MAINTENANCE"
+                ? "Bảo trì"
+                : "Ngừng hoạt động";
+          tbody.innerHTML += `<tr><td><img src="${getImgUrl(h.mainImage)}" class="hotel-img-mini"></td><td style="font-weight: 700;">${h.hotelName}</td><td>${h.address}</td><td class="text-warning"><b>${(h.averageRating || 0).toFixed(1)}</b></td><td><span class="badge badge-light" style="font-weight: 800;">${h.roomsTotal || 0}</span></td><td><span class="badge-status ${statusCls}">${statusText}</span></td><td class="text-center"><button class="btn-action" onclick="editHotel(${h.hotelId})"><i class="fas fa-edit"></i></button></td></tr>`;
+        });
+      }
+
+      // 🎨 SweetAlert2 Theme (Thông báo)
+      const ToastSuccess = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2200,
+        timerProgressBar: true,
+        background: "#ffffff",
+        color: "#333",
+        iconColor: "#22c55e",
+        customClass: {
+          popup: "swal2-toast-custom",
+          title: "swal2-title-custom",
+        },
+      });
+
+      const PopupError = Swal.mixin({
+        icon: "error",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#ef4444",
+        background: "#ffffff",
+        color: "#111827",
+        customClass: {
+          popup: "swal2-popup-custom",
+          title: "swal2-title-custom",
+          htmlContainer: "swal2-text-custom",
+        },
+      });
+
+      // ✅ Toast thành công (góc phải trên)
+      function showSuccess(message) {
+        ToastSuccess.fire({
+          icon: "success",
+          title: message,
+        });
+      }
+
+      // ❌ Popup lỗi (giữa màn hình)
+      function showError(message) {
+        PopupError.fire({
+          title: "Có lỗi xảy ra",
+          html: message,
+        });
+      }
+
+      // lấy lỗi đầu tiên từ backend validation
+      function getFirstError(obj) {
+        if (!obj) return "Có lỗi xảy ra";
+        if (obj.message) return obj.message;
+        if (typeof obj === "object") return Object.values(obj)[0];
+        return "Có lỗi xảy ra";
+      }
+
       function logout() {
         Swal.fire({
-          title: "Xác nhận đăng xuất?",
+          title: "Đăng xuất?",
           icon: "warning",
           showCancelButton: true,
           confirmButtonText: "Đăng xuất",
-          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
-          cancelButtonColor: "#6b7280",
-        }).then((result) => {
-          if (!result.isConfirmed) return;
-
-          // Xóa toàn bộ thông tin đăng nhập
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("userId");
-          localStorage.removeItem("username");
-          localStorage.removeItem("role");
-
-          // chuyển về trang login
-          window.location.href = "/login.html";
+        }).then((res) => {
+          if (res.isConfirmed) {
+            localStorage.clear();
+            window.location.href = "/login.html";
+          }
         });
       }
-    </script>
 
-      <div class="footer">
-        <p>Copyright © VXB-2026 AdminDashboard. All rights reserved.</p>
-        <p>Version 8.8.4-rc</p>
-      </div>
-    </div>
+      document.addEventListener("DOMContentLoaded", () => loadHotels(0));
+    </script>
   </body>
 </html>

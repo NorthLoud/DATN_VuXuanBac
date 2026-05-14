@@ -25,13 +25,11 @@ public class ManagerHotelUtilitiesController {
             @RequestParam(required = false) String hotelStatus,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "hotelId") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
-    ) {
+            @RequestParam(defaultValue = "asc") String sortDir) {
         Long managerId = SecurityUtil.getCurrentUserId();
 
         return utilitiesHotelService.getSummaryByManager(
-                managerId, keyword, hotelStatus, page, sortBy, sortDir
-        );
+                managerId, keyword, hotelStatus, page, sortBy, sortDir);
     }
 
     @GetMapping("/{hotelId}")
@@ -41,14 +39,14 @@ public class ManagerHotelUtilitiesController {
 
     @PostMapping("/{hotelId}/{utilityId}")
     public void assign(@PathVariable Long hotelId,
-                       @PathVariable Long utilityId) {
+            @PathVariable Long utilityId) {
 
         utilitiesHotelService.assignUtilityToHotel(hotelId, utilityId);
     }
 
     @DeleteMapping("/{hotelId}/{utilityId}")
     public void remove(@PathVariable Long hotelId,
-                       @PathVariable Long utilityId) {
+            @PathVariable Long utilityId) {
 
         utilitiesHotelService.removeUtilityFromHotel(hotelId, utilityId);
     }

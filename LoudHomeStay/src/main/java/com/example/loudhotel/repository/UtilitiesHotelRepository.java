@@ -107,4 +107,6 @@ ORDER BY
             @Param("sortDir") String sortDir,
             Pageable pageable
     );
+
+    void deleteByHotel_HotelId(Long hotelId);
 }

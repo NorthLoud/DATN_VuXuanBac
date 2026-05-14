@@ -15,6 +15,9 @@ public interface RoomService {
     void deleteRoom(Long roomId);
 
     List<RoomResponse> getAllRooms();
+    org.springframework.data.domain.Page<RoomResponse> getAllRooms(String keyword, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<RoomResponse> getRoomsByManager(Long managerId, String keyword, org.springframework.data.domain.Pageable pageable);
 
     RoomResponse getRoomById(Long id);
 

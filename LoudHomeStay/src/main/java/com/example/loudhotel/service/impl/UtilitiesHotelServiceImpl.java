@@ -54,8 +54,7 @@ public class UtilitiesHotelServiceImpl implements UtilitiesHotelService {
             }
         }
 
-        Utilities utility = utilitiesRepository
-                .findByUtilitiesIdAndIsDeletedFalse(utilityId)
+        Utilities utility = utilitiesRepository.findById(utilityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tiện ích không tồn tại!"));
 
         UtilitiesHotelId id = new UtilitiesHotelId(hotelId, utilityId);
@@ -158,7 +157,7 @@ public class UtilitiesHotelServiceImpl implements UtilitiesHotelService {
                                           String sortBy,
                                           String sortDir) {
 
-        Pageable pageable = PageRequest.of(page, 10);
+        Pageable pageable = PageRequest.of(page, 5);
 
         Hotel.HotelStatus statusEnum = null;
 
@@ -196,7 +195,7 @@ public class UtilitiesHotelServiceImpl implements UtilitiesHotelService {
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
 
-        Pageable pageable = PageRequest.of(page, 10);
+        Pageable pageable = PageRequest.of(page, 5);
 
         Hotel.HotelStatus statusEnum = null;
 

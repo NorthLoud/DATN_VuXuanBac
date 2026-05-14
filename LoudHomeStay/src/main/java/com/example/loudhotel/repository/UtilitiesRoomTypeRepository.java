@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface UtilitiesRoomTypeRepository
         extends JpaRepository<UtilitiesRoomType, UtilitiesRoomTypeId> {
 
@@ -39,7 +41,7 @@ public interface UtilitiesRoomTypeRepository
     @Query("""
 SELECT rt.typeId AS typeId,
        rt.typeName AS typeName,
-       COUNT(urt) AS utilityCount,
+       COUNT(urt.utilities.utilitiesId) AS utilityCount,
        rt.hotel.hotelName AS hotelName,
        rt.hotel.hotelId AS hotelId
 FROM RoomType rt
@@ -56,7 +58,7 @@ GROUP BY rt.typeId, rt.typeName, rt.hotel.hotelName, rt.hotel.hotelId
     @Query("""
     SELECT rt.typeId,
            rt.typeName,
-           COUNT(urt),
+           COUNT(urt.utilities.utilitiesId),
            rt.hotel.hotelName,
            rt.hotel.hotelId
     FROM RoomType rt
@@ -74,5 +76,23 @@ GROUP BY rt.typeId, rt.typeName, rt.hotel.hotelName, rt.hotel.hotelId
             @Param("managerId") Long managerId,
             @Param("keyword") String keyword,
             Pageable pageable
+    );
+
+    @Query("""
+SELECT rt.typeId,
+       rt.typeName,
+       COUNT(urt.utilities.utilitiesId),
+       rt.hotel.hotelName,
+       rt.hotel.hotelId
+FROM RoomType rt
+LEFT JOIN UtilitiesRoomType urt
+       ON urt.roomType.typeId = rt.typeId
+WHERE rt.isDeleted = false
+AND rt.hotel.isDeleted = false
+AND rt.hotel.hotelId = :hotelId
+GROUP BY rt.typeId, rt.typeName, rt.hotel.hotelName, rt.hotel.hotelId
+""")
+    List<Object[]> getSummaryByHotelId(
+            @Param("hotelId") Long hotelId
     );
 }

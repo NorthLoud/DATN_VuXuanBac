@@ -70,4 +70,10 @@ public class RoomAssignmentServiceImpl implements RoomAssignmentService {
     public boolean existsByBillDetail(BillDetail billDetail) {
         return repository.existsByBillDetail(billDetail);
     }
+
+    @Override
+    public void deleteByBill(Bill bill) {
+        List<RoomAssignment> list = repository.findByBillDetail_Bill(bill);
+        repository.deleteAll(list);
+    }
 }

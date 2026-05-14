@@ -33,6 +33,22 @@ public class RoomTypeController {
         return roomTypeService.getAll();
     }
 
+    @GetMapping("/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public org.springframework.data.domain.Page<RoomTypeResponse> summary(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "typeId") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        return roomTypeService.getAll(keyword, pageable);
+    }
+
     @GetMapping("/{id}")
     public RoomTypeResponse getById(@PathVariable Long id) {
         return roomTypeService.getById(id);
@@ -104,5 +120,26 @@ public class RoomTypeController {
                 .orElseThrow();
 
         return roomTypeService.getRoomTypesByManager(user.getUserId());
+    }
+
+    @GetMapping("/my/summary")
+    @PreAuthorize("hasRole('MANAGER')")
+    public org.springframework.data.domain.Page<RoomTypeResponse> getMyRoomTypesSummary(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "typeId") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow();
+        
+        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        
+        return roomTypeService.getRoomTypesByManager(user.getUserId(), keyword, pageable);
     }
 }

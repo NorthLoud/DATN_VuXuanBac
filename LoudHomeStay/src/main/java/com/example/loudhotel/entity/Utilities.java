@@ -1,5 +1,6 @@
 package com.example.loudhotel.entity;
 
+import com.example.loudhotel.enums.UtilityType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,9 +19,8 @@ public class Utilities {
     @Column(nullable = false, unique = true)
     private String utilitiesName;
 
-    @Builder.Default
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "utility_type")
+    private UtilityType utilityType;
 
 }

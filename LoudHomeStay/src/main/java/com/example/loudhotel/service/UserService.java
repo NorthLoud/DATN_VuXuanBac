@@ -22,4 +22,7 @@ public interface UserService {
 
     Page<UserResponse> searchUsers(String keyword, int page, int size, String sortBy, String sortDir);
 
+    UserResponse getMyProfile();
+
+    UserResponse updateMyProfile(UserRequest request);
 }

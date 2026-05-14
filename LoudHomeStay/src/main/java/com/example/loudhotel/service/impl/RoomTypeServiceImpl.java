@@ -3,14 +3,17 @@ package com.example.loudhotel.service.impl;
 import com.example.loudhotel.dto.request.RoomTypeRequest;
 import com.example.loudhotel.dto.response.ImageResponse;
 import com.example.loudhotel.dto.response.RoomTypeResponse;
+import com.example.loudhotel.dto.response.UtilitiesResponse;
 import com.example.loudhotel.entity.Hotel;
 import com.example.loudhotel.entity.RoomType;
 import com.example.loudhotel.entity.RoomTypeImage;
 import com.example.loudhotel.repository.HotelRepository;
 import com.example.loudhotel.repository.RoomRepository;
 import com.example.loudhotel.repository.RoomTypeRepository;
+import com.example.loudhotel.repository.UtilitiesRoomTypeRepository;
 import com.example.loudhotel.service.RoomTypeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +25,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
     private final RoomTypeRepository roomTypeRepository;
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
+    private final UtilitiesRoomTypeRepository utilitiesRoomTypeRepository;
 
     private RoomTypeResponse map(RoomType rt) {
 
@@ -45,6 +49,17 @@ public class RoomTypeServiceImpl implements RoomTypeService {
                     .orElse(images.isEmpty() ? null : images.get(0).getImageUrl());
         }
 
+        List<UtilitiesResponse> utilities =
+                utilitiesRoomTypeRepository
+                        .findByTypeId(rt.getTypeId(), null, Pageable.unpaged())
+                        .getContent()
+                        .stream()
+                        .map(urt -> UtilitiesResponse.builder()
+                                .id(urt.getUtilities().getUtilitiesId())
+                                .name(urt.getUtilities().getUtilitiesName())
+                                .build())
+                        .toList();
+
         return RoomTypeResponse.builder()
                 .typeId(rt.getTypeId())
                 .typeName(rt.getTypeName())
@@ -61,6 +76,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
                 .updatedAt(rt.getUpdatedAt())
                 .mainImage(mainImage)
                 .images(images)
+                .utilities(utilities)
                 .build();
     }
 
@@ -70,6 +86,14 @@ public class RoomTypeServiceImpl implements RoomTypeService {
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<RoomTypeResponse> getAll(String keyword, org.springframework.data.domain.Pageable pageable) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return roomTypeRepository.searchAll(keyword, pageable).map(this::map);
+        }
+        return roomTypeRepository.findByIsDeletedFalse(pageable).map(this::map);
     }
 
     @Override
@@ -180,5 +204,13 @@ public class RoomTypeServiceImpl implements RoomTypeService {
                 .filter(rt -> rt.getHotel().getManager().getUserId().equals(managerId))
                 .map(this::map)
                 .toList();
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<RoomTypeResponse> getRoomTypesByManager(Long managerId, String keyword, org.springframework.data.domain.Pageable pageable) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return roomTypeRepository.searchByManagerUserId(managerId, keyword, pageable).map(this::map);
+        }
+        return roomTypeRepository.findByManagerUserId(managerId, pageable).map(this::map);
     }
 }
