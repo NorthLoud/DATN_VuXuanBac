@@ -10,7 +10,7 @@ import java.util.List;
 public interface ReviewService {
     ReviewResponse updateReview(Long reviewId, ReviewRequest request);
 
-    ReviewResponse createReview(Long hotelId, ReviewRequest request);
+    ReviewResponse createReview(ReviewRequest request);
 
     List<ReviewResponse> getReviewsByHotel(Long hotelId);
 
@@ -24,10 +24,6 @@ public interface ReviewService {
                                     String sortBy,
                                     String direction);
 
-    void managerToggle(Long reviewId);
-
-    void adminApproveHide(Long reviewId);
-
     Page<ReviewResponse> getReviewsByManager(
             String keyword,
             Double rate,
@@ -40,10 +36,7 @@ public interface ReviewService {
             String direction
     );
 
-    void adminRejectHide(Long reviewId);
+    void deleteReview(Long reviewId);
 
-    void adminShow(Long reviewId);
-
-    void adminHide(Long reviewId);
 
 }

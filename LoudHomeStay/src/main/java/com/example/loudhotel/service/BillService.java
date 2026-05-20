@@ -31,4 +31,6 @@ public interface BillService {
     BillResponse payExtraFee(Long billId, Long extraFeeId);
 
     List<BillResponse> getBillsOfManager(Long managerId);
+
+    BillResponse update(Long billId, BillRequest request);
 }

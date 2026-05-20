@@ -16,11 +16,16 @@ public class ReviewResponse {
     private String comment;
     @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy", timezone = "Asia/Ho_Chi_Minh")
     private LocalDateTime createdAt;
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy", timezone = "Asia/Ho_Chi_Minh")
+    private LocalDateTime updatedAt;
     private String status; // ACTIVE | INACTIVE | PENDING
     private String hotelName;
     private boolean isMine;
 
-    private String hotelStatus;
     private Long hotelId;
+    private Long billId;
     private Long managerId; // hoặc hotel.managerId
+
+    private String roomTypeNames;
+    private Integer nights;
 }

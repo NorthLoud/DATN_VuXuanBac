@@ -42,6 +42,13 @@ public class BillController {
         return billService.create(userId, request);
     }
 
+    @PutMapping("/{id}")
+    public Object update(@PathVariable Long id,
+                         @RequestBody BillRequest request) {
+
+        return billService.update(id, request);
+    }
+
     @PutMapping("/{id}/cancel")
     public Object cancel(@PathVariable Long id) {
         return billService.cancel(id);
@@ -90,4 +97,5 @@ public class BillController {
         return billService
                 .getBillsOfManager(managerId);
     }
+
 }

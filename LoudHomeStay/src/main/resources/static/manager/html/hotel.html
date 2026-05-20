@@ -99,6 +99,7 @@
       }
       .side-nav {
         list-style: none;
+        margin-top: 10px;
       }
       .side-nav a {
         display: flex;
@@ -461,7 +462,7 @@
     <aside class="sidebar">
       <div class="logo-box">
         <div class="logo-icon"><i class="fas fa-paper-plane"></i></div>
-        <div class="logo-text">LoudHotel</div>
+        <div class="logo-text">LoudBooking</div>
       </div>
       <nav>
         <div class="nav-group-label">Trung tâm điều hành</div>
@@ -508,6 +509,13 @@
         </ul>
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
+          <li>
+            <a href="voucher.html" 
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
           <li>
             <a href="bill.html"
               ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
@@ -565,13 +573,7 @@
           />
         </div>
         <div class="d-flex align-items-center gap-4">
-          <div style="position: relative; cursor: pointer">
-            <i
-              class="fas fa-bell"
-              style="font-size: 20px; color: var(--secondary)"
-            ></i>
-            <span class="badge-dot"></span>
-          </div>
+          <div style="position: relative; cursor: pointer"></div>
           <div class="d-flex align-items-center gap-2" style="cursor: pointer">
             <div
               style="
@@ -588,7 +590,9 @@
             >
               M
             </div>
-            <span style="font-weight: 600; font-size: 14px">Quản lý viên</span>
+            <span style="font-weight: 600; font-size: 14px; margin-left: 10px"
+              >Manager</span
+            >
           </div>
         </div>
       </header>

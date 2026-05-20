@@ -593,11 +593,24 @@
         }
       }
 
-      document.addEventListener("DOMContentLoaded", loadProfile);
       function logout() {
-        localStorage.clear();
-        window.location.href = "/login.html";
+        Swal.fire({
+          title: "Đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Đăng xuất",
+          cancelButtonText: "Hủy",
+          confirmButtonColor: "#ef4444",
+        }).then((res) => {
+          if (res.isConfirmed) {
+            localStorage.clear();
+            window.location.href = "/login.html";
+          }
+        });
       }
+
+      document.addEventListener("DOMContentLoaded", loadProfile);
     </script>
   </body>
 </html>

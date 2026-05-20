@@ -122,7 +122,7 @@ public class HotelServiceImpl implements HotelService {
     public HotelResponse createHotel(HotelRequest request) {
 
         if (request.getManagerId() == null) {
-            throw new RuntimeException("Phải chọn manager");
+            throw new BadRequestException("Phải chọn manager");
         }
 
         User manager = userRepository
@@ -131,7 +131,7 @@ public class HotelServiceImpl implements HotelService {
 
         // ✅ check role
         if (manager.getRole() != User.Role.MANAGER) {
-            throw new RuntimeException("User này không phải MANAGER");
+            throw new BadRequestException("User này không phải MANAGER");
         }
 
         // ✅ (khuyến nghị) 1 manager chỉ 1 hotel
@@ -215,13 +215,13 @@ public class HotelServiceImpl implements HotelService {
                         .equals(currentUser.getUserId());
 
         if(!isAdmin && !isManager){
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "Không có quyền xóa hotel này"
             );
         }
 
         if (roomTypeRepository.existsByHotel_HotelIdAndIsDeletedFalse(id)) {
-            throw new RuntimeException("Không thể xóa khách sạn khi còn loại phòng");
+            throw new BadRequestException("Không thể xóa khách sạn khi còn loại phòng");
         }
 
         hotel.setIsDeleted(true);
@@ -254,7 +254,7 @@ public class HotelServiceImpl implements HotelService {
                         .equals(currentUser.getUserId());
 
         if(!isAdmin && !isManager){
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "Không có quyền sửa hotel này"
             );
         }
@@ -264,7 +264,7 @@ public class HotelServiceImpl implements HotelService {
                     .orElseThrow(() -> new ResourceNotFoundException("Manager không tồn tại"));
 
             if (newManager.getRole() != User.Role.MANAGER) {
-                throw new RuntimeException("User không phải MANAGER");
+                throw new BadRequestException("User không phải MANAGER");
             }
 
             hotel.setManager(newManager);

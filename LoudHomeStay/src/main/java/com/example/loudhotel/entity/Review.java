@@ -6,10 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "reviews",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "hotel_id"})
-)
+@Table(name = "reviews")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,8 +22,8 @@ public class Review {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotel_id", nullable = false)
-    private Hotel hotel;
+    @JoinColumn(name = "bill_id", nullable = false)
+    private Bill bill;
 
     @Column(name = "rate")
     private Double rate;
@@ -34,20 +31,23 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ReviewStatus status;
-
-    public enum ReviewStatus {
-        ACTIVE,
-        HIDDEN,
-        PENDING_HIDE
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
+
 }
+
+

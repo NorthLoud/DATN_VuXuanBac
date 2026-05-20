@@ -60,6 +60,13 @@ public class Bill {
     @Enumerated(EnumType.STRING)
     private CancelReason cancelReason;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "voucher_id")
+    private Voucher voucher;
+
+    @Column(name = "discount_amount")
+    private Double discountAmount;
+
 
     public enum BillStatus {
         PENDING, PAID, CANCELED

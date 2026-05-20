@@ -65,7 +65,7 @@ public class VNPayService {
         params.put("vnp_CreateDate", formatter.format(cal.getTime()));
 
         // ✅ 15 PHÚT HẾT HẠN
-        cal.add(Calendar.MINUTE, 15);
+        cal.add(Calendar.MINUTE, 10);
         params.put("vnp_ExpireDate", formatter.format(cal.getTime()));
 
         List<String> fieldNames = new ArrayList<>(params.keySet());

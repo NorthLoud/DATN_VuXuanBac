@@ -27,6 +27,8 @@ public class BillRequest {
 
     private String idCardCode;
 
+    private String voucherCode;
+
     // ✅ sửa lại
     @NotNull
     private List<RoomSelection> rooms;

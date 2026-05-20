@@ -43,7 +43,7 @@ public class RoomServiceImpl implements RoomService {
 
         return userRepository
                 .findByEmailAndIsDeletedFalse(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     private void validateHotelActive(Hotel hotel) {
@@ -130,7 +130,7 @@ public class RoomServiceImpl implements RoomService {
                 .equals(currentUser.getUserId());
 
         if(!isAdmin && !isManager){
-            throw new RuntimeException("Không có quyền thêm room vào hotel này");
+            throw new BadRequestException("Không có quyền thêm room vào hotel này");
         }
 
         if (roomRepository.existsByRoomType_HotelAndRoomNumberAndIsDeletedFalse(
@@ -139,7 +139,7 @@ public class RoomServiceImpl implements RoomService {
         }
 
         RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
-                .orElseThrow(() -> new RuntimeException("Room type not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Room type not found"));
 
         Room room = Room.builder()
                 .roomType(roomType)
@@ -188,7 +188,7 @@ public class RoomServiceImpl implements RoomService {
                 .equals(currentUser.getUserId());
 
         if(!isAdmin && !isManager){
-            throw new RuntimeException("Không có quyền xoá room");
+            throw new BadRequestException("Không có quyền xoá room");
         }
         room.setIsDeleted(true);
         roomRepository.save(room);
@@ -232,7 +232,7 @@ public class RoomServiceImpl implements RoomService {
 
             // Manager phải đúng hotel
             if (!isManager) {
-                throw new RuntimeException("Không có quyền sửa room");
+                throw new BadRequestException("Không có quyền sửa room");
             }
 
             // Manager mới bị check hotel active
@@ -248,7 +248,7 @@ public class RoomServiceImpl implements RoomService {
             throw new BadRequestException("Số phòng đã tồn tại trong khách sạn");
         }
         RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
-                .orElseThrow(() -> new RuntimeException("Room type not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Room type not found"));
 
         room.setRoomType(roomType);
 

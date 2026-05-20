@@ -35,6 +35,8 @@ public class BillResponse {
     private Double totalCost;
     private Double roomTotal;
     private Double extraFeeTotal;
+    private Double discountAmount;
+    private String voucherCode;
 
     private Bill.BillStatus billStatus;
     private Bill.PaymentMethod paymentMethod;
@@ -45,6 +47,7 @@ public class BillResponse {
     private LocalDateTime updatedAt;
 
     private Bill.CancelReason cancelReason;
+    private boolean isReviewed;
 
     private String hotelAddress;
     private String managerEmail;
@@ -55,6 +58,7 @@ public class BillResponse {
     private List<RoomItem> rooms;
     private List<BillDetailItem> details;
     private List<ExtraFeeItem> extraFees;
+
 
     @Data
     @Builder

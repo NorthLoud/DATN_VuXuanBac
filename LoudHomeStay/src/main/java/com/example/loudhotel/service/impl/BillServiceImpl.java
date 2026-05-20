@@ -32,11 +32,12 @@ public class BillServiceImpl implements BillService {
     private final RoomTypeRepository roomTypeRepository;
     private final RoomAssignmentService roomAssignmentService;
     private final BillExtraFeeRepository billExtraFeeRepository;
+    private final VoucherRepository voucherRepository;
+    private final ReviewRepository reviewRepository;
 
     private BillResponse toResponse(Bill bill) {
 
         var assignments = roomAssignmentService.getByBill(bill);
-
 
         List<BillResponse.RoomItem> rooms = assignments.stream()
                 .map(a -> {
@@ -115,7 +116,9 @@ public class BillServiceImpl implements BillService {
                 .checkOutDate(bill.getCheckOutDate())
                 .roomTotal(roomTotal)
                 .extraFeeTotal(extraFeeTotal)
-                .totalCost(roomTotal + extraFeeTotal)
+                .discountAmount(bill.getDiscountAmount())
+                .voucherCode(bill.getVoucher() != null ? bill.getVoucher().getVoucherCode() : null)
+                .totalCost(bill.getTotalCost())
                 .billStatus(bill.getBillStatus())
                 .paymentMethod(bill.getPaymentMethod())
                 .cancelReason(bill.getCancelReason())
@@ -128,7 +131,29 @@ public class BillServiceImpl implements BillService {
                 .rooms(rooms)
                 .details(details)
                 .extraFees(extraFees)
+                .isReviewed(reviewRepository.existsByBill_BillId(bill.getBillId()))
                 .build();
+    }
+
+    private void recalculateAndSaveTotalCost(Bill bill) {
+        double roomTotal = bill.getBillDetails().stream()
+                .mapToDouble(d -> {
+                    double price = d.getPriceAtBooking() != null ? d.getPriceAtBooking() : d.getRoomType().getPrice();
+                    int nights = d.getNights() != null ? d.getNights() : 0;
+                    return price * nights;
+                })
+                .sum();
+
+        double extraFeeTotal = 0;
+        if (bill.getExtraFees() != null) {
+            extraFeeTotal = bill.getExtraFees().stream()
+                    .mapToDouble(f -> f.getAmount() != null ? f.getAmount() : 0)
+                    .sum();
+        }
+
+        double discount = bill.getDiscountAmount() != null ? bill.getDiscountAmount() : 0;
+        bill.setTotalCost(roomTotal + extraFeeTotal - discount);
+        billRepository.save(bill);
     }
 
     @Override
@@ -203,6 +228,55 @@ public class BillServiceImpl implements BillService {
             }
         }
 
+        double roomTotal = totalCost;
+        Double discountAmount = 0.0;
+        Voucher appliedVoucher = null;
+
+        if (request.getVoucherCode() != null && !request.getVoucherCode().trim().isEmpty()) {
+            Voucher voucher = voucherRepository.findByVoucherCodeAndIsDeletedFalse(request.getVoucherCode())
+                    .orElseThrow(() -> new BadRequestException("Mã giảm giá không hợp lệ"));
+            
+            LocalDateTime now = LocalDateTime.now();
+            if (voucher.getStatus() != Voucher.VoucherStatus.ACTIVE ||
+                (voucher.getStartDate() != null && now.isBefore(voucher.getStartDate())) ||
+                (voucher.getEndDate() != null && now.isAfter(voucher.getEndDate()))) {
+                throw new BadRequestException("Mã giảm giá không khả dụng hoặc đã hết hạn");
+            }
+
+            if (voucher.getQuantity() != null && voucher.getUsedCount() >= voucher.getQuantity()) {
+                throw new BadRequestException("Mã giảm giá đã hết lượt sử dụng");
+            }
+
+            if (voucher.getMinBillAmount() != null && roomTotal < voucher.getMinBillAmount()) {
+                throw new BadRequestException("Chưa đạt giá trị đơn hàng tối thiểu để áp dụng mã này");
+            }
+
+            boolean isHotelEligible = voucher.getHotels() == null || voucher.getHotels().isEmpty() || 
+                                      voucher.getHotels().stream().anyMatch(h -> h.getHotelId().equals(hotel.getHotelId()));
+            if (!isHotelEligible) {
+                throw new BadRequestException("Mã giảm giá không áp dụng cho khách sạn này");
+            }
+
+            if (voucher.getDiscountType() == Voucher.DiscountType.PERCENT) {
+                discountAmount = roomTotal * voucher.getDiscountValue() / 100.0;
+                if (voucher.getMaxDiscountAmount() != null && discountAmount > voucher.getMaxDiscountAmount()) {
+                    discountAmount = voucher.getMaxDiscountAmount();
+                }
+            } else if (voucher.getDiscountType() == Voucher.DiscountType.FIXED) {
+                discountAmount = voucher.getDiscountValue();
+            }
+
+            if (discountAmount > roomTotal) {
+                discountAmount = roomTotal;
+            }
+
+            totalCost = roomTotal - discountAmount;
+            
+            voucher.setUsedCount(voucher.getUsedCount() + 1);
+            voucherRepository.save(voucher);
+            appliedVoucher = voucher;
+        }
+
         Bill bill = Bill.builder()
                 .user(user)
                 .hotel(hotel)
@@ -213,6 +287,8 @@ public class BillServiceImpl implements BillService {
                 .checkInDate(request.getCheckInDate())
                 .checkOutDate(request.getCheckOutDate())
                 .totalCost(totalCost)
+                .voucher(appliedVoucher)
+                .discountAmount(discountAmount > 0 ? discountAmount : null)
                 .idCardCode(request.getIdCardCode())
                 .billStatus(Bill.BillStatus.PENDING)
                 .paymentMethod(Bill.PaymentMethod.VNPAY)
@@ -273,7 +349,19 @@ public class BillServiceImpl implements BillService {
         bill.setBillStatus(Bill.BillStatus.CANCELED);
         bill.setUpdatedAt(LocalDateTime.now());
 
+        refundVoucher(bill);
+
         return toResponse(billRepository.save(bill));
+    }
+
+    private void refundVoucher(Bill bill) {
+        if (bill.getVoucher() != null) {
+            Voucher voucher = bill.getVoucher();
+            if (voucher.getUsedCount() != null && voucher.getUsedCount() > 0) {
+                voucher.setUsedCount(voucher.getUsedCount() - 1);
+                voucherRepository.save(voucher);
+            }
+        }
     }
 
     @Override
@@ -347,10 +435,13 @@ public class BillServiceImpl implements BillService {
         billExtraFeeRepository.save(fee);
 
         // Cập nhật total_cost của bill
+        if (bill.getExtraFees() == null) {
+            bill.setExtraFees(new ArrayList<>());
+        }
+        bill.getExtraFees().add(fee);
+        recalculateAndSaveTotalCost(bill);
 
-        bill.setUpdatedAt(LocalDateTime.now());
-
-        return toResponse(billRepository.save(bill));
+        return toResponse(bill);
     }
 
     @Override
@@ -384,7 +475,7 @@ public class BillServiceImpl implements BillService {
     @Scheduled(fixedRate = 60000)
     public void autoCancelExpiredVnpayBills() {
 
-        LocalDateTime timeout = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime timeout = LocalDateTime.now().minusMinutes(10);
 
         List<Bill> bills = billRepository.findByBillStatusAndCreatedAtBefore(
                 Bill.BillStatus.PENDING,
@@ -402,6 +493,7 @@ public class BillServiceImpl implements BillService {
 
                 bill.setUpdatedAt(
                         LocalDateTime.now());
+                refundVoucher(bill);
             }
         }
 
@@ -479,5 +571,193 @@ public class BillServiceImpl implements BillService {
                 return code;
             }
         }
+    }
+
+    @Override
+    public BillResponse update(Long billId, BillRequest request) {
+
+        Bill bill = getBill(billId);
+
+        // CHỈ CHO UPDATE BILL PENDING
+        if (bill.getBillStatus() != Bill.BillStatus.PENDING) {
+            throw new BadRequestException(
+                    "Chỉ được cập nhật đơn chờ thanh toán");
+        }
+
+        // rollback voucher cũ nếu có
+        refundVoucher(bill);
+
+        Hotel hotel = hotelRepository.findById(request.getHotelId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Hotel không tồn tại"));
+
+        long nights = ChronoUnit.DAYS.between(
+                request.getCheckInDate(),
+                request.getCheckOutDate());
+
+        if (nights <= 0) {
+            throw new BadRequestException(
+                    "Check-out phải sau check-in");
+        }
+
+        // XÓA DETAIL CŨ
+        bill.getBillDetails().clear();
+
+        List<BillDetail> details = new ArrayList<>();
+
+        double totalCost = 0;
+
+        for (BillRequest.RoomSelection r : request.getRooms()) {
+
+            RoomType roomType = roomTypeRepository.findById(r.getTypeId())
+                    .orElseThrow(() ->
+                            new RuntimeException("Room type not found"));
+
+            int totalRooms =
+                    roomRepository.countByRoomType_TypeId(
+                            roomType.getTypeId());
+
+            int booked =
+                    roomRepository.countBookedRooms(
+                            roomType.getTypeId(),
+                            request.getCheckInDate(),
+                            request.getCheckOutDate());
+
+            int available = totalRooms - booked;
+
+            if (available < r.getQuantity()) {
+                throw new BadRequestException(
+                        "Không đủ phòng trống");
+            }
+
+            double price = roomType.getPrice();
+
+            for (int i = 0; i < r.getQuantity(); i++) {
+
+                BillDetail bd = BillDetail.builder()
+                        .bill(bill)
+                        .roomType(roomType)
+                        .priceAtBooking(price)
+                        .nights((int) nights)
+                        .guestCount(r.getGuestCount())
+                        .build();
+
+                details.add(bd);
+
+                totalCost += price * nights;
+            }
+        }
+
+        double roomTotal = totalCost;
+
+        Double discountAmount = 0.0;
+
+        Voucher appliedVoucher = null;
+
+        /* ===== APPLY VOUCHER MỚI ===== */
+        if (request.getVoucherCode() != null
+                && !request.getVoucherCode().trim().isEmpty()) {
+
+            Voucher voucher =
+                    voucherRepository
+                            .findByVoucherCodeAndIsDeletedFalse(
+                                    request.getVoucherCode())
+                            .orElseThrow(() ->
+                                    new BadRequestException(
+                                            "Mã giảm giá không hợp lệ"));
+
+            LocalDateTime now = LocalDateTime.now();
+
+            if (voucher.getStatus()
+                    != Voucher.VoucherStatus.ACTIVE ||
+
+                    (voucher.getStartDate() != null
+                            && now.isBefore(voucher.getStartDate())) ||
+
+                    (voucher.getEndDate() != null
+                            && now.isAfter(voucher.getEndDate()))) {
+
+                throw new BadRequestException(
+                        "Voucher không khả dụng");
+            }
+
+            if (voucher.getQuantity() != null
+                    && voucher.getUsedCount()
+                    >= voucher.getQuantity()) {
+
+                throw new BadRequestException(
+                        "Voucher đã hết lượt");
+            }
+
+            if (voucher.getMinBillAmount() != null
+                    && roomTotal < voucher.getMinBillAmount()) {
+
+                throw new BadRequestException(
+                        "Chưa đủ giá trị tối thiểu");
+            }
+
+            if (voucher.getDiscountType()
+                    == Voucher.DiscountType.PERCENT) {
+
+                discountAmount =
+                        roomTotal
+                                * voucher.getDiscountValue()
+                                / 100.0;
+
+                if (voucher.getMaxDiscountAmount() != null
+                        && discountAmount
+                        > voucher.getMaxDiscountAmount()) {
+
+                    discountAmount =
+                            voucher.getMaxDiscountAmount();
+                }
+
+            } else {
+
+                discountAmount =
+                        voucher.getDiscountValue();
+            }
+
+            if (discountAmount > roomTotal) {
+                discountAmount = roomTotal;
+            }
+
+            totalCost = roomTotal - discountAmount;
+
+            voucher.setUsedCount(
+                    voucher.getUsedCount() + 1);
+
+            voucherRepository.save(voucher);
+
+            appliedVoucher = voucher;
+        }
+
+        // UPDATE INFO
+        bill.setHotel(hotel);
+
+        bill.setOrderName(request.getOrderName());
+        bill.setOrderEmail(request.getOrderEmail());
+        bill.setOrderPhone(request.getOrderPhone());
+
+        bill.setCheckInDate(request.getCheckInDate());
+        bill.setCheckOutDate(request.getCheckOutDate());
+
+        bill.setIdCardCode(request.getIdCardCode());
+
+        bill.setVoucher(appliedVoucher);
+
+        bill.setDiscountAmount(
+                discountAmount > 0
+                        ? discountAmount
+                        : null);
+
+        bill.setTotalCost(totalCost);
+
+        bill.setUpdatedAt(LocalDateTime.now());
+
+        bill.setBillDetails(details);
+
+        return toResponse(
+                billRepository.save(bill));
     }
 }

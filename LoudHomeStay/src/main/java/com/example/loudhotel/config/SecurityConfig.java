@@ -49,7 +49,6 @@ public class SecurityConfig {
                         //hotel
                         // PUBLIC
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**").permitAll()
-
                         // PROTECTED
                         .requestMatchers(HttpMethod.DELETE, "/api/hotels/images/**")
                         .hasAnyRole("ADMIN","MANAGER")
@@ -62,7 +61,6 @@ public class SecurityConfig {
                         //Room
                         .requestMatchers(HttpMethod.POST,"/api/rooms/hotel/*")
                         .hasAnyRole("ADMIN","MANAGER")
-
                         // admin
                         .requestMatchers(HttpMethod.PUT, "/api/rooms/*/block").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/rooms/*/unblock").hasRole("ADMIN")
@@ -87,6 +85,22 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/room-types/**").hasAnyRole("ADMIN","MANAGER")
                         .requestMatchers(HttpMethod.GET, "/api/room-types/**").permitAll()
 
+                        // Voucher
+                        .requestMatchers(HttpMethod.GET, "/api/vouchers/public").permitAll()
+                        // manager xem voucher
+                        .requestMatchers(HttpMethod.GET, "/api/vouchers/manager")
+                        .hasRole("MANAGER")
+                        // admin xem tất cả
+                        .requestMatchers(HttpMethod.GET, "/api/vouchers/**")
+                        .hasRole("ADMIN")
+                        // chỉ admin được CRUD
+                        .requestMatchers(HttpMethod.POST, "/api/vouchers")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/vouchers/*")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/vouchers/*")
+                        .hasRole("ADMIN")
+
                         // ===== Utilities tổng =====
                         .requestMatchers(HttpMethod.GET,"/api/utilities/**")
                         .hasAnyRole("ADMIN","MANAGER")
@@ -100,6 +114,7 @@ public class SecurityConfig {
                         // ===== Utilities theo hotel =====
                         // MANAGER
                         .requestMatchers("/api/manager/**").hasRole("MANAGER")
+
                         // ===== Utilities theo RoomType =====
                         .requestMatchers("/api/manager/room-type-utilities/**").hasRole("MANAGER")
                         .requestMatchers("/api/admin/room-type-utilities/**").hasRole("ADMIN")

@@ -7,8 +7,9 @@ import lombok.Data;
 public class ReviewRequest {
 
     @NotNull
-    private Long hotelId;
+    private Long billId;
 
+    @NotNull
     @DecimalMin("0.0")
     @DecimalMax("10.0")
     private Double rate;

@@ -14,6 +14,17 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <!-- Flatpickr -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
       :root {
         --primary: #3570ef;
@@ -337,6 +348,208 @@
         cursor: pointer;
       }
 
+      /* =========================
+   BOOKING DATEPICKER UI
+========================= */
+      .flatpickr-calendar {
+        width: 300px !important;
+        max-width: 90vw !important;
+        max-height: 500px !important;
+
+        background: #fff !important;
+        border: none !important;
+        border-radius: 22px !important;
+
+        padding: 16px !important;
+
+        box-shadow:
+          0 20px 50px rgba(15, 23, 42, 0.12),
+          0 8px 20px rgba(15, 23, 42, 0.08) !important;
+
+        overflow: hidden;
+      }
+      /* ===== Header ===== */
+
+      .flatpickr-month {
+        height: 64px !important;
+
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .flatpickr-current-month {
+        position: static !important;
+        width: 100%;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 !important;
+        font-size: 17px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+      }
+
+      .flatpickr-current-month .flatpickr-monthDropdown-months,
+      .flatpickr-current-month input.cur-year {
+        border: none !important;
+        background: transparent !important;
+        font-size: 17px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+        pointer-events: none;
+      }
+      /* ===== Arrow ===== */
+      .flatpickr-prev-month,
+      .flatpickr-next-month {
+        top: 18px !important;
+        width: 38px;
+        height: 38px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: 0.2s;
+      }
+      .flatpickr-prev-month:hover,
+      .flatpickr-next-month:hover {
+        background: #f1f5f9;
+      }
+      .flatpickr-prev-month svg,
+      .flatpickr-next-month svg {
+        width: 16px !important;
+        height: 16px !important;
+        fill: #0f172a !important;
+      }
+      /* ===== Layout tổng ===== */
+      .flatpickr-rContainer {
+        width: 100% !important;
+      }
+      .flatpickr-days {
+        width: 100% !important;
+      }
+      /* QUAN TRỌNG */
+      .flatpickr-innerContainer {
+        display: block !important;
+      }
+      /* ===== Mỗi tháng ===== */
+      .dayContainer {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr);
+        justify-items: center;
+        row-gap: 8px;
+      }
+      /* ===== Weekday ===== */
+      .flatpickr-weekdays {
+        display: block !important;
+      }
+      .flatpickr-weekdaycontainer {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr);
+        justify-items: center;
+      }
+      .flatpickr-weekday {
+        width: 38px !important;
+        height: 32px !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        color: #334155 !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+      }
+      /* ===== Day ===== */
+      .flatpickr-day {
+        width: 38px !important;
+        max-width: 38px !important;
+
+        height: 38px !important;
+        line-height: 38px !important;
+        margin: 0 !important;
+        border-radius: 12px !important;
+
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #0f172a !important;
+        border: none !important;
+        transition: all 0.2s ease;
+      }
+      /* Hover */
+      .flatpickr-day:hover {
+        background: #eef2ff !important;
+        color: #2563eb !important;
+      }
+      /* Outside month */
+      .flatpickr-day.prevMonthDay,
+      .flatpickr-day.nextMonthDay {
+        color: #94a3b8 !important;
+      }
+      /* Ngày quá khứ */
+      .flatpickr-day.flatpickr-disabled,
+      .flatpickr-day.prevMonthDay.flatpickr-disabled {
+        color: #cbd5e1 !important;
+        opacity: 0.45 !important;
+        cursor: not-allowed !important;
+        background: transparent !important;
+      }
+      /* Today */
+      .flatpickr-day.today {
+        border: 2px solid #2563eb !important;
+        color: #2563eb !important;
+      }
+      /* Selected */
+      .flatpickr-day.selected,
+      .flatpickr-day.startRange,
+      .flatpickr-day.endRange {
+        background: #2563eb !important;
+        color: white !important;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+      }
+      /* In range */
+      .flatpickr-day.inRange {
+        background: #dbe7ff !important;
+        color: #2563eb !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      /* Start */
+      .flatpickr-day.startRange {
+        border-radius: 12px 0 0 12px !important;
+      }
+      /* End */
+      .flatpickr-day.endRange {
+        border-radius: 0 12px 12px 0 !important;
+      }
+      /* 1 ngày */
+      .flatpickr-day.startRange.endRange {
+        border-radius: 12px !important;
+      }
+      /* ===== Footer ===== */
+      .custom-flatpickr-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 18px;
+        border-top: 1px solid #e2e8f0;
+      }
+      .custom-flatpickr-footer button {
+        border: none;
+        background: transparent;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .fp-btn-clear {
+        color: #ef4444;
+      }
+      .fp-btn-today {
+        color: #2563eb;
+      }
       .btn-search {
         background: var(--primary);
         color: white;
@@ -477,13 +690,153 @@
         cursor: not-allowed;
       }
 
+      /* Voucher */
+      .voucher-slider {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 10px 0 30px;
+
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        margin-bottom: 30px;
+      }
+
+      .voucher-slider::-webkit-scrollbar {
+        display: none;
+      }
+
+      .voucher-card {
+        min-width: 320px;
+        max-width: 320px;
+
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+
+        box-shadow: var(--card-shadow);
+
+        border-left: 5px solid var(--accent);
+
+        transition: 0.3s;
+      }
+
+      .voucher-card:hover {
+        transform: translateY(-6px);
+      }
+
+      /* Voucher Detail Modal */
+      .voucher-detail-modal .swal2-popup {
+        border-radius: 24px;
+        padding: 0;
+        overflow: hidden;
+        width: 500px;
+      }
+
+      .voucher-detail-header {
+        padding: 40px 30px;
+        color: rgb(0, 0, 0);
+        text-align: center;
+        position: relative;
+      }
+
+      .voucher-detail-header h3 {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 5px;
+        color: var(--primary);
+      }
+
+      .voucher-detail-header p {
+        opacity: 0.9;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .voucher-detail-content {
+        padding: 30px;
+        text-align: left;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        color: var(--text-main);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .voucher-detail-desc {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px dashed #f1f5f9;
+      }
+
+      .voucher-detail-desc h4 {
+        font-size: 15px;
+        margin-bottom: 10px;
+        color: var(--text-main);
+      }
+
+      .voucher-detail-desc p {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .btn-copy-premium {
+        width: 100%;
+        margin-top: 30px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .btn-copy-premium:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(53, 112, 239, 0.3);
+      }
+
+      .premium-toast {
+        border-radius: 16px !important;
+        padding: 12px 20px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+      }
+
       /* Cards */
       .hotels-slider {
         display: flex;
         gap: 25px;
         overflow-x: auto;
         scroll-behavior: smooth;
-        padding: 10px 0 30px;
+        padding: 0px 0 30px;
         scrollbar-width: none;
         -ms-overflow-style: none;
       }
@@ -720,13 +1073,13 @@
                 class="dropdown-item"
                 onclick="location.href = 'bill.html'"
               >
-                <i class="fas fa-receipt"></i> Đơn đặt chỗ
+                <i class="fas fa-receipt"></i> Đơn đặt phòng
               </button>
               <button
                 class="dropdown-item"
                 onclick="location.href = 'chat.html'"
               >
-                <i class="fas fa-comment-dots"></i> Hỗ trợ trực tuyến
+                <i class="fas fa-comment-dots"></i> Tin nhắn
               </button>
               <button class="dropdown-item logout" onclick="logoutUser()">
                 <i class="fas fa-sign-out-alt"></i> Đăng xuất
@@ -749,8 +1102,7 @@
           onsubmit="handleSearch(event)"
         >
           <div class="search-box keyword-box">
-            <label>Điểm đến hoặc khách sạn</label>
-
+            <label>Điểm đến - khách sạn</label>
             <input
               type="text"
               id="keyword"
@@ -764,11 +1116,20 @@
           </div>
           <div class="search-box">
             <label>Ngày nhận</label>
-            <input type="date" id="startDate" required />
+
+            <input
+              type="text"
+              id="startDate"
+              placeholder="Chọn ngày"
+              readonly
+              required
+            />
           </div>
+
           <div class="search-box">
             <label>Ngày trả</label>
-            <input type="date" id="endDate" required />
+
+            <input type="text" id="endDate" placeholder="Chọn ngày" readonly />
           </div>
           <div class="search-box">
             <label>Số phòng</label>
@@ -783,10 +1144,30 @@
 
     <!-- Main Content -->
     <main class="main-content">
+      <!-- VOUCHER SECTION -->
+      <div class="section-header" style="margin-bottom: 20px">
+        <div class="section-title">
+          <h2>Khuyến mãi hấp dẫn</h2>
+          <p>Nhận ngay mã giảm giá để tận hưởng kỳ nghỉ tiết kiệm</p>
+        </div>
+
+        <div class="slider-controls">
+          <button class="control-btn" id="voucherPrevBtn">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+
+          <button class="control-btn" id="voucherNextBtn">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="publicVouchers" class="voucher-slider"></div>
+
       <div class="section-header">
         <div class="section-title">
-          <h2>Khám phá các chỗ nghỉ nổi bật</h2>
-          <p>Những địa điểm được đánh giá cao</p>
+          <h2>Khám phá các khách sạn nổi bật</h2>
+          <p>Những khách sạn được đánh giá cao</p>
         </div>
         <div class="slider-controls">
           <button class="control-btn" id="prevBtn">
@@ -849,7 +1230,7 @@
           <ul>
             <li><a href="#">Trung tâm trợ giúp</a></li>
             <li><a href="#">An toàn khi du lịch</a></li>
-            <li><a href="#">Hủy đặt phòng</a></li>
+
             <li><a href="#">Phản hồi</a></li>
           </ul>
         </div>
@@ -876,14 +1257,19 @@
           <ul>
             <li><a href="#">Điều khoản sử dụng</a></li>
             <li><a href="#">Chính sách bảo mật</a></li>
+            <li>
+              <a href="cancel-policy.html"
+                >Quy định về xác nhận thông tin đặt phòng</a
+              >
+            </li>
             <li><a href="#">Cookie settings</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
         <p>
-          &copy; 2026 LoudBooking.com - Công ty hàng đầu thế giới về du lịch
-          trực tuyến. Đã đăng ký bản quyền.
+          &copy; 2026 LoudBooking.com - Công ty hàng đầu về du lịch trực tuyến
+          tại Việt Nam. Đã đăng ký bản quyền.
         </p>
       </div>
     </footer>
@@ -987,6 +1373,186 @@
         }
       });
 
+      function checkLoginState() {
+        const token = localStorage.getItem("accessToken");
+        const username = localStorage.getItem("username");
+        const fullname = localStorage.getItem("fullname");
+        const role = localStorage.getItem("role");
+
+        if (token && username) {
+          // Đã đăng nhập
+          let displayName =
+            fullname && fullname.trim() !== "" ? fullname : username;
+          document.getElementById("buttonusername").innerText = displayName;
+          document.getElementById("userInitials").innerText = displayName
+            .charAt(0)
+            .toUpperCase();
+
+          // Xử lý avatar: có thể gọi API lấy user info nếu cần thiết,
+          // nhưng tạm thời dùng Initials
+
+          // Hiện user profile, ẩn btn login
+          // (Trong HTML hiện tại .user-profile luôn hiện, ta sẽ gán click mở menu)
+        } else {
+          // Chưa đăng nhập
+          document.getElementById("buttonusername").innerText = "Đăng nhập";
+          document.querySelector(".user-profile").onclick = function () {
+            window.location.href = "login.html";
+          };
+          document.getElementById("dropdownMenu").style.display = "none";
+        }
+      }
+
+      let allVouchers = [];
+
+      async function loadPublicVouchers() {
+        try {
+          const res = await fetch(`${API_URL}/api/vouchers/public`);
+          if (res.ok) {
+            allVouchers = await res.json();
+            const container = document.getElementById("publicVouchers");
+            if (allVouchers.length === 0) {
+              container.innerHTML =
+                "<p style='color: var(--text-muted); font-size: 15px;'>Hiện tại chưa có khuyến mãi nào.</p>";
+              return;
+            }
+            container.innerHTML = allVouchers
+              .map(
+                (v) => `
+    <div class="voucher-card">
+      <div style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 8px;">
+        ${v.voucherCode}
+      </div>
+
+      <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+        ${v.title || ""}
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 16px; font-weight: 800; color: var(--accent);">
+          Giảm ${v.discountValue ? v.discountValue.toLocaleString() : 0}
+          ${v.discountType === "PERCENT" ? "%" : "VNĐ"}
+        </span>
+      </div>
+      <div onclick="showVoucherDetail(${v.voucherId})" style="font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 15px; cursor: pointer; text-decoration: underline;">
+        Xem chi tiết
+      </div>
+    </div>
+  `,
+              )
+              .join("");
+          }
+        } catch (e) {
+          console.error("Could not load vouchers");
+        }
+      }
+
+      function showVoucherDetail(id) {
+        const v = allVouchers.find((x) => x.voucherId == id);
+        if (!v) return;
+
+        const discountTxt =
+          v.discountValue.toLocaleString() +
+          (v.discountType === "PERCENT" ? "%" : " VNĐ");
+        const minBillTxt = v.minBillAmount
+          ? v.minBillAmount.toLocaleString() + " VNĐ"
+          : "Không giới hạn";
+        const maxDiscountTxt = v.maxDiscountAmount
+          ? v.maxDiscountAmount.toLocaleString() + " VNĐ"
+          : "Không giới hạn";
+        const startDateTxt = v.startDate
+          ? new Date(v.startDate).toLocaleString("vi-VN")
+          : "Đang cập nhật";
+
+        const endDateTxt = v.endDate
+          ? new Date(v.endDate).toLocaleString("vi-VN")
+          : "Đang cập nhật";
+
+        Swal.fire({
+          html: `
+            <div class="voucher-detail-header">
+              <p>MÃ KHUYẾN MÃI</p>
+              <h3>${v.voucherCode}</h3>
+            </div>
+
+            <div class="voucher-detail-content">
+              <div class="detail-row">
+                <span class="detail-label">Chương trình ưu đãi</span>
+                <span class="detail-value">
+                  ${v.title || "Ưu đãi LoudBooking"}
+                </span>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-label">Mức ưu đãi</span>
+                <span class="detail-value" style="color: var(--accent); font-size: 16px;">
+                  ${discountTxt}
+                </span>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-label">Đơn tối thiểu</span>
+                <span class="detail-value">${minBillTxt}</span>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-label">Giảm tối đa</span>
+                <span class="detail-value">${maxDiscountTxt}</span>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-label">Hiệu lực từ</span>
+                <span class="detail-value">${startDateTxt}</span>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-label">Hết hạn</span>
+                <span class="detail-value">${endDateTxt}</span>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-label">Số lượng còn lại</span>
+                <span class="detail-value">
+                  ${(v.quantity || 0) - (v.usedCount || 0)}
+                </span>
+              </div>
+
+              <div class="voucher-detail-desc">
+                <h4>Thông tin ưu đãi</h4>
+                <p>
+                  ${v.description || "Áp dụng cho khách hàng đặt phòng trực tuyến tại LoudBooking."}
+                </p>
+              </div>
+
+            </div>
+          `,
+          showConfirmButton: false,
+          showCloseButton: true,
+          customClass: {
+            container: "voucher-detail-modal",
+          },
+          width: 500,
+        });
+      }
+
+      function copyVoucherCode(code) {
+        navigator.clipboard.writeText(code).then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Đã sao chép mã!",
+            text: `Mã ${code} đã sẵn sàng để sử dụng.`,
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: "top-end",
+            background: "#ffffff",
+            iconColor: "#10b981",
+            customClass: {
+              popup: "premium-toast",
+            },
+          });
+        });
+      }
+
       // Sticky Header Logic
       window.onscroll = () => {
         const header = document.getElementById("mainHeader");
@@ -996,6 +1562,9 @@
 
       // User Dropdown
       function toggleDropdown() {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return; // Nếu chưa đăng nhập thì đã bị đè sự kiện onclick ở trên
+
         const menu = document.getElementById("dropdownMenu");
         menu.style.display = menu.style.display === "block" ? "none" : "block";
       }
@@ -1124,7 +1693,24 @@
         slider.scrollBy({ left: 350, behavior: "smooth" });
       prevBtn.onclick = () =>
         slider.scrollBy({ left: -350, behavior: "smooth" });
+      // ===== Voucher Slider =====
+      const voucherSlider = document.getElementById("publicVouchers");
 
+      const voucherPrevBtn = document.getElementById("voucherPrevBtn");
+
+      const voucherNextBtn = document.getElementById("voucherNextBtn");
+
+      voucherNextBtn.onclick = () =>
+        voucherSlider.scrollBy({
+          left: 350,
+          behavior: "smooth",
+        });
+
+      voucherPrevBtn.onclick = () =>
+        voucherSlider.scrollBy({
+          left: -350,
+          behavior: "smooth",
+        });
       // Initialize
       document.addEventListener("DOMContentLoaded", () => {
         const username = localStorage.getItem("username");
@@ -1162,7 +1748,90 @@
 
         loadHotels();
         loadHotelOptions();
+        loadPublicVouchers();
       });
+    </script>
+    <script>
+      const startPicker = flatpickr("#startDate", {
+        locale: "vn",
+
+        dateFormat: "Y-m-d",
+
+        minDate: "today",
+
+        disableMobile: true,
+
+        showMonths: 1,
+
+        monthSelectorType: "static",
+
+        static: true,
+
+        allowInput: false,
+
+        onChange: function (selectedDates) {
+          if (selectedDates.length > 0) {
+            endPicker.set("minDate", selectedDates[0]);
+          }
+        },
+
+        onReady: function (selectedDates, dateStr, instance) {
+          addFlatpickrButtons(instance);
+        },
+      });
+
+      const endPicker = flatpickr("#endDate", {
+        locale: "vn",
+
+        dateFormat: "Y-m-d",
+
+        minDate: "today",
+
+        disableMobile: true,
+
+        showMonths: 1,
+
+        monthSelectorType: "static",
+
+        static: true,
+
+        allowInput: false,
+
+        onReady: function (selectedDates, dateStr, instance) {
+          addFlatpickrButtons(instance);
+        },
+      });
+
+      // ===== Footer =====
+      function addFlatpickrButtons(instance) {
+        const calendar = instance.calendarContainer;
+
+        if (calendar.querySelector(".custom-flatpickr-footer")) return;
+
+        const footer = document.createElement("div");
+
+        footer.className = "custom-flatpickr-footer";
+
+        footer.innerHTML = `
+      <button type="button" class="fp-btn-clear">
+        Xóa ngày
+      </button>
+
+      <button type="button" class="fp-btn-today">
+        Hôm nay
+      </button>
+    `;
+
+        calendar.appendChild(footer);
+
+        footer.querySelector(".fp-btn-clear").addEventListener("click", () => {
+          instance.clear();
+        });
+
+        footer.querySelector(".fp-btn-today").addEventListener("click", () => {
+          instance.setDate(new Date(), true);
+        });
+      }
     </script>
   </body>
 </html>

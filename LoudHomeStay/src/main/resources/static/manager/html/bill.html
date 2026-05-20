@@ -108,6 +108,7 @@
 
       .side-nav {
         list-style: none;
+        margin-top: 10px;
       }
 
       .side-nav li {
@@ -223,7 +224,7 @@
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
+        gap: 10px;
         margin-bottom: 30px;
       }
 
@@ -356,6 +357,47 @@
       .bg-done {
         background: #f1f5f9;
         color: #475569;
+      }
+
+      /* Pagination */
+      .pagination {
+        list-style: none;
+        display: flex;
+        gap: 4px;
+        margin: 0;
+      }
+      .page-item {
+        margin: 0;
+      }
+      .page-item .page-link {
+        padding: 6px 10px;
+        font-size: 13px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        color: var(--secondary);
+        transition: 0.2s;
+        min-width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        text-decoration: none;
+      }
+      .page-item .page-link:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-light);
+      }
+      .page-item.active .page-link {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+      }
+      .page-item.disabled .page-link {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
       }
 
       /* Action Buttons */
@@ -575,6 +617,11 @@
         right: -2px;
         border: 2px solid white;
       }
+      .review-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
     </style>
   </head>
 
@@ -583,9 +630,8 @@
     <aside class="sidebar">
       <div class="logo-box">
         <div class="logo-icon"><i class="fas fa-paper-plane"></i></div>
-        <div class="logo-text">LoudHotel</div>
+        <div class="logo-text">LoudBooking</div>
       </div>
-
       <nav>
         <div class="nav-group-label">Trung tâm điều hành</div>
         <ul class="side-nav">
@@ -630,9 +676,15 @@
             </ul>
           </li>
         </ul>
-
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
+          <li>
+            <a href="voucher.html"
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
           <li>
             <a href="bill.html" class="active"
               ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
@@ -640,7 +692,6 @@
               ></i
             ></a>
           </li>
-
           <li>
             <a href="review.html"
               ><i class="fas fa-comment-alt"></i> Đánh giá của khách<i
@@ -656,7 +707,6 @@
             ></a>
           </li>
         </ul>
-
         <div class="nav-group-label">Hệ thống</div>
         <ul class="side-nav">
           <li>
@@ -678,13 +728,6 @@
       <header class="top-bar">
         <div style="width: 400px; position: relative"></div>
         <div class="d-flex align-items-center gap-4">
-          <div style="position: relative; cursor: pointer">
-            <i
-              class="fas fa-bell"
-              style="font-size: 20px; color: var(--secondary)"
-            ></i>
-            <span class="badge-dot"></span>
-          </div>
           <div class="d-flex align-items-center gap-2" style="cursor: pointer">
             <div
               style="
@@ -701,7 +744,9 @@
             >
               M
             </div>
-            <span style="font-weight: 600; font-size: 14px">Quản lý viên</span>
+            <span style="font-weight: 600; font-size: 14px; margin-left: 10px"
+              >Manager</span
+            >
           </div>
         </div>
       </header>
@@ -754,8 +799,16 @@
               </select>
             </div>
             <div class="filter-item">
+              <label>Tháng tạo đơn</label>
+              <input type="month" id="filterCreatedMonth" />
+            </div>
+            <div class="filter-item">
               <label>Ngày nhận (Check-in)</label>
               <input type="date" id="filterCheckIn" />
+            </div>
+            <div class="filter-item">
+              <label>Ngày trả (Check-out)</label>
+              <input type="date" id="filterCheckOut" />
             </div>
           </div>
           <div class="d-flex justify-content-end gap-2 mt-4">
@@ -778,17 +831,15 @@
 
         <div class="stats-grid">
           <div class="stat-card">
-            <div
-              class="stat-icon"
-              style="background: #eef2ff; color: var(--primary)"
-            >
-              <i class="fas fa-file-invoice"></i>
+            <div class="stat-icon" style="background: #eff6ff; color: #2563eb">
+              <i class="fas fa-check-circle"></i>
             </div>
             <div class="stat-info">
-              <h5 id="statTotal">0</h5>
-              <p>TỔNG ĐƠN</p>
+              <h5 id="statCompleted">0</h5>
+              <p>ĐÃ HOÀN THÀNH</p>
             </div>
           </div>
+
           <div class="stat-card">
             <div
               class="stat-icon"
@@ -798,9 +849,10 @@
             </div>
             <div class="stat-info">
               <h5 id="statPending">0</h5>
-              <p>CHỜ XỬ LÝ</p>
+              <p>CHỜ THANH TOÁN</p>
             </div>
           </div>
+
           <div class="stat-card">
             <div
               class="stat-icon"
@@ -813,6 +865,7 @@
               <p>KHÁCH ĐANG Ở</p>
             </div>
           </div>
+
           <div class="stat-card">
             <div
               class="stat-icon"
@@ -869,6 +922,16 @@
               </tbody>
             </table>
           </div>
+          <!-- Pagination -->
+          <div
+            class="d-flex justify-content-center"
+            style="padding: 16px 25px 20px"
+          >
+            <ul
+              class="pagination pagination-sm m-0"
+              id="paginationControls"
+            ></ul>
+          </div>
         </div>
       </div>
     </div>
@@ -913,6 +976,9 @@
 
     <script>
       let bills = [];
+      let currentData = [];
+      let currentPage = 1;
+      const ITEMS_PER_PAGE = 5;
       const API = "http://localhost:8080/api/bills";
       const token = localStorage.getItem("accessToken");
 
@@ -951,7 +1017,6 @@
       }
 
       function updateStats() {
-        document.getElementById("statTotal").innerText = bills.length;
         document.getElementById("statPending").innerText = bills.filter(
           (b) => b.billStatus === "PENDING",
         ).length;
@@ -961,15 +1026,35 @@
         document.getElementById("statCancel").innerText = bills.filter(
           (b) => b.billStatus === "CANCELED",
         ).length;
+
+        document.getElementById("statCompleted").innerText = bills.filter(
+          (b) => getStayStatus(b) === "COMPLETED",
+        ).length;
         document.getElementById("tableCount").innerText =
           `Tổng cộng ${bills.length} đơn `;
       }
 
-      function renderBills(data) {
+      function renderBills(data = bills, page = 1) {
+        currentData = data;
+        currentPage = page;
+        const totalItems = currentData.length;
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        const paginatedData = currentData.slice(start, end);
+
         const tbody = document.getElementById("billTableBody");
         tbody.innerHTML = "";
-        data.forEach((b) => {
-          tbody.innerHTML += `
+
+        if (paginatedData.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-5">Không có dữ liệu</td></tr>`;
+        } else {
+          paginatedData.forEach((b) => {
+            tbody.innerHTML += `
                     <tr>
                         <td style="font-weight: 700; color: var(--primary);">${b.billCode}</td>
                         <td>
@@ -990,7 +1075,77 @@
                         </td>
                     </tr>
                 `;
-        });
+          });
+        }
+        renderPagination(totalPages);
+      }
+
+      function renderPagination(totalPages) {
+        const pagination = document.getElementById("paginationControls");
+        pagination.innerHTML = "";
+
+        if (totalPages <= 1) return;
+
+        const range = 2;
+
+        // ===== Prev =====
+        const prevLi = document.createElement("li");
+        prevLi.className = "page-item " + (currentPage === 1 ? "disabled" : "");
+
+        prevLi.innerHTML = `<a class="page-link" >«</a>`;
+
+        prevLi.onclick = () => {
+          if (currentPage > 1) {
+            renderBills(currentData, currentPage - 1);
+          }
+        };
+
+        pagination.appendChild(prevLi);
+
+        // ===== Tính start/end =====
+        let startPage = currentPage - range;
+        let endPage = currentPage + range;
+
+        if (startPage < 1) {
+          startPage = 1;
+          endPage = Math.min(totalPages, range * 2 + 1);
+        }
+
+        if (endPage > totalPages) {
+          endPage = totalPages;
+          startPage = Math.max(1, totalPages - range * 2);
+        }
+
+        // ===== Render số trang =====
+        for (let i = startPage; i <= endPage; i++) {
+          const li = document.createElement("li");
+
+          li.className = "page-item " + (i === currentPage ? "active" : "");
+
+          li.innerHTML = `<a class="page-link" >${i}</a>`;
+
+          li.onclick = () => {
+            renderBills(currentData, i);
+          };
+
+          pagination.appendChild(li);
+        }
+
+        // ===== Next =====
+        const nextLi = document.createElement("li");
+
+        nextLi.className =
+          "page-item " + (currentPage === totalPages ? "disabled" : "");
+
+        nextLi.innerHTML = `<a class="page-link">»</a>`;
+
+        nextLi.onclick = () => {
+          if (currentPage < totalPages) {
+            renderBills(currentData, currentPage + 1);
+          }
+        };
+
+        pagination.appendChild(nextLi);
       }
 
       function getBillStatusBadge(s) {
@@ -1044,20 +1199,28 @@
                 subtotal: d.priceAtBooking * d.nights,
               }));
 
-        // tính tổng tiền phòng từ renderItems
+        // Tổng tiền phòng
         const roomTotal =
           renderItems.reduce((sum, r) => sum + Number(r.subtotal || 0), 0) || 0;
 
-        // phụ phí
+        // Tổng phụ phí
         const extraFeeTotal =
           (b.extraFees || []).reduce(
             (sum, f) => sum + Number(f.amount || 0),
             0,
           ) || 0;
 
+        // Tiền giảm voucher
+        const discountAmount = Number(b.discountAmount || 0);
+
+        // Có phụ phí chưa thanh toán không
         const unpaidExtraFee = (b.extraFees || []).some((f) => !f.paid);
 
-        const totalAmount = roomTotal + extraFeeTotal;
+        // Tổng cuối cùng
+        const totalAmount = Math.max(
+          roomTotal - discountAmount + extraFeeTotal,
+          0,
+        );
 
         let roomsHtml =
           renderItems
@@ -1069,8 +1232,8 @@
                         ${
                           isPreCheckIn
                             ? `<div style="font-weight: 700; font-size: 14px; color: var(--text-muted);">
-  ${r.roomType}
-</div>
+                                ${r.roomType}
+                              </div>
 
                         <div style="font-size: 12px; color: var(--text-muted);">S\u1ed1 ng\u01b0\u1eddi \u1edf: ${r.guestCount} kh\u00e1ch</div>`
                             : `<div style="font-weight: 800; font-size: 15px;">Ph\u00f2ng ${r.roomNumber}</div>
@@ -1241,13 +1404,23 @@
     
     <div class="info-row mb-2">
         <span style="font-weight:700;">Tổng tiền phòng</span>
-        <span style="
-            font-weight:800;
-            color:${b.billStatus === "PAID" ? "var(--success)" : "var(--danger)"};
-        ">
+        <span style="font-weight:800;">
             ${formatMoney(roomTotal)}
         </span>
     </div>
+
+    ${
+      b.discountAmount
+        ? `
+    <div class="info-row mb-2">
+        <span style="font-weight:700;">Giảm giá (Voucher: ${b.voucherCode || "-"})</span>
+        <span style="font-weight:800;">
+            -${formatMoney(b.discountAmount)}
+        </span>
+    </div>
+    `
+        : ""
+    }
 
     <div class="info-row mb-2">
         <span style="font-weight:700;">Tổng tiền phụ phí</span>
@@ -1362,8 +1535,13 @@
           });
           if (!res.ok) throw new Error(await res.text());
           Swal.fire("Thành công", "Đã thêm phụ phí.", "success");
-          loadBills();
-          viewBill(id);
+          await loadBills();
+
+          const updatedBill = bills.find((b) => b.billId === id);
+
+          if (updatedBill) {
+            viewBill(updatedBill.billId);
+          }
         } catch (e) {
           Swal.fire("Lỗi", e.message, "error");
         }
@@ -1567,7 +1745,10 @@
             },
             body: JSON.stringify({ roomIds }),
           });
-          if (!res.ok) throw new Error(await res.text());
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message);
+          }
           Swal.fire("Thành công", "Đã cập nhật số phòng.", "success");
           loadBills();
           viewBill(id);
@@ -1697,7 +1878,15 @@
             setTimeout(loadBills, 300);
           }
         } catch (e) {
-          Swal.fire("Lỗi", e.message, "error");
+          let message = e.message;
+
+          // backend trả JSON string
+          try {
+            const parsed = JSON.parse(e.message);
+            message = parsed.message || e.message;
+          } catch (_) {}
+
+          Swal.fire("Lỗi", message, "error");
         }
       }
 
@@ -1719,12 +1908,21 @@
         const bStat = document.getElementById("filterBillStatus").value;
         const sStat = document.getElementById("filterStayStatus").value;
         const checkIn = document.getElementById("filterCheckIn").value;
+        const checkOut = document.getElementById("filterCheckOut").value;
+        const createdMonth =
+          document.getElementById("filterCreatedMonth").value;
 
         const filtered = bills.filter((b) => {
           if (payment && b.paymentMethod !== payment) return false;
           if (bStat && b.billStatus !== bStat) return false;
           if (sStat && getStayStatus(b) !== sStat) return false;
           if (checkIn && b.checkInDate.slice(0, 10) !== checkIn) return false;
+          if (checkOut && b.checkOutDate?.slice(0, 10) !== checkOut)
+            return false;
+          if (createdMonth) {
+            const billMonth = b.createdAt?.slice(0, 7); // yyyy-mm
+            if (billMonth !== createdMonth) return false;
+          }
           return true;
         });
         renderBills(filtered);

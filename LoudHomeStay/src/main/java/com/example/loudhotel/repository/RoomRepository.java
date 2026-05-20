@@ -50,7 +50,7 @@ AND r.roomType.hotel.manager.userId = :managerId
 SELECT r FROM Room r
 WHERE r.isDeleted = false
 AND r.roomType.hotel.isDeleted = false
-AND (:keyword IS NULL OR CAST(r.roomNumber AS string) LIKE %:keyword% OR LOWER(r.roomType.typeName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+AND (:keyword IS NULL OR CAST(r.roomNumber AS string) LIKE %:keyword% OR LOWER(r.roomType.typeName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(r.roomType.hotel.hotelName) LIKE LOWER(CONCAT('%', :keyword, '%')))
 """)
     Page<Room> findAllActiveRooms(@Param("keyword") String keyword, Pageable pageable);
 
@@ -59,7 +59,7 @@ SELECT r FROM Room r
 WHERE r.isDeleted = false
 AND r.roomType.hotel.isDeleted = false
 AND r.roomType.hotel.manager.userId = :managerId
-AND (:keyword IS NULL OR CAST(r.roomNumber AS string) LIKE %:keyword% OR LOWER(r.roomType.typeName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+AND (:keyword IS NULL OR CAST(r.roomNumber AS string) LIKE %:keyword% OR LOWER(r.roomType.typeName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(r.roomType.hotel.hotelName) LIKE LOWER(CONCAT('%', :keyword, '%')))
 """)
     Page<Room> findByManagerId(@Param("managerId") Long managerId, @Param("keyword") String keyword, Pageable pageable);
 
@@ -78,7 +78,7 @@ AND r.roomId NOT IN (
     JOIN ra.billDetail bd
     JOIN bd.bill b
 
-    WHERE b.billStatus = 'PAID'
+    WHERE b.billStatus IN ('PENDING', 'PAID')
 
     AND (
         b.checkInDate < :checkOut
@@ -98,7 +98,7 @@ FROM BillDetail bd
 JOIN bd.bill b
 WHERE bd.roomType.typeId = :typeId
 
-AND b.billStatus = 'PAID'
+AND b.billStatus IN ('PENDING', 'PAID')
 
 AND (
     
@@ -155,7 +155,7 @@ AND (
         JOIN ra.billDetail bd
         JOIN bd.bill b
 
-        WHERE b.billStatus = 'PAID'
+        WHERE b.billStatus IN ('PENDING', 'PAID')
 
         AND (
             b.checkInDate < :checkOut
@@ -187,7 +187,7 @@ AND r.roomId NOT IN (
     JOIN ra.billDetail bd
     JOIN bd.bill b
 
-    WHERE b.billStatus = 'PAID'
+    WHERE b.billStatus IN ('PENDING', 'PAID')
 
     AND (
         b.checkInDate < :checkOut

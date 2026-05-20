@@ -366,6 +366,56 @@
         height: 16px;
       }
 
+      /* PRICE RANGE */
+
+      .price-slider-wrapper {
+        margin-top: 10px;
+      }
+
+      .price-values {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+
+      #priceRange {
+        width: 100%;
+        appearance: none;
+        height: 6px;
+        border-radius: 999px;
+        background: #dbeafe;
+        outline: none;
+      }
+
+      #priceRange::-webkit-slider-thumb {
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--primary);
+        cursor: pointer;
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(53, 112, 239, 0.35);
+        transition: 0.2s;
+      }
+
+      #priceRange::-webkit-slider-thumb:hover {
+        transform: scale(1.08);
+      }
+
+      .price-current {
+        margin-top: 14px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .price-current strong {
+        color: var(--primary);
+        font-size: 15px;
+      }
+
       /* RESULT */
 
       .results-header {
@@ -616,7 +666,7 @@
                 onclick="location.href = 'bill.html'"
               >
                 <i class="fas fa-receipt"></i>
-                Đơn đặt chỗ
+                Đơn đặt phòng
               </button>
 
               <button
@@ -624,7 +674,7 @@
                 onclick="location.href = 'chat.html'"
               >
                 <i class="fas fa-comment-dots"></i>
-                Hỗ trợ trực tuyến
+                Tin nhắn
               </button>
 
               <button class="dropdown-item logout" onclick="logoutUser()">
@@ -686,6 +736,45 @@
 
       <aside class="filter-section">
         <h2 class="filter-title">Bộ lọc</h2>
+        <!-- GIÁ / ĐÊM -->
+        <div class="filter-group">
+          <h4>Giá / đêm tối đa</h4>
+
+          <div class="price-slider-wrapper">
+            <div class="price-values">
+              <span id="priceMinText">0đ</span>
+              <span id="priceMaxText">10.000.000đ</span>
+            </div>
+
+            <input
+              type="range"
+              id="priceRange"
+              min="0"
+              max="10000000"
+              step="100000"
+              value="10000000"
+            />
+
+            <div class="price-current">
+              Tối đa:
+              <strong id="priceCurrentValue">10.000.000đ</strong>
+            </div>
+          </div>
+        </div>
+        <!-- THƯƠNG HIỆU -->
+        <div class="filter-group">
+          <h4>Thương hiệu</h4>
+
+          <label class="filter-item">
+            <input type="checkbox" class="brand-filter" value="Luxury" />
+            Luxury
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="brand-filter" value="Grand" />
+            Grand
+          </label>
+        </div>
         <!-- ĐÁNH GIÁ -->
         <div class="filter-group">
           <h4>Đánh giá</h4>
@@ -708,48 +797,6 @@
           <label class="filter-item">
             <input type="checkbox" class="rating-filter" value="Bình thường" />
             Bình thường
-          </label>
-        </div>
-
-        <!-- THƯƠNG HIỆU -->
-
-        <div class="filter-group">
-          <h4>Thương hiệu</h4>
-
-          <label class="filter-item">
-            <input type="checkbox" class="brand-filter" value="Luxury" />
-            Luxury
-          </label>
-
-          <label class="filter-item">
-            <input type="checkbox" class="brand-filter" value="Grand" />
-            Grand
-          </label>
-        </div>
-
-        <!-- TIỆN NGHI -->
-
-        <div class="filter-group">
-          <h4>Tiện nghi</h4>
-
-          <label class="filter-item">
-            <input type="checkbox" />
-            Hồ bơi
-          </label>
-
-          <label class="filter-item">
-            <input type="checkbox" />
-            Nhà hàng
-          </label>
-
-          <label class="filter-item">
-            <input type="checkbox" />
-            Phòng tập gym
-          </label>
-
-          <label class="filter-item">
-            <input type="checkbox" />
-            Khu vui chơi trẻ em
           </label>
         </div>
       </aside>
@@ -826,6 +873,8 @@
           ...document.querySelectorAll(".brand-filter:checked"),
         ].map((item) => item.value);
 
+        const maxPrice = Number(document.getElementById("priceRange").value);
+
         let filteredHotels = [...searchedHotels];
 
         // FILTER ĐÁNH GIÁ
@@ -847,6 +896,11 @@
             ),
           );
         }
+
+        // FILTER GIÁ
+        filteredHotels = filteredHotels.filter(
+          (hotel) => Number(hotel.minPrice || 0) <= maxPrice,
+        );
 
         renderHotels(filteredHotels);
       }
@@ -968,7 +1022,7 @@
             ? `${API_URL}${hotel.mainImage}`
             : "https://via.placeholder.com/600x400";
 
-          const rating = hotel.averageRating || "0.0";
+          const rating = Number(hotel.averageRating || 0).toFixed(1);
 
           const html = `
       <div class="hotel-card">
@@ -1216,6 +1270,16 @@
       document.addEventListener("DOMContentLoaded", () => {
         loadHotels();
         loadUserInfo();
+        const priceRange = document.getElementById("priceRange");
+        const priceCurrentValue = document.getElementById("priceCurrentValue");
+
+        priceRange.addEventListener("input", () => {
+          const value = Number(priceRange.value);
+
+          priceCurrentValue.innerText = value.toLocaleString("vi-VN") + "đ";
+
+          filterHotelsBySidebar();
+        });
         document
           .getElementById("sortSelect")
           .addEventListener("change", sortHotels);

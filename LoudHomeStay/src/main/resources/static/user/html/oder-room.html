@@ -17,6 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
       body {
         font-family: "Inter", sans-serif;
@@ -689,7 +690,7 @@
 
       /* ===== ROOM LIST SCROLL ===== */
       #roomList {
-        max-height: 400px; /* chiều cao cố định */
+        max-height: 700px; /* chiều cao cố định */
         overflow-y: auto;
         padding-right: 5px;
         padding-bottom: 10px;
@@ -738,6 +739,491 @@
         font-weight: 600;
         margin-left: 6px;
         float: right; /* đẩy sang phải */
+      }
+
+      /* Premium Voucher Input */
+      .premium-voucher-box {
+        margin-top: 20px;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .voucher-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 12px;
+      }
+
+      .voucher-label i {
+        color: #3570ef;
+      }
+
+      .voucher-input-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .voucher-input-group input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s;
+        margin-top: 0 !important;
+      }
+
+      .voucher-input-group input:focus {
+        border-color: #3570ef;
+        box-shadow: 0 0 0 3px rgba(53, 112, 239, 0.1);
+      }
+
+      .voucher-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 15px;
+
+        max-height: 195px; /* khoảng 2 voucher */
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+            .voucher-list::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .voucher-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+      }
+
+      .voucher-item {
+        margin-top: 10px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 14px;
+        cursor: pointer;
+        transition: 0.25s;
+        background: #fff;
+      }
+
+      .voucher-item:hover {
+        border-color: #4f46e5;
+        transform: translateY(-2px);
+      }
+
+      .voucher-item.active {
+        border-color: #4f46e5;
+        background: #eef2ff;
+      }
+
+      .voucher-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .voucher-code {
+        font-size: 16px;
+        font-weight: 800;
+        color: #4f46e5;
+      }
+
+      .voucher-discount {
+        font-size: 13px;
+        font-weight: 700;
+        color: #f59e0b;
+      }
+
+      .voucher-desc {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.5;
+      }
+
+      .voucher-empty {
+        text-align: center;
+        color: #94a3b8;
+        font-style: italic;
+        padding: 20px 0;
+      }
+
+      /* ===== Voucher actions ===== */
+      .voucher-actions {
+        margin-top: -20px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn-voucher-detail {
+        border: none;
+        background: transparent;
+        color: #2563eb;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        width: auto !important;
+        padding: 0 !important;
+      }
+
+      .btn-voucher-detail:hover {
+        text-decoration: underline;
+      }
+
+      /* ===== PREMIUM VOUCHER MODAL ===== */
+      .voucher-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(4px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+
+        opacity: 0;
+        transition: 0.25s ease;
+      }
+
+      .voucher-modal.show {
+        display: flex;
+        opacity: 1;
+      }
+
+      .voucher-modal-content {
+        width: 520px;
+        max-width: 95%;
+        background: #fff;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow:
+          0 25px 60px rgba(0,0,0,.18),
+          0 10px 20px rgba(0,0,0,.08);
+
+        transform: translateY(20px) scale(.96);
+        transition: .25s ease;
+        animation: modalPop .25s ease forwards;
+      }
+
+      @keyframes modalPop {
+        to {
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* ===== HEADER ===== */
+      .voucher-modal-header {
+        position: relative;
+        padding: 26px 28px;
+        background: linear-gradient(135deg, #4f46e5, #2563eb);
+        color: white;
+      }
+
+      .voucher-modal-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.18);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        backdrop-filter: blur(8px);
+      }
+
+      .voucher-modal-title {
+        margin-top: 18px;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+      }
+
+      .voucher-modal-subtitle {
+        margin-top: 8px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: rgba(255,255,255,.9);
+      }
+
+      /* close */
+      .voucher-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+
+        width: 38px;
+        height: 38px;
+
+        border-radius: 50%;
+        border: none;
+
+        background: rgba(255,255,255,.16);
+        color: white;
+
+        cursor: pointer;
+        transition: .2s;
+      }
+
+      .voucher-close:hover {
+        background: rgba(255,255,255,.28);
+        transform: rotate(90deg);
+      }
+
+      /* ===== BODY ===== */
+      .voucher-modal-body {
+        padding: 24px 28px 28px;
+      }
+
+      .voucher-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .voucher-info-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .voucher-info-label {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 10px;
+      }
+
+      .voucher-info-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        word-break: break-word;
+      }
+
+      .voucher-info-value.discount {
+        color: #f59e0b;
+      }
+
+      .voucher-info-value.primary {
+        color: #4f46e5;
+      }
+
+      /* ===== FOOTER ===== */
+      .voucher-modal-footer {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+      }
+
+      .voucher-modal-footer button {
+        flex: 1;
+      }
+
+      .close-modal-btn {
+        background: #f1f5f9;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+      }
+
+      .close-modal-btn:hover {
+        background: #e2e8f0;
+      }
+
+      .use-voucher-btn {
+        background: linear-gradient(135deg, #4f46e5, #2563eb);
+      }
+
+      /* mobile */
+      @media (max-width: 640px) {
+        .voucher-modal-content {
+          width: 95%;
+        }
+
+        .voucher-modal-title {
+          font-size: 24px;
+        }
+
+        .voucher-info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .voucher-modal-body {
+          padding: 20px;
+        }
+      }
+      /* ===== VOUCHER DETAIL MODAL ===== */
+
+      :root {
+        --accent: #4f46e5;
+      }
+
+      .voucher-detail-modal {
+        backdrop-filter: blur(5px);
+      }
+
+      .voucher-detail-popup {
+        padding: 0 !important;
+        border-radius: 26px !important;
+        overflow: hidden !important;
+        font-family: "Inter", sans-serif !important;
+        box-shadow:
+          0 25px 60px rgba(0,0,0,.18),
+          0 10px 25px rgba(0,0,0,.08) !important;
+      }
+
+      /* HEADER */
+      .voucher-detail-header {
+        padding: 28px;
+        background: linear-gradient(135deg, #4f46e5, #2563eb);
+        color: white;
+        text-align: left;
+      }
+
+      .voucher-detail-header p {
+        margin: 0;
+        font-size: 12px;
+        letter-spacing: 1.2px;
+        opacity: .9;
+        font-weight: 600;
+      }
+
+      .voucher-detail-header h3 {
+        margin: 12px 0 0;
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+      }
+
+      /* CONTENT */
+      .voucher-detail-content {
+        padding: 26px;
+        background: #fff;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+
+        padding: 14px 0;
+
+        border-bottom: 1px dashed #e2e8f0;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        text-align: right;
+        color: #0f172a;
+        font-size: 14px;
+        font-weight: 700;
+        max-width: 60%;
+        word-break: break-word;
+      }
+
+      /* DESCRIPTION */
+      .voucher-detail-desc {
+        margin-top: 22px;
+        padding: 18px;
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+      }
+
+      .voucher-detail-desc h4 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .voucher-detail-desc p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.7;
+        color: #475569;
+      }
+
+      /* CLOSE BUTTON */
+      .swal2-close {
+        color: white !important;
+        font-size: 26px !important;
+        top: 16px !important;
+        right: 16px !important;
+        transition: .2s;
+      }
+
+      .swal2-close:hover {
+        transform: rotate(90deg);
+        color: #fff !important;
+      }
+
+      /* MOBILE */
+      @media (max-width: 640px) {
+
+        .voucher-detail-header {
+          padding: 24px;
+        }
+
+        .voucher-detail-header h3 {
+          font-size: 28px;
+        }
+
+        .voucher-detail-content {
+          padding: 20px;
+        }
+
+        .detail-row {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .detail-value {
+          max-width: 100%;
+          text-align: left;
+        }
+      }
+
+      .discount-display {
+        display: none;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding: 12px 15px;
+        background: #ecfdf5;
+        border-radius: 10px;
+        border: 1px solid #a7f3d0;
+      }
+
+      .discount-display span:first-child {
+        color: #065f46;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .discount-display span:last-child {
+        color: #059669;
+        font-weight: 800;
+        font-size: 15px;
       }
     </style>
   </head>
@@ -901,13 +1387,35 @@
                 <span>Số đêm</span>
                 <span class="price-main"></span>
               </div>
+            </div>
 
-              <div class="total-box">
-                <div class="total-row">
-                  <span class="total-label">Tổng thanh toán</span>
-                  <span class="total-price"></span>
+            <!-- Voucher Section -->
+            <div class="premium-voucher-box">
+              <div class="voucher-label">
+                <i class="fas fa-ticket-alt"></i>
+                Chọn mã giảm giá
+              </div>
+
+              <div id="voucherList" class="voucher-list">
+                <div class="voucher-empty">
+                  Đang tải voucher...
                 </div>
               </div>
+
+              <div id="voucherMessage" style="font-size: 12px; margin-top: 10px"></div>
+
+              <div class="discount-display" id="discountRow">
+                <span>Số tiền giảm:</span>
+                <span id="discountValue">-0đ</span>
+              </div>
+            </div>
+
+            <div class="total-box">
+              <div class="total-row">
+                <span class="total-label">Tổng thanh toán</span>
+                <span class="total-price"></span>
+              </div>
+            </div>
 
               <div class="payment-box">
                 <div class="payment-title">
@@ -942,12 +1450,124 @@
                 </label>
               </div>
 
-              <button style="margin-top: 25px">Thanh toán</button>
+              <button id="btnSubmitBooking" style="margin-top: 25px">Thanh toán</button>
             </div>
           </div>
         </div>
       </div>
     </div>
+   <div class="voucher-modal" id="voucherModal">
+  <div class="voucher-modal-content">
+
+    <!-- HEADER -->
+    <div class="voucher-modal-header">
+
+      <button
+        class="voucher-close"
+        onclick="closeVoucherModal()"
+      >
+        <i class="fas fa-xmark"></i>
+      </button>
+
+      <div class="voucher-modal-badge">
+        <i class="fas fa-ticket-alt"></i>
+        Ưu đãi khách sạn
+      </div>
+
+      <div
+        class="voucher-modal-title"
+        id="modalVoucherCode"
+      >
+        SALE50
+      </div>
+
+      <div
+        class="voucher-modal-subtitle"
+        id="modalVoucherTitle"
+      >
+        Voucher giảm giá đặt phòng khách sạn
+      </div>
+
+    </div>
+
+    <!-- BODY -->
+    <div class="voucher-modal-body">
+
+      <div class="voucher-info-grid">
+
+        <div class="voucher-info-card">
+          <div class="voucher-info-label">
+            Mức giảm giá
+          </div>
+
+          <div
+            class="voucher-info-value discount"
+            id="modalVoucherDiscount"
+          >
+            50%
+          </div>
+        </div>
+
+        <div class="voucher-info-card">
+          <div class="voucher-info-label">
+            Đơn tối thiểu
+          </div>
+
+          <div
+            class="voucher-info-value"
+            id="modalVoucherMin"
+          >
+            500.000đ
+          </div>
+        </div>
+
+        <div class="voucher-info-card">
+          <div class="voucher-info-label">
+            Giảm tối đa
+          </div>
+
+          <div
+            class="voucher-info-value primary"
+            id="modalVoucherMax"
+          >
+            200.000đ
+          </div>
+        </div>
+
+        <div class="voucher-info-card">
+          <div class="voucher-info-label">
+            Trạng thái
+          </div>
+
+          <div class="voucher-info-value">
+            Đang hoạt động
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="voucher-modal-footer">
+
+        <button
+          class="close-modal-btn"
+          onclick="closeVoucherModal()"
+        >
+          Đóng
+        </button>
+
+        <button
+          class="use-voucher-btn"
+          onclick="closeVoucherModal()"
+        >
+          Sử dụng voucher
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
   </body>
   <script>
     /* ===== DROPDOWN ===== */
@@ -1034,6 +1654,7 @@
     function formatPrice(price) {
       return price.toLocaleString("vi-VN") + "đ";
     }
+
     async function loadRepayBill() {
       repayBillId = localStorage.getItem("rePayBillId");
 
@@ -1069,6 +1690,7 @@
 
       await loadBooking();
     }
+
     /* ===== LOAD BOOKING ===== */
     async function loadBooking() {
       try {
@@ -1099,30 +1721,30 @@
           }
 
           roomListBox.innerHTML += `
-  <div class="room-item">
-    
-    <!-- LEFT IMAGE -->
-    <div class="room-left">
-      <img src="${roomImg}" />
-    </div>
+            <div class="room-item">
+              
+              <!-- LEFT IMAGE -->
+              <div class="room-left">
+                <img src="${roomImg}" />
+              </div>
 
-    <!-- RIGHT INFO -->
-    <div class="room-right">
-      <div>
-  <b>Tên Phòng:</b>
-  ${room.typeName}
-  ${item.quantity > 1 ? `<span class="room-qty"> x${item.quantity}</span>` : ""}
-</div>
-      <div><b>Số người:</b> ${item.guestCount || 1}</div>
-      <div><b>Giá:</b> ${formatPrice(room.price)} / đêm</div>
-      <div><b>Số đêm:</b> ${nights}</div>
-      <div style="color:#e11d48;font-weight:600">
-        <b>Tổng:</b> ${formatPrice(subtotal)}
-      </div>
-    </div>
+              <!-- RIGHT INFO -->
+              <div class="room-right">
+                <div>
+            <b>Tên Phòng:</b>
+            ${room.typeName}
+            ${item.quantity > 1 ? `<span class="room-qty"> x${item.quantity}</span>` : ""}
+          </div>
+                <div><b>Số người:</b> ${item.guestCount || 1}</div>
+                <div><b>Giá:</b> ${formatPrice(room.price)} / đêm</div>
+                <div><b>Số đêm:</b> ${nights}</div>
+                <div style="color:#e11d48;font-weight:600">
+                  <b>Tổng:</b> ${formatPrice(subtotal)}
+                </div>
+              </div>
 
-  </div>
-`;
+            </div>
+          `;
         }
         if (!selectedRooms.length) {
           throw new Error("selectedRooms rỗng");
@@ -1153,7 +1775,7 @@
         });
 
         const reviews = await reviewRes.json();
-
+        
         /* ===== CALC REVIEW ===== */
         let reviewCount = reviews.length;
         let sum = 0;
@@ -1206,9 +1828,8 @@
             `<div class="more-amenity">+${utilities.length - 7} tiện ích khác</div>`,
           );
         }
-
+        
         /* ===== ROOM ===== */
-
         function getRoomTypeVN(type) {
           switch (type) {
             case "SINGLE":
@@ -1231,6 +1852,7 @@
         /* ===== PRICE ===== */
         document.querySelector(".price-main").innerText = nights;
 
+        currentTotalPrice = totalPrice;
         document.querySelector(".total-price").innerText =
           formatPrice(totalPrice);
       } catch (err) {
@@ -1260,33 +1882,98 @@
     }
 
     async function submitBooking() {
-      const cccd = document.getElementById("idCardCode").value;
-      const name = document.getElementById("orderName").value;
-      const phone = document.getElementById("orderPhone").value;
-      const email = document.getElementById("orderEmail").value;
+      const btn = document.getElementById("btnSubmitBooking");
+      btn.disabled = true;
+      btn.innerText = "Đang xử lý...";
 
-      const selectedPayment = document.querySelector(
-        "input[name='payment']:checked",
-      );
+      try {
+        const cccd = document.getElementById("idCardCode").value;
+        const name = document.getElementById("orderName").value;
+        const phone = document.getElementById("orderPhone").value;
+        const email = document.getElementById("orderEmail").value;
+        const agree = document.getElementById("agreeTerms").checked;
 
-      if (!selectedPayment) {
-        alert("Vui lòng chọn phương thức thanh toán");
-        return;
-      }
+        if (!name || !phone || !email || !cccd) {
+          alert("Vui lòng điền đầy đủ thông tin người đặt!");
+          return;
+        }
+        if (!agree) {
+          alert("Vui lòng đồng ý với điều khoản dịch vụ!");
+          return;
+        }
 
-      const paymentMethod = selectedPayment.value;
+        const selectedPayment = document.querySelector(
+          "input[name='payment']:checked",
+        );
+        if (!selectedPayment) {
+          alert("Vui lòng chọn phương thức thanh toán");
+          return;
+        }
 
-      const userId = Number(localStorage.getItem("userId"));
+        const paymentMethod = selectedPayment.value;
+        const userId = Number(localStorage.getItem("userId"));
 
-      if (!userId || isNaN(userId)) {
-        alert("Vui lòng đăng nhập lại");
-        return;
-      }
+        if (!userId || isNaN(userId)) {
+          alert("Vui lòng đăng nhập lại");
+          window.location.href = "/login.html";
+          return;
+        }
 
-      /* ========================CASE REPAY VNPAY ======================== */
-      if (isRepay) {
+        /* ========================CASE REPAY VNPAY ======================== */
+        if (isRepay) {
+          const payRes = await fetch(
+            `${API_URL}/api/payments/vnpay?billId=${repayBillId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+            },
+          );
+
+          if (!payRes.ok) throw new Error("Lỗi khi tạo liên kết thanh toán");
+          const paymentUrl = await payRes.text();
+          window.location.href = paymentUrl;
+          return;
+        }
+
+        /* ========================CASE BOOKING NEW======================== */
+        const billRes = await fetch(`${API_URL}/api/bills?userId=${userId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+          body: JSON.stringify({
+            hotelId: hotelIdGlobal,
+            rooms: selectedRooms.map((r) => ({
+              typeId: r.roomTypeId,
+              quantity: r.quantity || 1,
+              guestCount: r.guestCount || 1,
+            })),
+            checkInDate: checkIn,
+            checkOutDate: checkOut,
+            orderName: name,
+            orderEmail: email,
+            orderPhone: phone,
+            idCardCode: cccd,
+            paymentMethod: paymentMethod,
+            voucherCode: selectedVoucher
+            ? selectedVoucher.voucherCode
+            : null,
+          }),
+        });
+
+        if (!billRes.ok) {
+          const errorMsg = await billRes.text();
+          throw new Error(errorMsg || "Lỗi khi tạo đơn đặt phòng");
+        }
+
+        const bill = await billRes.json();
+        console.log("BILL RESPONSE =", bill);
+
         const payRes = await fetch(
-          `${API_URL}/api/payments/vnpay?billId=${repayBillId}`,
+          `${API_URL}/api/payments/vnpay?billId=${bill.billId}`,
           {
             method: "POST",
             headers: {
@@ -1295,60 +1982,16 @@
           },
         );
 
+        if (!payRes.ok) throw new Error("Lỗi khi tạo liên kết thanh toán VNPAY");
         const paymentUrl = await payRes.text();
-
         window.location.href = paymentUrl;
-
-        return;
+      } catch (err) {
+        console.error(err);
+        alert("Có lỗi xảy ra: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Thanh toán";
       }
-
-      /* ========================CASE BOOKING NEW======================== */
-
-      const billRes = await fetch(`${API_URL}/api/bills?userId=${userId}`, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-
-        body: JSON.stringify({
-          hotelId: hotelIdGlobal,
-
-          rooms: selectedRooms.map((r) => ({
-            typeId: r.roomTypeId,
-            quantity: r.quantity || 1,
-            guestCount: r.guestCount || 1,
-          })),
-
-          checkInDate: checkIn,
-          checkOutDate: checkOut,
-          orderName: name,
-          orderEmail: email,
-          orderPhone: phone,
-          idCardCode: cccd,
-          paymentMethod: paymentMethod,
-        }),
-      });
-
-      const bill = await billRes.json();
-      console.log("BILL RESPONSE =", bill);
-
-      const payRes = await fetch(
-        `${API_URL}/api/payments/vnpay?billId=${bill.billId}`,
-        {
-          method: "POST",
-
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        },
-      );
-
-      const paymentUrl = await payRes.text();
-
-      window.location.href = paymentUrl;
     }
 
     /* chọn card payment */
@@ -1357,12 +2000,343 @@
         document
           .querySelectorAll(".payment-card")
           .forEach((c) => c.classList.remove("active"));
-
         card.classList.add("active");
-
-        card.querySelector("input").checked = true;
+        const radio = card.querySelector("input[type='radio']");
+        if (radio) radio.checked = true;
       });
     });
+
+
+    /* ===== VOUCHER LOGIC ===== */
+
+    let currentTotalPrice = 0;
+    let appliedDiscount = 0;
+    let selectedVoucher = null;
+    let hotelVouchers = [];
+
+    async function loadVouchers() {
+      try {
+        const res = await fetch(
+          `${API_URL}/api/vouchers/public?hotelId=${hotelIdGlobal}`,
+        );
+
+        hotelVouchers = await res.json();
+
+        const list = document.getElementById("voucherList");
+
+        if (!hotelVouchers.length) {
+          list.innerHTML = `
+            <div class="voucher-empty">
+              Không có voucher khả dụng
+            </div>
+          `;
+          return;
+        }
+
+        list.innerHTML = hotelVouchers
+          .map((v) => {
+            const discount =
+              v.discountType === "PERCENT"
+                ? `Giảm ${v.discountValue}%`
+                : `Giảm ${formatPrice(v.discountValue)}`;
+
+            return `
+        <div class="voucher-item"
+            id="voucher-${v.voucherId}"
+            onclick="selectVoucher(${v.voucherId})">
+
+          <div class="voucher-top">
+            <div class="voucher-code">
+              ${v.voucherCode}
+            </div>
+
+            <div class="voucher-discount">
+              ${discount}
+            </div>
+          </div>
+
+          <div class="voucher-desc">
+            ${v.title || "Ưu đãi đặt phòng khách sạn"}
+          </div>
+
+          <div class="voucher-actions">
+            <button 
+              class="btn-voucher-detail"
+              onclick="event.stopPropagation(); showVoucherDetail(${v.voucherId})">
+              Xem chi tiết
+            </button>
+          </div>
+
+        </div>
+          `;
+        })
+        .join("");
+
+        // auto chọn voucher từ URL
+        const vCode = params.get("voucherCode");
+
+        if (vCode) {
+          const found = hotelVouchers.find(
+            (x) => x.voucherCode === vCode,
+          );
+
+          if (found) {
+            selectVoucher(found.voucherId);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function selectVoucher(voucherId) {
+      // click lại voucher đang chọn = bỏ chọn
+      if (
+        selectedVoucher &&
+        selectedVoucher.voucherId === voucherId
+      ) {
+        document
+          .querySelectorAll(".voucher-item")
+          .forEach((x) => x.classList.remove("active"));
+
+        selectedVoucher = null;
+
+        applySelectedVoucher();
+
+        return;
+      }
+
+      document
+        .querySelectorAll(".voucher-item")
+        .forEach((x) => x.classList.remove("active"));
+
+      const item = document.getElementById(
+        `voucher-${voucherId}`
+      );
+
+      if (item) {
+        item.classList.add("active");
+      }
+
+      selectedVoucher = hotelVouchers.find(
+        (x) => x.voucherId === voucherId
+      );
+
+      applySelectedVoucher();
+    }
+
+    function showVoucherDetail(voucherId) {
+
+      const v = hotelVouchers.find(
+        x => x.voucherId === voucherId
+      );
+
+      if (!v) return;
+
+      const discountTxt =
+        v.discountType === "PERCENT"
+          ? `Giảm ${v.discountValue}%`
+          : `Giảm ${formatPrice(v.discountValue)}`;
+
+      const minBillTxt =
+        v.minBillAmount
+          ? formatPrice(v.minBillAmount)
+          : "Không yêu cầu";
+
+      const maxDiscountTxt =
+        v.maxDiscountAmount
+          ? formatPrice(v.maxDiscountAmount)
+          : "Theo mức ưu đãi";
+
+      const startDateTxt = v.startDate
+        ? new Date(v.startDate).toLocaleString("vi-VN")
+        : "---";
+
+      const endDateTxt = v.endDate
+        ? new Date(v.endDate).toLocaleString("vi-VN")
+        : "---";
+
+      Swal.fire({
+        html: `
+          <div class="voucher-detail-header">
+            <p>MÃ KHUYẾN MÃI</p>
+
+            <h3>${v.voucherCode}</h3>
+          </div>
+
+          <div class="voucher-detail-content">
+
+            <div class="detail-row">
+              <span class="detail-label">
+                Chương trình ưu đãi
+              </span>
+
+              <span class="detail-value">
+                ${v.title || "Ưu đãi LoudBooking"}
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">
+                Mức ưu đãi
+              </span>
+
+              <span
+                class="detail-value"
+                style="color: var(--accent); font-size: 16px;"
+              >
+                ${discountTxt}
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">
+                Đơn tối thiểu
+              </span>
+
+              <span class="detail-value">
+                ${minBillTxt}
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">
+                Giảm tối đa
+              </span>
+
+              <span class="detail-value">
+                ${maxDiscountTxt}
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">
+                Hiệu lực từ
+              </span>
+
+              <span class="detail-value">
+                ${startDateTxt}
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">
+                Hết hạn
+              </span>
+
+              <span class="detail-value">
+                ${endDateTxt}
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">
+                Số lượng còn lại
+              </span>
+
+              <span class="detail-value">
+                ${(v.quantity || 0) - (v.usedCount || 0)}
+              </span>
+            </div>
+
+            <div class="voucher-detail-desc">
+              <h4>Thông tin ưu đãi</h4>
+
+              <p>
+                ${
+                  v.description ||
+                  "Áp dụng cho khách hàng đặt phòng trực tuyến tại LoudBooking."
+                }
+              </p>
+            </div>
+
+          </div>
+        `,
+
+        showConfirmButton: false,
+        showCloseButton: true,
+
+        width: 520,
+
+        customClass: {
+          container: "voucher-detail-modal",
+          popup: "voucher-detail-popup",
+        },
+      });
+    }
+
+    function closeVoucherModal() {
+      document.getElementById(
+        "voucherModal"
+      ).classList.remove("show");
+    }
+
+    function applySelectedVoucher() {
+      const msg = document.getElementById("voucherMessage");
+      const discountRow = document.getElementById("discountRow");
+      const discountVal = document.getElementById("discountValue");
+
+      appliedDiscount = 0;
+
+      if (!selectedVoucher) {
+        discountRow.style.display = "none";
+        updateFinalTotal();
+        return;
+      }
+
+      const v = selectedVoucher;
+
+      if (
+        v.minBillAmount &&
+        currentTotalPrice < v.minBillAmount
+      ) {
+        msg.innerText =
+          `Đơn tối thiểu ${formatPrice(v.minBillAmount)} để dùng voucher này`;
+        msg.style.color = "#dc2626";
+        discountRow.style.display = "none";
+        updateFinalTotal();
+
+        return;
+      }
+
+      if (v.discountType === "PERCENT") {
+        appliedDiscount =
+          (currentTotalPrice * v.discountValue) / 100;
+
+        if (
+          v.maxDiscountAmount &&
+          appliedDiscount > v.maxDiscountAmount
+        ) {
+          appliedDiscount = v.maxDiscountAmount;
+        }
+      } else {
+        appliedDiscount = v.discountValue;
+      }
+
+      if (appliedDiscount > currentTotalPrice) {
+        appliedDiscount = currentTotalPrice;
+      }
+
+      msg.innerText = `Đã áp dụng voucher ${v.voucherCode}`;
+      msg.style.color = "#16a34a";
+      discountRow.style.display = "flex";
+      discountVal.innerText =
+        "-" + formatPrice(appliedDiscount);
+
+      updateFinalTotal();
+    }
+
+    function updateFinalTotal() {
+      const finalTotal = currentTotalPrice - appliedDiscount;
+
+      document.querySelector(".total-price").innerText =
+        formatPrice(finalTotal > 0 ? finalTotal : 0);
+    }
+
+    function updateFinalTotal() {
+      const finalTotal = currentTotalPrice - appliedDiscount;
+      document.querySelector(".total-price").innerText = formatPrice(finalTotal);
+    }
     /* ===== INIT ===== */
     document.addEventListener("DOMContentLoaded", async () => {
       loadUser();
@@ -1373,7 +2347,10 @@
         await loadBooking();
       }
 
-      document.querySelector("button").onclick = submitBooking;
+      // Pre-fill voucher from URL
+      await loadVouchers();
+
+      document.getElementById("btnSubmitBooking").onclick = submitBooking;
     });
   </script>
 </html>

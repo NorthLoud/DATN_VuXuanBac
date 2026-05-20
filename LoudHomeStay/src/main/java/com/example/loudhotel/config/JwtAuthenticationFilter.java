@@ -31,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return uri.startsWith("/api/auth/")
                 || uri.startsWith("/images/")
+                || uri.startsWith("/api/vouchers/public")
                 || uri.startsWith("/api/payments/");
     }
 

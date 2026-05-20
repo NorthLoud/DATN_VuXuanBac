@@ -7,6 +7,8 @@ import com.example.loudhotel.dto.response.UtilitiesResponse;
 import com.example.loudhotel.entity.Hotel;
 import com.example.loudhotel.entity.RoomType;
 import com.example.loudhotel.entity.RoomTypeImage;
+import com.example.loudhotel.exception.BadRequestException;
+import com.example.loudhotel.exception.ResourceNotFoundException;
 import com.example.loudhotel.repository.HotelRepository;
 import com.example.loudhotel.repository.RoomRepository;
 import com.example.loudhotel.repository.RoomTypeRepository;
@@ -88,10 +90,22 @@ public class RoomTypeServiceImpl implements RoomTypeService {
                 .toList();
     }
 
+    /** Map Vietnamese bed type keyword to English enum name for DB search */
+    private String mapBedTypeKeyword(String keyword) {
+        if (keyword == null) return null;
+        String kw = keyword.toLowerCase().trim();
+        if (kw.contains("đơn") || kw.contains("single")) return "SINGLE";
+        if (kw.contains("đôi") || kw.contains("double")) return "DOUBLE";
+        if (kw.contains("queen")) return "QUEEN";
+        if (kw.contains("king")) return "KING";
+        return null;
+    }
+
     @Override
     public org.springframework.data.domain.Page<RoomTypeResponse> getAll(String keyword, org.springframework.data.domain.Pageable pageable) {
         if (keyword != null && !keyword.trim().isEmpty()) {
-            return roomTypeRepository.searchAll(keyword, pageable).map(this::map);
+            String bedKeyword = mapBedTypeKeyword(keyword);
+            return roomTypeRepository.searchAll(keyword, bedKeyword, pageable).map(this::map);
         }
         return roomTypeRepository.findByIsDeletedFalse(pageable).map(this::map);
     }
@@ -100,7 +114,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
     public RoomTypeResponse create(Long hotelId, RoomTypeRequest request) {
 
         Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new RuntimeException("Hotel not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found"));
 
         boolean exists = roomTypeRepository
                 .existsByHotel_HotelIdAndTypeNameAndIsDeletedFalse(
@@ -109,7 +123,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
                 );
 
         if (exists) {
-            throw new RuntimeException("Tên loại phòng đã tồn tại trong khách sạn này");
+            throw new BadRequestException("Tên loại phòng đã tồn tại trong khách sạn này");
         }
 
         RoomType roomType = RoomType.builder()
@@ -131,7 +145,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
     public RoomTypeResponse update(Long id, RoomTypeRequest request) {
 
         RoomType rt = roomTypeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("RoomType not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("RoomType not found"));
 
         boolean exists = roomTypeRepository
                 .existsByHotel_HotelIdAndTypeNameAndIsDeletedFalse(
@@ -141,7 +155,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 
         // tránh check chính nó
         if (exists && !rt.getTypeName().equals(request.getTypeName())) {
-            throw new RuntimeException("Tên loại phòng đã tồn tại trong khách sạn này");
+            throw new BadRequestException("Tên loại phòng đã tồn tại trong khách sạn này");
         }
 
         rt.setTypeName(request.getTypeName());
@@ -159,14 +173,14 @@ public class RoomTypeServiceImpl implements RoomTypeService {
     public void delete(Long id) {
 
         RoomType rt = roomTypeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("RoomType not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("RoomType not found"));
 
         // ❗ CHECK QUAN TRỌNG
         boolean hasRooms = roomRepository
                 .existsByRoomType_TypeIdAndIsDeletedFalse(id);
 
         if (hasRooms) {
-            throw new RuntimeException("Không thể xóa loại phòng đang có phòng");
+            throw new BadRequestException("Không thể xóa loại phòng đang có phòng");
         }
 
         rt.setIsDeleted(true);
@@ -188,7 +202,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 
         RoomType rt = roomTypeRepository
                 .findByTypeIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new RuntimeException("RoomType not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("RoomType not found"));
 
         return map(rt);
     }
@@ -209,7 +223,8 @@ public class RoomTypeServiceImpl implements RoomTypeService {
     @Override
     public org.springframework.data.domain.Page<RoomTypeResponse> getRoomTypesByManager(Long managerId, String keyword, org.springframework.data.domain.Pageable pageable) {
         if (keyword != null && !keyword.trim().isEmpty()) {
-            return roomTypeRepository.searchByManagerUserId(managerId, keyword, pageable).map(this::map);
+            String bedKeyword = mapBedTypeKeyword(keyword);
+            return roomTypeRepository.searchByManagerUserId(managerId, keyword, bedKeyword, pageable).map(this::map);
         }
         return roomTypeRepository.findByManagerUserId(managerId, pageable).map(this::map);
     }

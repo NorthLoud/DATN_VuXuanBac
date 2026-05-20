@@ -724,7 +724,7 @@
                 <th>Ngày tạo đơn</th>
                 <th>Ngày nhận</th>
                 <th>Ngày trả</th>
-                <th>Tiền phòng</th>
+                <th>Tổng tiền</th>
                 <th>Hình thức thanh toán</th>
                 <th>Trạng thái đơn</th>
                 <th>Thao tác</th>
@@ -769,6 +769,114 @@
               data-dismiss="modal"
             >
               Đóng cửa sổ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Đánh giá -->
+    <div
+      id="reviewWriteModal"
+      class="modal fade"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 550px">
+        <div class="modal-content" style="border-radius: 24px; padding: 20px">
+          <div class="modal-header" style="border: none; padding-bottom: 0">
+            <h2 style="font-weight: 800; margin-bottom: 0">Đánh giá của bạn</h2>
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+          </div>
+          <div class="modal-body">
+            <p
+              id="reviewHotelTarget"
+              style="
+                color: var(--text-muted);
+                margin-bottom: 25px;
+                font-weight: 600;
+              "
+            >
+              Đánh giá cho khách sạn...
+            </p>
+
+            <div
+              id="reviewRoomInfo"
+              style="
+                background: #f8fafc;
+                padding: 15px;
+                border-radius: 16px;
+                margin-bottom: 25px;
+                font-size: 14px;
+              "
+            >
+              <div class="d-flex justify-content-between mb-1">
+                <span style="color: var(--text-muted)">Loại phòng:</span>
+                <span id="reviewRoomType" style="font-weight: 700">...</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span style="color: var(--text-muted)">Số đêm:</span>
+                <span id="reviewNights" style="font-weight: 700">... đêm</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 30px">
+              <label
+                style="display: block; font-weight: 700; margin-bottom: 10px"
+              >
+                Mức độ hài lòng:
+                <span
+                  id="scoreVal"
+                  style="color: var(--primary); font-size: 20px"
+                  >8.0</span
+                >/10
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="10"
+                step="0.1"
+                value="8"
+                id="inputScore"
+                oninput="
+                  document.getElementById('scoreVal').innerText = parseFloat(
+                    this.value,
+                  ).toFixed(1)
+                "
+                style="width: 100%; accent-color: var(--primary)"
+              />
+            </div>
+
+            <textarea
+              id="inputComment"
+              placeholder="Bạn cảm thấy thế nào về chỗ nghỉ này?"
+              style="
+                width: 100%;
+                height: 120px;
+                padding: 15px;
+                border-radius: 16px;
+                border: 1px solid #e2e8f0;
+                font-size: 14px;
+                resize: none;
+                margin-bottom: 20px;
+                outline: none;
+                transition: 0.3s;
+              "
+            ></textarea>
+
+            <button
+              class="btn btn-primary btn-block"
+              style="
+                padding: 12px;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 16px;
+              "
+              onclick="sendReview()"
+            >
+              Gửi đánh giá ngay
             </button>
           </div>
         </div>
@@ -922,6 +1030,8 @@
             const showPayBtn =
               b.paymentMethod === "VNPAY" && b.billStatus === "PENDING";
 
+            const showReviewBtn = b.actualCheckOutTime && !b.reviewed;
+
             tbody.insertAdjacentHTML(
               "beforeend",
               `
@@ -973,6 +1083,19 @@
 
                 <i class="fa fa-eye"></i>
               </button>
+
+              ${
+                showReviewBtn
+                  ? `
+                <button
+                  class="btn btn-sm btn-outline-warning"
+                  title="Đánh giá"
+                  onclick="openReviewModal(${b.billId})">
+                  <i class="fa fa-star"></i>
+                </button>
+              `
+                  : ""
+              }
 
               ${
                 showCancel
@@ -1055,14 +1178,10 @@
 
       function viewBill(id) {
         const b = bills.find((x) => x.billId === id);
-
         document.getElementById("mBillCode").innerText = "#" + b.billCode;
-
         const stayStatus = getStayStatus(b);
-
         // chỉ hiện số phòng sau check-in
         const isPreCheckIn = stayStatus === "BOOKED";
-
         const renderItems =
           b.rooms && b.rooms.length > 0
             ? b.rooms
@@ -1080,11 +1199,9 @@
         // 1. TÍNH TIỀN PHÒNG
         const roomTotal =
           renderItems.reduce((sum, r) => sum + (r.subtotal || 0), 0) || 0;
-
         // 2. TÍNH PHỤ PHÍ
         const extraFeeTotal =
           b.extraFees?.reduce((sum, f) => sum + (f.amount || 0), 0) || 0;
-
         // 3. TỔNG TIỀN
         const totalAmount = roomTotal + extraFeeTotal;
 
@@ -1092,55 +1209,41 @@
           renderItems
             ?.map(
               (r) => `
-
-    <div class="room-item">
-
-      <div class="d-flex justify-content-between">
-
-        <div>
-
-          ${
-            isPreCheckIn
-              ? `
-              <div style="font-weight:700;">
-                ${r.roomType || "-"}
-              </div>
-
-              <div style="font-size:12px;color:gray;">
-                Số người ở: ${r.capacity || r.totalGuests || 0} khách
-              </div>
-              `
-              : `
-              <div style="font-weight:700;">
-                Phòng ${r.roomNumber || "-"}
-              </div>
-
-              <div style="font-size:12px;color:gray;">
-                ${r.roomType || "-"} |
-                Số người ở: ${r.capacity || r.totalGuests || 0} khách
-              </div>
-              `
-          }
-
-        </div>
-
-        <div style="text-align:right;">
-
-          <div style="font-weight:700;color:#10b981;">
-            ${formatPrice(r.subtotal)}
-          </div>
-
-          <div style="font-size:12px;color:gray;">
-            ${formatPrice(r.oldPrice || r.price)} x ${r.nights || 1} đêm
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  `,
+                <div class="room-item">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      ${
+                        isPreCheckIn
+                          ? `
+                          <div style="font-weight:700;">
+                            ${r.roomType || "-"}
+                          </div>
+                          <div style="font-size:12px;color:gray;">
+                            Số người ở: ${r.capacity || r.totalGuests || 0} khách
+                          </div>
+                          `
+                          : `
+                          <div style="font-weight:700;">
+                            Phòng ${r.roomNumber || "-"}
+                          </div>
+                          <div style="font-size:12px;color:gray;">
+                            ${r.roomType || "-"} |
+                            Số người ở: ${r.capacity || r.totalGuests || 0} khách
+                          </div>
+                          `
+                      }
+                    </div>
+                    <div style="text-align:right;">
+                      <div style="font-weight:700;color:#10b981;">
+                        ${formatPrice(r.subtotal)}
+                      </div>
+                      <div style="font-size:12px;color:gray;">
+                        ${formatPrice(r.oldPrice || r.price)} x ${r.nights || 1} đêm
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `,
             )
             .join("") || "Không có dữ liệu";
         let extraFeesHtml = "";
@@ -1153,38 +1256,29 @@
 
       ${b.extraFees
         .map(
-          (f) => `
-          
+          (f) => `       
           <div class="room-item">
-
             <div class="d-flex justify-content-between">
-
               <div>
                 <div style="font-weight:700;">
                   ${f.reason || f.description || "-"}
                 </div>
               </div>
-
               <div style="text-align:right;">
                 <div style="font-weight:700;color:#10b981;">
                   ${formatPrice(f.amount)}
                 </div>
-
                 <div style="font-size:12px;color:${
                   f.paid ? "#10b981" : "#ef4444"
                 };">
                   ${f.paid ? "Đã thanh toán" : "Chưa thanh toán"}
                 </div>
               </div>
-
             </div>
-
           </div>
-
         `,
         )
         .join("")}
-
     </div>
 
   `;
@@ -1195,80 +1289,62 @@
 
       <div class="info-card">
         <h6>Thông tin người đặt</h6>
-
-<div class="info-row">
-  <span>Tài khoản</span>
-  <span>${b.userName || "-"}</span>
-</div>
-
-<div class="info-row">
-  <span>Người nhận</span>
-  <span>${b.orderName || "-"}</span>
-</div>
-
-<div class="info-row">
-  <span>Điện thoại</span>
-  <span>${b.orderPhone || "-"}</span>
-</div>
-
-<div class="info-row">
-  <span>Email</span>
-  <span>${b.orderEmail || b.email || "-"}</span>
-</div>
-
-<div class="info-row">
-  <span>Căn cước</span>
-  <span>${b.idCardCode || "-"}</span>
-</div>
+          <div class="info-row">
+            <span>Tài khoản</span>
+            <span>${b.userName || "-"}</span>
+          </div>
+          <div class="info-row">
+            <span>Người nhận</span>
+            <span>${b.orderName || "-"}</span>
+          </div>
+          <div class="info-row">
+            <span>Điện thoại</span>
+            <span>${b.orderPhone || "-"}</span>
+          </div>
+          <div class="info-row">
+            <span>Email</span>
+            <span>${b.orderEmail || b.email || "-"}</span>
+          </div>
+          <div class="info-row">
+            <span>Căn cước</span>
+            <span>${b.idCardCode || "-"}</span>
+          </div>
       </div>
-
       <div class="info-card">
         <h6>Thông tin khách sạn</h6>
-
         <div class="info-row">
           <span>Khách sạn</span>
           <span>${b.hotelName}</span>
         </div>
-
         <div class="info-row">
           <span>Địa chỉ</span>
           <span>${b.hotelAddress}</span>
         </div>
-
       </div>
-
     </div>
-
     <div class="bill-info-grid">
-
       <div class="info-card">
         <h6>Thời gian lưu trú</h6>
-
-<div class="info-row">
-  <span>Ngày đặt</span>
-  <span>${formatDateTime(b.createdAt)}</span>
-</div>
-
-<div class="info-row">
-  <span>Ngày nhận (dự kiến)</span>
-  <span>${formatDate(b.checkInDate)}</span>
-</div>
-
-<div class="info-row">
-  <span>Ngày trả (dự kiến)</span>
-  <span>${formatDate(b.checkOutDate)}</span>
-</div>
-
-<div class="info-row">
-  <span>Check-in thực tế</span>
-  <span>${formatDateTime(b.actualCheckInTime)}</span>
-</div>
-
-<div class="info-row">
-  <span>Check-out thực tế</span>
-  <span>${formatDateTime(b.actualCheckOutTime)}</span>
-</div>
-
+        <div class="info-row">
+          <span>Ngày đặt</span>
+          <span>${formatDateTime(b.createdAt)}</span>
+        </div>
+        <div class="info-row">
+          <span>Ngày nhận (dự kiến)</span>
+          <span>${formatDate(b.checkInDate)}</span>
+        </div>
+        <div class="info-row">
+          <span>Ngày trả (dự kiến)</span>
+          <span>${formatDate(b.checkOutDate)}</span>
+        </div>
+        <div class="info-row">
+          <span>Check-in thực tế</span>
+          <span>${formatDateTime(b.actualCheckInTime)}</span>
+        </div>
+        <div class="info-row">
+          <span>Check-out thực tế</span>
+          <span>${formatDateTime(b.actualCheckOutTime)}</span>
+        </div>
       </div>
 
       <div class="info-card">
@@ -1289,6 +1365,17 @@
           <span>${getStayStatusBadge(stayStatus)}</span>
         </div>
 
+        ${
+          b.billStatus === "CANCELED"
+            ? `
+          <div class="info-row">
+            <span>Lý do hủy</span>
+            <span>${formatCancelReason(b.cancelReason)}</span>
+          </div>
+        `
+            : ""
+        }
+
       </div>
 
     </div>
@@ -1308,21 +1395,28 @@
           <span>${formatPrice(roomTotal)}</span>
         </div>
 
+        ${
+          b.discountAmount
+            ? `
+        <div class="info-row" style="color: #10b981;">
+          <span>Giảm giá (Voucher: ${b.voucherCode || "-"})</span>
+          <span>-${formatPrice(b.discountAmount)}</span>
+        </div>
+        `
+            : ""
+        }
+
         <div class="info-row">
           <span>Tổng phụ phí</span>
           <span>${formatPrice(extraFeeTotal)}</span>
         </div>
 
-        <div class="info-row"
-             style="font-size:20px;font-weight:800;">
-
-          <span>Tổng thanh toán</span>
-
-          <span style="color:red;">
-            ${formatPrice(totalAmount)}
-          </span>
-
-        </div>
+        <div class="info-row" style="border-top:1px dashed #eee; padding-top:10px; margin-top:10px;">
+        <span style="font-size:16px; font-weight:800;">Tổng cộng</span>
+        <span style="font-size:18px; font-weight:900; color:#ef4444;">
+          ${formatPrice(b.totalCost)}
+        </span>
+      </div>
 
       </div>
 
@@ -1332,12 +1426,128 @@
         $("#viewBillModal").modal("show");
       }
 
-      function goToPay(billId) {
-        // 👉 lưu billId vào localStorage
-        localStorage.setItem("rePayBillId", billId);
+      let currentReviewBillId = null;
+      function openReviewModal(billId) {
+        const b = bills.find((x) => x.billId === billId);
+        if (!b) return;
 
-        // 👉 chuyển sang order.html
-        window.location.href = "oder-room.html?repay=true";
+        currentReviewBillId = billId;
+        document.getElementById("reviewHotelTarget").innerText =
+          "Đánh giá cho " + b.hotelName;
+
+        const roomTypes =
+          b.details?.map((d) => d.typeName).join(", ") ||
+          b.rooms?.map((r) => r.roomType).join(", ") ||
+          "-";
+        const nights =
+          b.details?.[0]?.nights ||
+          b.rooms?.[0]?.nights ||
+          Math.ceil(
+            (new Date(b.checkOutDate) - new Date(b.checkInDate)) /
+              (1000 * 60 * 60 * 24),
+          );
+
+        document.getElementById("reviewRoomType").innerText = roomTypes;
+        document.getElementById("reviewNights").innerText = nights + " đêm";
+
+        // Reset form
+        document.getElementById("inputScore").value = 8;
+        document.getElementById("scoreVal").innerText = "8.0";
+        document.getElementById("inputComment").value = "";
+
+        $("#reviewWriteModal").modal("show");
+      }
+
+      async function sendReview() {
+        if (!currentReviewBillId) return;
+
+        const score = document.getElementById("inputScore").value;
+        const comment = document.getElementById("inputComment").value;
+
+        try {
+          const b = bills.find((x) => x.billId === currentReviewBillId);
+
+          const res = await fetch(`${API_URL}/api/reviews`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+            body: JSON.stringify({
+              billId: currentReviewBillId,
+              rate: parseFloat(score),
+              comment: comment,
+            }),
+          });
+
+          if (res.ok) {
+            // đóng modal
+            $("#reviewWriteModal").modal("hide");
+
+            // fade out
+            document.body.style.transition = "opacity 0.5s ease";
+
+            Swal.fire({
+              icon: "success",
+              title: "Đánh giá thành công!",
+              text: "Đang chuyển đến khách sạn...",
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 2000,
+            });
+
+            setTimeout(() => {
+              document.body.style.opacity = "0";
+            }, 1200);
+
+            setTimeout(() => {
+              window.location.href = `detail-hotel.html?id=${b.hotelId}`;
+            }, 2000);
+          } else {
+            showError(await res.text());
+          }
+        } catch (e) {
+          console.error(e);
+          showError("Lỗi khi gửi đánh giá!");
+        }
+      }
+      async function goToPay(billId) {
+        try {
+          Swal.fire({
+            title: "Đang chuyển đến VNPAY...",
+            text: "Vui lòng chờ trong giây lát",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          const res = await fetch(
+            `${API_URL}/api/payments/vnpay?billId=${billId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+            },
+          );
+
+          if (!res.ok) {
+            throw new Error(await res.text());
+          }
+
+          const paymentUrl = await res.text();
+
+          // 👉 redirect thẳng sang VNPAY
+          window.location.href = paymentUrl;
+        } catch (e) {
+          console.error(e);
+
+          Swal.close();
+
+          showError(e.message || "Không thể tạo liên kết thanh toán!");
+        }
       }
       function closeModal() {
         document.getElementById("viewBillModal").style.display = "none";
@@ -1354,6 +1564,7 @@
 
         f.style.display = f.style.display === "block" ? "none" : "block";
       }
+
       function applyFilter() {
         const payment = document.getElementById("paymentStatus").value;
         const orderStatus = document.getElementById("orderStatus").value;
@@ -1458,6 +1669,22 @@
           document.title,
           window.location.pathname,
         );
+      }
+      function logout() {
+        Swal.fire({
+          title: "Đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Đăng xuất",
+          cancelButtonText: "Hủy",
+          confirmButtonColor: "#ef4444",
+        }).then((res) => {
+          if (res.isConfirmed) {
+            localStorage.clear();
+            window.location.href = "/login.html";
+          }
+        });
       }
     </script>
   </body>

@@ -2,10 +2,9 @@ package com.example.loudhotel.service.impl;
 
 import com.example.loudhotel.dto.request.ReviewRequest;
 import com.example.loudhotel.dto.response.ReviewResponse;
-import com.example.loudhotel.entity.Hotel;
-import com.example.loudhotel.entity.Review;
-import com.example.loudhotel.entity.User;
+import com.example.loudhotel.entity.*;
 import com.example.loudhotel.exception.ResourceNotFoundException;
+import com.example.loudhotel.repository.BillRepository;
 import com.example.loudhotel.repository.HotelRepository;
 import com.example.loudhotel.repository.ReviewRepository;
 import com.example.loudhotel.repository.UserRepository;
@@ -29,6 +28,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final HotelRepository hotelRepository;
     private final UserRepository userRepository;
+    private final BillRepository billRepository;
 
     private ReviewResponse mapToResponse(Review review) {
         Long currentUserId = null;
@@ -36,27 +36,47 @@ public class ReviewServiceImpl implements ReviewService {
             currentUserId = SecurityUtil.getCurrentUserId();
         } catch (Exception ignored) {}
 
+        String roomTypeNames = "";
+        if (review.getBill() != null && review.getBill().getBillDetails() != null) {
+            roomTypeNames = review.getBill().getBillDetails().stream()
+                .map(d -> d.getRoomType().getTypeName())
+                .distinct()
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("");
+        }
+
+        Integer nights = 0;
+        if (review.getBill() != null && review.getBill().getBillDetails() != null) {
+            nights = review.getBill().getBillDetails().stream()
+                .map(BillDetail::getNights)
+                .filter(n -> n != null)
+                .findFirst()
+                .orElse(0);
+        }
+
         return ReviewResponse.builder()
                 .reviewId(review.getReviewId())
                 .username(review.getUser() != null ? review.getUser().getUsername() : null)
-                .hotelName(review.getHotel().getHotelName())
+                .hotelName(review.getBill().getHotel().getHotelName())
+                .hotelId(review.getBill().getHotel().getHotelId())
+                .billId(review.getBill().getBillId())
                 .rate(review.getRate())
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt())
-                .status(review.getStatus() != null ? review.getStatus().name() : null)
-                .hotelStatus(review.getHotel().getHotelStatus().name())
+                .updatedAt(review.getUpdatedAt() != null ? review.getUpdatedAt() : review.getCreatedAt())
                 .isMine(
                         currentUserId != null &&
+                                review.getUser() != null &&
                                 review.getUser().getUserId().equals(currentUserId)
                 )
+                .roomTypeNames(roomTypeNames)
+                .nights(nights)
+                .status("ACTIVE")
                 .build();
     }
 
     private void updateAvg(Long hotelId) {
-        List<Review> reviews = reviewRepository.findByHotel_HotelId(hotelId)
-                .stream()
-                .filter(r -> r.getStatus() == Review.ReviewStatus.ACTIVE)
-                .toList();
+        List<Review> reviews = reviewRepository.findByHotel_HotelId(hotelId);
 
         double avg = reviews.stream()
                 .mapToDouble(Review::getRate)
@@ -69,60 +89,56 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewResponse createReview(Long hotelId, ReviewRequest request) {
+    @Transactional
+    public ReviewResponse createReview(ReviewRequest request) {
 
         Long userId = SecurityUtil.getCurrentUserId();
 
-        Review existing = reviewRepository
-                .findByUser_UserIdAndHotel_HotelId(userId, hotelId)
-                .orElse(null);
+        Bill bill = billRepository.findById(request.getBillId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bill not found"));
 
-        if (existing != null) {
-            throw new RuntimeException("Bạn đã đánh giá rồi, hãy chỉnh sửa");
+        // 1. Kiểm tra chính chủ
+        if (!bill.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền đánh giá đơn đặt này");
         }
 
+        // 2. Kiểm tra đã ở xong chưa (actualCheckOutTime != null)
+        if (bill.getActualCheckOutTime() == null) {
+            throw new RuntimeException("Bạn chỉ có thể đánh giá sau khi đã trả phòng");
+        }
+
+        // 3. Kiểm tra đã đánh giá chưa
+        reviewRepository.findByUser_UserIdAndBill_BillId(userId, request.getBillId())
+                .ifPresent(r -> {
+                    throw new RuntimeException("Bạn đã đánh giá đơn đặt này rồi");
+                });
+
         User user = userRepository.findById(userId).orElseThrow();
-        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow();
 
         Review review = Review.builder()
                 .user(user)
-                .hotel(hotel)
+                .bill(bill)
                 .rate(request.getRate())
                 .comment(request.getComment())
-                .status(Review.ReviewStatus.ACTIVE)
                 .build();
 
         reviewRepository.save(review);
 
-        updateAvg(hotelId);
+        updateAvg(bill.getHotel().getHotelId());
 
         return mapToResponse(review);
     }
+
     @Override
     public List<ReviewResponse> getReviewsByHotel(Long hotelId) {
-
-        Long currentUserId = null;
-
-        try {
-            currentUserId = SecurityUtil.getCurrentUserId();
-        } catch (Exception e) {
-            // chưa login
-        }
-
-        Long finalCurrentUserId = currentUserId;
-
         return reviewRepository.findByHotel_HotelId(hotelId)
                 .stream()
-                .filter(r ->
-                        r.getStatus() == Review.ReviewStatus.ACTIVE
-                                || (finalCurrentUserId != null
-                                && r.getUser().getUserId().equals(finalCurrentUserId))
-                )
                 .map(this::mapToResponse)
                 .toList();
     }
 
     @Override
+    @Transactional
     public ReviewResponse updateReview(Long reviewId, ReviewRequest request) {
 
         Long userId = SecurityUtil.getCurrentUserId();
@@ -130,23 +146,19 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
-        // 🔥 chỉ chính chủ được sửa
         if (!review.getUser().getUserId().equals(userId)) {
             throw new RuntimeException("Không có quyền sửa");
         }
 
-        // ✅ cho sửa cả ACTIVE và HIDDEN
         review.setRate(request.getRate());
         review.setComment(request.getComment());
 
         reviewRepository.save(review);
 
-        updateAvg(review.getHotel().getHotelId());
+        updateAvg(review.getBill().getHotel().getHotelId());
 
         return mapToResponse(review);
     }
-
-
 
     @Override
     public Page<ReviewResponse> getReviews(String keyword,
@@ -183,66 +195,17 @@ public class ReviewServiceImpl implements ReviewService {
 
         Page<Review> reviewPage;
 
-        // ADMIN
         if ("ROLE_ADMIN".equals(role)) {
             reviewPage = reviewRepository.searchReviews(
                     keyword, rate, minRate, maxRate, statusEnum, pageable
             );
-        }
-        // Manager
-        else {
+        } else {
             reviewPage = reviewRepository.searchReviewsByManager(
                     userId, keyword, rate, minRate, maxRate, statusEnum, pageable
             );
         }
 
         return reviewPage.map(this::mapToResponse);
-    }
-
-    @Override
-    @Transactional
-    public void managerToggle(Long reviewId) {
-
-        Long managerId = SecurityUtil.getCurrentUserId();
-
-        Review review = reviewRepository
-                .findByIdAndManagerId(reviewId, managerId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Review không thuộc khách sạn của bạn")
-                );
-
-        if (review.getStatus() == Review.ReviewStatus.ACTIVE) {
-            // 👉 manager yêu cầu ẩn → chờ admin duyệt
-            review.setStatus(Review.ReviewStatus.PENDING_HIDE);
-
-        } else if (review.getStatus() == Review.ReviewStatus.HIDDEN) {
-            // 👉 hiện lại luôn (không cần admin)
-            review.setStatus(Review.ReviewStatus.ACTIVE);
-
-        } else {
-            // 👉 đang PENDING thì KHÔNG cho bấm
-            throw new RuntimeException("Đang chờ admin duyệt");
-        }
-
-        reviewRepository.save(review);
-    }
-
-    @Transactional
-    @Override
-    public void adminApproveHide(Long reviewId) {
-
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-
-        if (review.getStatus() != Review.ReviewStatus.PENDING_HIDE) {
-            throw new RuntimeException("Không phải trạng thái chờ duyệt");
-        }
-
-        review.setStatus(Review.ReviewStatus.HIDDEN);
-
-        reviewRepository.save(review);
-
-        updateAvg(review.getHotel().getHotelId());
     }
 
     @Override
@@ -265,63 +228,27 @@ public class ReviewServiceImpl implements ReviewService {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Hotel.HotelStatus statusEnum = null;
-
         if (hotelStatus != null && !hotelStatus.isEmpty()) {
             try {
                 statusEnum = Hotel.HotelStatus.valueOf(hotelStatus.toUpperCase());
-            } catch (Exception e) {
-                statusEnum = null;
-            }
+            } catch (Exception e) {}
         }
 
         Page<Review> reviewPage = reviewRepository.searchReviewsByManager(
-                managerId,
-                keyword,
-                rate,
-                minRate,
-                maxRate,
-                statusEnum,
-                pageable
+                managerId, keyword, rate, minRate, maxRate, statusEnum, pageable
         );
 
         return reviewPage.map(this::mapToResponse);
     }
 
+    @Override
     @Transactional
-    public void adminRejectHide(Long reviewId) {
-
+    public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-
-        if (review.getStatus() == Review.ReviewStatus.PENDING_HIDE) {
-            review.setStatus(Review.ReviewStatus.ACTIVE);
-            reviewRepository.save(review);
-        }
-    }
-
-    @Transactional
-    public void adminShow(Long reviewId) {
-
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-
-        review.setStatus(Review.ReviewStatus.ACTIVE);
-
-        reviewRepository.save(review);
-
-        updateAvg(review.getHotel().getHotelId());
-    }
-
-    @Transactional
-    public void adminHide(Long reviewId) {
-
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-
-        review.setStatus(Review.ReviewStatus.HIDDEN);
-
-        reviewRepository.save(review);
-
-        updateAvg(review.getHotel().getHotelId());
+        
+        Long hotelId = review.getBill().getHotel().getHotelId();
+        reviewRepository.delete(review);
+        updateAvg(hotelId);
     }
 }
