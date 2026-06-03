@@ -36,7 +36,7 @@ CREATE TABLE `bill_details` (
   KEY `FK4cvcod50iedw3lu7kuh000pht` (`type_id`),
   CONSTRAINT `FK4cvcod50iedw3lu7kuh000pht` FOREIGN KEY (`type_id`) REFERENCES `room_types` (`type_id`),
   CONSTRAINT `FKfwm4sko9p82ndh6belyxx12bj` FOREIGN KEY (`bill_id`) REFERENCES `bills` (`bill_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=243 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=290 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -56,7 +56,7 @@ CREATE TABLE `bill_extra_fees` (
   PRIMARY KEY (`extra_fee_id`),
   KEY `FK23o4nten0ovgbrrfi1b7y3lp7` (`bill_id`),
   CONSTRAINT `FK23o4nten0ovgbrrfi1b7y3lp7` FOREIGN KEY (`bill_id`) REFERENCES `bills` (`bill_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,7 +97,7 @@ CREATE TABLE `bills` (
   CONSTRAINT `FK1p232jm7oedinqkn0pmlj3upi` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`voucher_id`),
   CONSTRAINT `FK4hx4n4l70fxpftolai9gqi0wa` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`hotel_id`),
   CONSTRAINT `FKk8vs7ac9xknv5xp18pdiehpp1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=144 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -114,7 +114,7 @@ CREATE TABLE `chat_images` (
   PRIMARY KEY (`image_id`),
   KEY `FK5ylie1y7p0lnpgyfd0j0es3fw` (`chat_id`),
   CONSTRAINT `FK5ylie1y7p0lnpgyfd0j0es3fw` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`chat_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -145,7 +145,7 @@ CREATE TABLE `chats` (
   CONSTRAINT `FK66qywv3f3xheb6sk2vxu6vftb` FOREIGN KEY (`recipient_id`) REFERENCES `users` (`user_id`),
   CONSTRAINT `FK9usi9ip09s0x0km7gvcw6sarg` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`hotel_id`),
   CONSTRAINT `FKla7peq6fislsxok7a4wxv5p36` FOREIGN KEY (`sender_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -164,7 +164,7 @@ CREATE TABLE `hotel_images` (
   PRIMARY KEY (`image_id`),
   KEY `FKrj3n45f8oqy1yr996g14j757i` (`hotel_id`),
   CONSTRAINT `FKrj3n45f8oqy1yr996g14j757i` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`hotel_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=178 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -188,7 +188,7 @@ CREATE TABLE `hotels` (
   PRIMARY KEY (`hotel_id`),
   KEY `FKaq04sfgwojtl4faui62h7my9n` (`manager_id`),
   CONSTRAINT `FKaq04sfgwojtl4faui62h7my9n` FOREIGN KEY (`manager_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -211,7 +211,7 @@ CREATE TABLE `reviews` (
   KEY `FKcgy7qjc1r99dp117y9en6lxye` (`user_id`),
   CONSTRAINT `FK9f3soldiok3ogwh4fjphong5o` FOREIGN KEY (`bill_id`) REFERENCES `bills` (`bill_id`),
   CONSTRAINT `FKcgy7qjc1r99dp117y9en6lxye` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -231,7 +231,7 @@ CREATE TABLE `room_assignments` (
   KEY `FKt96wkyclodjlrg52xftxyve1h` (`room_id`),
   CONSTRAINT `FKqda3men7fayroc33jet371fci` FOREIGN KEY (`bill_detail_id`) REFERENCES `bill_details` (`bill_detail_id`),
   CONSTRAINT `FKt96wkyclodjlrg52xftxyve1h` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -250,7 +250,7 @@ CREATE TABLE `room_type_images` (
   PRIMARY KEY (`image_id`),
   KEY `FKh5ppjdpf1hbet7xr9kqu74l2y` (`type_id`),
   CONSTRAINT `FKh5ppjdpf1hbet7xr9kqu74l2y` FOREIGN KEY (`type_id`) REFERENCES `room_types` (`type_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=320 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=328 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -276,7 +276,7 @@ CREATE TABLE `room_types` (
   PRIMARY KEY (`type_id`),
   KEY `FK42cc0t2sr43om89u1loqh7arj` (`hotel_id`),
   CONSTRAINT `FK42cc0t2sr43om89u1loqh7arj` FOREIGN KEY (`hotel_id`) REFERENCES `hotels` (`hotel_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -297,7 +297,7 @@ CREATE TABLE `rooms` (
   PRIMARY KEY (`room_id`),
   KEY `FK36pnbgx5yxaalc346d0astj9s` (`type_id`),
   CONSTRAINT `FK36pnbgx5yxaalc346d0astj9s` FOREIGN KEY (`type_id`) REFERENCES `room_types` (`type_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=652 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=660 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -313,7 +313,7 @@ CREATE TABLE `users` (
   `deleted_at` datetime(6) DEFAULT NULL,
   `email` varchar(150) NOT NULL,
   `first_name` varchar(100) DEFAULT NULL,
-  `is_deleted` bit(1) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `last_name` varchar(100) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `phone` varchar(20) NOT NULL,
@@ -326,7 +326,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`),
   UNIQUE KEY `UK_du5v5sr43g5bfnji4vb8hg5s3` (`phone`),
   UNIQUE KEY `UK_r43af9ap4edm43mmtq01oddj6` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -422,7 +422,7 @@ CREATE TABLE `vouchers` (
   `voucher_code` varchar(255) NOT NULL,
   PRIMARY KEY (`voucher_id`),
   UNIQUE KEY `UK_hvqsc8qffpt5okjmyot3a4b77` (`voucher_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -560,4 +560,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-31 21:55:08
+-- Dump completed on 2026-06-03 17:28:24

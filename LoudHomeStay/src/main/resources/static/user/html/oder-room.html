@@ -1351,21 +1351,26 @@
 
         <div class="section">
           <h2 style="text-align: center; font-size: 20px">
-            Thông tin người đặt phòng
+            Thông tin người nhận phòng
           </h2>
 
-          <div class="input-group">
-            <label>Tên người đặt</label>
-            <input type="text" id="orderName" placeholder="Nhập tên người đặt" />
+          <div class="checkbox" style="margin-top: 10px; margin-bottom: 15px; justify-content: center; margin-right: 110px;">
+            <input type="checkbox" id="useCurrentUser" onchange="toggleUseCurrentUser()" />
+            <label for="useCurrentUser">Đặt phòng hộ người khác (người nhận phòng không phải bạn)</label>
           </div>
 
           <div class="input-group">
-            <label>Số điện thoại người đặt</label>
+            <label>Họ và tên </label>
+            <input type="text" id="orderName" placeholder="Nhập họ tên" />
+          </div>
+
+          <div class="input-group">
+            <label>Số điện thoại </label>
             <input type="text" id="orderPhone" placeholder="Nhập số điện thoại" />
           </div>
 
           <div class="input-group">
-            <label>Email người đặt</label>
+            <label>Email </label>
             <input type="email" id="orderEmail" placeholder="Nhập email" />
           </div>
           <div class="input-group">
@@ -1431,7 +1436,7 @@
             </div>
 
             <!-- VNPAY -->
-            <label class="payment-card">
+            <label class="payment-card active">
               <div class="payment-left">
                 <div class="payment-icon">
                   <img src="/images/vnpay.jpg" />
@@ -1444,7 +1449,7 @@
                 </div>
               </div>
 
-              <input type="radio" name="payment" value="VNPAY" />
+              <input type="radio" name="payment" value="VNPAY" checked/>
             </label>
           </div>
 
@@ -1554,8 +1559,7 @@
   </div>
 
     <script src="/js/chatbot.js" defer></script>
-</body>
-<script>
+    <script>
   /* ===== DROPDOWN ===== */
   const userMenuToggle = document.getElementById("userMenuToggle");
   const dropdownMenu = document.getElementById("dropdownMenu");
@@ -1592,6 +1596,34 @@
 
   let checkIn = localStorage.getItem("checkIn");
   let checkOut = localStorage.getItem("checkOut");
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    await loadCurrentUserInfo();
+  });
+
+  async function loadCurrentUserInfo() {
+  const token = localStorage.getItem("accessToken");
+
+  const res = await fetch(`${API_URL}/api/users/me`, {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
+
+  const user = await res.json();
+
+  document.getElementById("orderName").value =
+    `${user.lastName} ${user.firstName}`.trim();
+
+  document.getElementById("orderPhone").value =
+    user.phone || "";
+
+  document.getElementById("orderEmail").value =
+    user.email || "";
+
+  document.getElementById("idCardCode").value =
+    user.idCardCode || "";
+}
 
   // 🔥 fallback nếu đi bằng URL
   if (selectedRooms.length === 0) {
@@ -1688,9 +1720,7 @@
       roomListBox.innerHTML = "";
 
       for (const item of selectedRooms) {
-        const res = await fetch(
-          `${API_URL}/api/room-types/${item.roomTypeId}`,
-        );
+        const res = await fetch(`${API_URL}/api/room-types/${item.roomTypeId}`);
         const room = await res.json();
 
         const subtotal = room.price * nights * (item.quantity || 1);
@@ -1830,8 +1860,7 @@
       }
 
       /* ===== DATE ===== */
-      document.getElementById("checkInDate").innerText =
-        formatDateVN(checkIn);
+      document.getElementById("checkInDate").innerText = formatDateVN(checkIn);
       document.getElementById("checkOutDate").innerText =
         formatDateVN(checkOut);
 
@@ -1883,6 +1912,31 @@
     Toast.fire({ icon, title, text });
   }
 
+  async function toggleUseCurrentUser() {
+    const checked = document.getElementById("useCurrentUser").checked;
+
+    const orderName = document.getElementById("orderName");
+    const orderPhone = document.getElementById("orderPhone");
+    const orderEmail = document.getElementById("orderEmail");
+    const idCardCode = document.getElementById("idCardCode");
+
+    if (checked) {
+      // Đặt hộ => xóa trắng
+      orderName.value = "";
+      orderPhone.value = "";
+      orderEmail.value = "";
+      idCardCode.value = "";
+
+      orderName.readOnly = false;
+      orderPhone.readOnly = false;
+      orderEmail.readOnly = false;
+      idCardCode.readOnly = false;
+    } else {
+      // Nhận phòng là chính mình => đổ lại dữ liệu tài khoản
+      loadCurrentUserInfo();
+    }
+  }
+
   async function submitBooking() {
     const btn = document.getElementById("btnSubmitBooking");
     btn.disabled = true;
@@ -1896,17 +1950,65 @@
       const agree = document.getElementById("agreeTerms").checked;
 
       if (!name || !phone || !email || !cccd) {
-        showToast("warning", "Thiếu thông tin", "Vui lòng điền đầy đủ thông tin người đặt!");
-        return;
-      }
-      if (!agree) {
-        showToast("info", "Chưa đồng ý điều khoản", "Vui lòng đọc và đồng ý với điều khoản dịch vụ!");
+        showToast(
+          "warning",
+          "Thiếu thông tin",
+          "Vui lòng điền đầy đủ thông tin người đặt!",
+        );
+        btn.disabled = false;
+        btn.innerText = "Xác nhận & Thanh toán";
         return;
       }
 
-      const selectedPayment = document.querySelector("input[name='payment']:checked");
+      const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
+      if (!phoneRegex.test(phone)) {
+        showToast(
+          "warning",
+          "Sai định dạng",
+          "Số điện thoại phải bao gồm 10 chữ số hợp lệ!",
+        );
+        btn.disabled = false;
+        btn.innerText = "Xác nhận & Thanh toán";
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showToast("warning", "Sai định dạng", "Email không đúng định dạng!");
+        btn.disabled = false;
+        btn.innerText = "Xác nhận & Thanh toán";
+        return;
+      }
+
+      const cccdRegex = /^\d{12}$/;
+      if (!cccdRegex.test(cccd)) {
+        showToast(
+          "warning",
+          "Sai định dạng",
+          "Số CCCD phải bao gồm 12 chữ số!",
+        );
+        btn.disabled = false;
+        btn.innerText = "Xác nhận & Thanh toán";
+        return;
+      }
+      if (!agree) {
+        showToast(
+          "info",
+          "Chưa đồng ý điều khoản",
+          "Vui lòng đọc và đồng ý với điều khoản dịch vụ!",
+        );
+        return;
+      }
+
+      const selectedPayment = document.querySelector(
+        "input[name='payment']:checked",
+      );
       if (!selectedPayment) {
-        showToast("warning", "Chưa chọn thanh toán", "Vui lòng chọn phương thức thanh toán!");
+        showToast(
+          "warning",
+          "Chưa chọn thanh toán",
+          "Vui lòng chọn phương thức thanh toán!",
+        );
         return;
       }
 
@@ -1914,8 +2016,14 @@
       const userId = Number(localStorage.getItem("userId"));
 
       if (!userId || isNaN(userId)) {
-        showToast("error", "Phiên đăng nhập hết hạn", "Vui lòng đăng nhập lại để tiếp tục.");
-        setTimeout(() => { window.location.href = "/login.html"; }, 1800);
+        showToast(
+          "error",
+          "Phiên đăng nhập hết hạn",
+          "Vui lòng đăng nhập lại để tiếp tục.",
+        );
+        setTimeout(() => {
+          window.location.href = "/login.html";
+        }, 1800);
         return;
       }
 
@@ -1968,7 +2076,9 @@
           const errBody = await billRes.json();
           errorMsg = errBody.message || errorMsg;
         } catch (_) {
-          try { errorMsg = await billRes.text() || errorMsg; } catch (__) {}
+          try {
+            errorMsg = (await billRes.text()) || errorMsg;
+          } catch (__) {}
         }
         throw new Error(errorMsg);
       }
@@ -1989,7 +2099,6 @@
       if (!payRes.ok) throw new Error("Lỗi khi tạo liên kết thanh toán VNPAY");
       const paymentUrl = await payRes.text();
       window.location.href = paymentUrl;
-
     } catch (err) {
       console.error(err);
 
@@ -2005,19 +2114,27 @@
       // Chọn icon phù hợp
       let icon = "error";
       let title = "Đặt phòng thất bại";
-      if (errMsg.toLowerCase().includes("không đủ phòng") || errMsg.toLowerCase().includes("hết phòng")) {
+      if (
+        errMsg.toLowerCase().includes("không đủ phòng") ||
+        errMsg.toLowerCase().includes("hết phòng")
+      ) {
         icon = "warning";
         title = "🏨 Hết phòng trống";
-      } else if (errMsg.toLowerCase().includes("check-out") || errMsg.toLowerCase().includes("ngày")) {
+      } else if (
+        errMsg.toLowerCase().includes("check-out") ||
+        errMsg.toLowerCase().includes("ngày")
+      ) {
         icon = "warning";
         title = "📅 Ngày không hợp lệ";
-      } else if (errMsg.toLowerCase().includes("voucher") || errMsg.toLowerCase().includes("mã")) {
+      } else if (
+        errMsg.toLowerCase().includes("voucher") ||
+        errMsg.toLowerCase().includes("mã")
+      ) {
         icon = "info";
         title = "🎟️ Lỗi voucher";
       }
 
       showToast(icon, title, errMsg, 5000);
-
     } finally {
       btn.disabled = false;
       btn.innerText = "Xác nhận đặt phòng";
@@ -2035,7 +2152,6 @@
       if (radio) radio.checked = true;
     });
   });
-
 
   /* ===== VOUCHER LOGIC ===== */
 
@@ -2106,9 +2222,7 @@
       const vCode = params.get("voucherCode");
 
       if (vCode) {
-        const found = hotelVouchers.find(
-          (x) => x.voucherCode === vCode,
-        );
+        const found = hotelVouchers.find((x) => x.voucherCode === vCode);
 
         if (found) {
           selectVoucher(found.voucherId);
@@ -2121,10 +2235,7 @@
 
   function selectVoucher(voucherId) {
     // click lại voucher đang chọn = bỏ chọn
-    if (
-      selectedVoucher &&
-      selectedVoucher.voucherId === voucherId
-    ) {
+    if (selectedVoucher && selectedVoucher.voucherId === voucherId) {
       document
         .querySelectorAll(".voucher-item")
         .forEach((x) => x.classList.remove("active"));
@@ -2140,26 +2251,19 @@
       .querySelectorAll(".voucher-item")
       .forEach((x) => x.classList.remove("active"));
 
-    const item = document.getElementById(
-      `voucher-${voucherId}`
-    );
+    const item = document.getElementById(`voucher-${voucherId}`);
 
     if (item) {
       item.classList.add("active");
     }
 
-    selectedVoucher = hotelVouchers.find(
-      (x) => x.voucherId === voucherId
-    );
+    selectedVoucher = hotelVouchers.find((x) => x.voucherId === voucherId);
 
     applySelectedVoucher();
   }
 
   function showVoucherDetail(voucherId) {
-
-    const v = hotelVouchers.find(
-      x => x.voucherId === voucherId
-    );
+    const v = hotelVouchers.find((x) => x.voucherId === voucherId);
 
     if (!v) return;
 
@@ -2168,15 +2272,13 @@
         ? `Giảm ${v.discountValue}%`
         : `Giảm ${formatPrice(v.discountValue)}`;
 
-    const minBillTxt =
-      v.minBillAmount
-        ? formatPrice(v.minBillAmount)
-        : "Không yêu cầu";
+    const minBillTxt = v.minBillAmount
+      ? formatPrice(v.minBillAmount)
+      : "Không yêu cầu";
 
-    const maxDiscountTxt =
-      v.maxDiscountAmount
-        ? formatPrice(v.maxDiscountAmount)
-        : "Theo mức ưu đãi";
+    const maxDiscountTxt = v.maxDiscountAmount
+      ? formatPrice(v.maxDiscountAmount)
+      : "Theo mức ưu đãi";
 
     const startDateTxt = v.startDate
       ? new Date(v.startDate).toLocaleString("vi-VN")
@@ -2273,9 +2375,10 @@
               <h4>Thông tin ưu đãi</h4>
 
               <p>
-                ${v.description ||
-        "Áp dụng cho khách hàng đặt phòng trực tuyến tại LoudBooking."
-        }
+                ${
+                  v.description ||
+                  "Áp dụng cho khách hàng đặt phòng trực tuyến tại LoudBooking."
+                }
               </p>
             </div>
 
@@ -2295,9 +2398,7 @@
   }
 
   function closeVoucherModal() {
-    document.getElementById(
-      "voucherModal"
-    ).classList.remove("show");
+    document.getElementById("voucherModal").classList.remove("show");
   }
 
   function applySelectedVoucher() {
@@ -2308,19 +2409,21 @@
     appliedDiscount = 0;
 
     if (!selectedVoucher) {
+      msg.innerText = "";
+      msg.style.color = "";
+
       discountRow.style.display = "none";
+
+      appliedDiscount = 0;
+
       updateFinalTotal();
       return;
     }
 
     const v = selectedVoucher;
 
-    if (
-      v.minBillAmount &&
-      currentTotalPrice < v.minBillAmount
-    ) {
-      msg.innerText =
-        `Đơn tối thiểu ${formatPrice(v.minBillAmount)} để dùng voucher này`;
+    if (v.minBillAmount && currentTotalPrice < v.minBillAmount) {
+      msg.innerText = `Đơn tối thiểu ${formatPrice(v.minBillAmount)} để dùng voucher này`;
       msg.style.color = "#dc2626";
       discountRow.style.display = "none";
       updateFinalTotal();
@@ -2329,13 +2432,9 @@
     }
 
     if (v.discountType === "PERCENT") {
-      appliedDiscount =
-        (currentTotalPrice * v.discountValue) / 100;
+      appliedDiscount = (currentTotalPrice * v.discountValue) / 100;
 
-      if (
-        v.maxDiscountAmount &&
-        appliedDiscount > v.maxDiscountAmount
-      ) {
+      if (v.maxDiscountAmount && appliedDiscount > v.maxDiscountAmount) {
         appliedDiscount = v.maxDiscountAmount;
       }
     } else {
@@ -2349,8 +2448,7 @@
     msg.innerText = `Đã áp dụng voucher ${v.voucherCode}`;
     msg.style.color = "#16a34a";
     discountRow.style.display = "flex";
-    discountVal.innerText =
-      "-" + formatPrice(appliedDiscount);
+    discountVal.innerText = "-" + formatPrice(appliedDiscount);
 
     updateFinalTotal();
   }
@@ -2358,13 +2456,9 @@
   function updateFinalTotal() {
     const finalTotal = currentTotalPrice - appliedDiscount;
 
-    document.querySelector(".total-price").innerText =
-      formatPrice(finalTotal > 0 ? finalTotal : 0);
-  }
-
-  function updateFinalTotal() {
-    const finalTotal = currentTotalPrice - appliedDiscount;
-    document.querySelector(".total-price").innerText = formatPrice(finalTotal);
+    document.querySelector(".total-price").innerText = formatPrice(
+      finalTotal > 0 ? finalTotal : 0,
+    );
   }
   /* ===== INIT ===== */
   document.addEventListener("DOMContentLoaded", async () => {
@@ -2383,4 +2477,5 @@
   });
 </script>
 
+</body>
 </html>

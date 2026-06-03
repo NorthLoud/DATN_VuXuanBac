@@ -682,11 +682,18 @@
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu" id="roomSub">
-              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="roomtype.html">Quản lý loại phòng</a></li>
               <li><a href="room.html">Danh sách phòng</a></li>
             </ul>
           </li>
           <li>
+            <a href="room-util.html"
+              ><i class="fas fa-concierge-bell"></i>Quản lý tiện ích<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <!-- <li>
             <a
               href="javascript:void(0)"
               onclick="$('#utilSub').toggleClass('show')"
@@ -698,22 +705,21 @@
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li><a href="room-util.html">Tiện ích phòng</a></li>
             </ul>
-          </li>
+          </li> -->
         </ul>
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i>Mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html" class="active"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
@@ -804,7 +810,7 @@
               <input
                 type="text"
                 id="searchBillInput"
-                placeholder="Tìm kiếm theo mã đơn, tên khách..."
+                placeholder="Tìm kiếm theo mã đơn, tên khách hàng, số..."
                 onkeyup="searchBill()"
               />
             </div>
@@ -816,7 +822,7 @@
               style="border-radius: 12px; font-weight: 700; padding: 10px 25px"
               onclick="$('#filterPanel').fadeToggle()"
             >
-              <i class="fas fa-filter mr-2"></i> Bộ lọc nâng cao
+              <i class="fas fa-filter mr-2"></i> Bộ lọc
             </button>
           </div>
         </div>
@@ -830,9 +836,9 @@
             <div class="filter-item">
               <label>Thanh toán</label>
               <select id="filterPayment">
-                <option value="">Tất cả</option>
-                <option value="CASH">Tiền mặt</option>
-                <option value="VNPAY">VNPay</option>
+                <option value="VNPAY">VNPAY</option>
+                <!-- <option value="CASH">Tiền mặt</option>
+                <option value="VNPAY">VNPay</option> -->
               </select>
             </div>
             <div class="filter-item">
@@ -848,7 +854,7 @@
               <label>Trạng thái ở</label>
               <select id="filterStayStatus">
                 <option value="">Tất cả</option>
-                <option value="BOOKED">Đã đặt</option>
+                <option value="BOOKED">Đã đặt (Chưa nhận phòng)</option>
                 <option value="CHECKED_IN">Đang ở</option>
                 <option value="COMPLETED">Đã trả phòng</option>
               </select>
@@ -869,7 +875,7 @@
           <div class="d-flex justify-content-end gap-2 mt-4">
             <button
               class="btn btn-light btn-sm"
-              style="font-weight: 700"
+              style="font-weight: 700; margin-right: 10px"
               onclick="resetFilter()"
             >
               Xóa lọc
@@ -879,7 +885,7 @@
               style="font-weight: 700"
               onclick="applyFilter()"
             >
-              Áp dụng ngay
+              Áp dụng
             </button>
           </div>
         </div>
@@ -951,10 +957,10 @@
           <div class="table-responsive">
             <table class="admin-table">
               <thead>
-                <tr>
+                <tr style="text-align: center">
                   <th>Mã đơn</th>
-                  <th>Khách hàng</th>
-                  <th>Thời gian ở</th>
+                  <th>Người nhận phòng</th>
+                  <th>Nhận / trả phòng</th>
                   <th>Thanh toán</th>
                   <th>Trạng thái đơn</th>
                   <th style="text-align: center">Thao tác</th>
@@ -997,7 +1003,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              Hồ sơ đơn hàng
+              Chi tiết đơn đặt phòng
               <span id="mBillCode" class="text-primary">#...</span>
             </h5>
             <button type="button" class="close" data-dismiss="modal">
@@ -1033,6 +1039,8 @@
       let bills = [];
       let currentData = [];
       let currentPage = 1;
+      let currentFilter = null;
+
       const ITEMS_PER_PAGE = 5;
       const API = "http://localhost:8080/api/bills";
       const token = localStorage.getItem("accessToken");
@@ -1060,12 +1068,17 @@
           });
           bills.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
           updateStats();
-          renderBills(bills);
+
+          if (currentFilter) {
+            applyFilter();
+          } else {
+            renderBills(bills);
+          }
         } catch (e) {
           console.error(e);
           Swal.fire(
             "Lỗi",
-            "Không thể tải danh sách đơn hàng. Vui lòng đăng nhập lại.",
+            "Không thể tải danh sách đơn đặt phòng. Vui lòng đăng nhập lại.",
             "error",
           );
         }
@@ -1110,19 +1123,22 @@
         } else {
           paginatedData.forEach((b) => {
             tbody.innerHTML += `
-                    <tr>
-                        <td style="font-weight: 700; color: var(--primary);">${b.billCode}</td>
+                    <tr style="text-align: center;">
+                        <td >
+                          <div style="font-weight: 700; color: var(--primary);">${b.billCode}</div>
+                          <div style="font-size: 11px; font-weight: 500; color: var(--text-muted);">${formatDateTime(b.createdAt)}</div>  
+                        </td>
                         <td>
                             <div style="font-weight: 600;">${b.orderName}</div>
                             <div style="font-size: 12px; color: var(--text-muted);"><i class="fas fa-phone-alt mr-1"></i> ${b.orderPhone}</div>
                         </td>
                         <td>
-                            <div style="font-size: 13px;"><b>In:</b> ${formatDate(b.checkInDate)}</div>
-                            <div style="font-size: 13px;"><b>Out:</b> ${formatDate(b.checkOutDate)}</div>
+                            <div style="font-size: 13px;"><span style="color: #16a34a; font-weight: 600"><i class="fas fa-sign-in-alt"></i> </span>  ${formatDate(b.checkInDate)}</div>
+                            <div style="font-size: 13px;"><span style="color: #dc2626; font-weight: 600"><i class="fas fa-sign-out-alt"></i> </span>${formatDate(b.checkOutDate)}</div>
                         </td>
                         <td>
                             <div style="font-weight: 700;">${formatMoney(b.totalCost)}</div>
-                            <div style="font-size: 11px; color: var(--text-muted);">${b.paymentMethod === "CASH" ? "Tiền mặt" : "VNPay"}</div>
+                            <div style="font-size: 11px; color: #007bff; ">${b.paymentMethod === "CASH" ? "Tiền mặt" : "VNPay"}</div>
                         </td>
                         <td>${getBillStatusBadge(b.billStatus)}</td>
                         <td style="text-align: center;">
@@ -1414,12 +1430,12 @@
         document.getElementById("billDetailContent").innerHTML = `
             <div class="bill-info-grid">
                 <div class="info-card">
-                    <h6>Thông tin người đặt</h6>
-                    <div class="info-row"><span>Tài khoản</span><span>${b.userName || "Khách vãng lai"}</span></div>
+                    <h6>Thông tin tài khoản đặt và khách nhận phòng</h6>
+                    <div class="info-row"><span>Tài khoản đặt</span><span>${b.userName || "Khách vãng lai"}</span></div>
                     <div class="info-row"><span>Người nhận</span><span>${b.orderName}</span></div>
-                    <div class="info-row"><span>Điện thoại</span><span>${b.orderPhone}</span></div>
+                    <div class="info-row"><span>Số điện thoại</span><span>${b.orderPhone}</span></div>
                     <div class="info-row"><span>Email</span><span>${b.orderEmail || "-"}</span></div>
-                    <div class="info-row"><span>ID/CCCD</span><span>${b.idCardCode || "-"}</span></div>
+                    <div class="info-row"><span>Số CCCD</span><span>${b.idCardCode || "-"}</span></div>
                 </div>
                 <div class="info-card">
                     <h6>Thông tin khách sạn</h6>
@@ -1432,11 +1448,11 @@
             <div class="bill-info-grid">
                 <div class="info-card">
                     <h6>Thời gian lưu trú</h6>
-                    <div class="info-row"><span>Ngày đặt đơn</span><span>${formatDateTime(b.createdAt)}</span></div>
+                    <div class="info-row"><span>Ngày đặt</span><span>${formatDateTime(b.createdAt)}</span></div>
                     <div class="info-row"><span>Ngày nhận (Dự kiến)</span><span>${formatDate(b.checkInDate)}</span></div>
                     <div class="info-row"><span>Ngày trả (Dự kiến)</span><span>${formatDate(b.checkOutDate)}</span></div>
-                    <div class="info-row"><span>Check-in thực tế</span><span>${formatDateTime(b.actualCheckInTime)}</span></div>
-                    <div class="info-row"><span>Check-out thực tế</span><span>${formatDateTime(b.actualCheckOutTime)}</span></div>
+                    <div class="info-row"><span>Ngày nhận thực tế</span><span>${formatDateTime(b.actualCheckInTime)}</span></div>
+                    <div class="info-row"><span>Ngày trả thực tế</span><span>${formatDateTime(b.actualCheckOutTime)}</span></div>
                 </div>
                 <div class="info-card">
                     <h6>Thanh toán & Trạng thái</h6>
@@ -1720,8 +1736,13 @@
           });
           if (!res.ok) throw new Error(await res.text());
           Swal.fire("Thành công", "Đã thanh toán phụ phí.", "success");
-          loadBills();
-          viewBill(billId);
+          await loadBills();
+
+          const updatedBill = bills.find((b) => b.billId === billId);
+
+          if (updatedBill) {
+            viewBill(updatedBill.billId);
+          }
         } catch (e) {
           Swal.fire("Lỗi", e.message, "error");
         }
@@ -1795,8 +1816,13 @@
             throw new Error(err.message);
           }
           Swal.fire("Thành công", "Đã cập nhật số phòng.", "success");
-          loadBills();
-          viewBill(id);
+          await loadBills();
+
+          const updatedBill = bills.find((b) => b.billId === id);
+
+          if (updatedBill) {
+            viewBill(updatedBill.billId);
+          }
         } catch (e) {
           Swal.fire("Lỗi", e.message, "error");
         }
@@ -1836,8 +1862,13 @@
             });
             if (!res.ok) throw new Error(await res.text());
             Swal.fire("Thành công", "Đã thêm phụ phí.", "success");
-            loadBills();
-            viewBill(id);
+            await loadBills();
+
+            const updatedBill = bills.find((b) => b.billId === id);
+
+            if (updatedBill) {
+              viewBill(updatedBill.billId);
+            }
           } catch (e) {
             Swal.fire("Lỗi", e.message, "error");
           }
@@ -1916,11 +1947,17 @@
           } else {
             Swal.fire(
               "Thành công",
-              "Đã cập nhật trạng thái đơn hàng.",
+              "Đã cập nhật trạng thái đơn đặt phòng.",
               "success",
             );
-            $("#viewBillModal").modal("hide");
-            setTimeout(loadBills, 300);
+
+            await loadBills();
+
+            const updatedBill = bills.find((b) => b.billId === id);
+
+            if (updatedBill) {
+              viewBill(updatedBill.billId);
+            }
           }
         } catch (e) {
           let message = e.message;
@@ -1949,24 +1986,43 @@
       }
 
       function applyFilter() {
-        const payment = document.getElementById("filterPayment").value;
-        const bStat = document.getElementById("filterBillStatus").value;
-        const sStat = document.getElementById("filterStayStatus").value;
-        const checkIn = document.getElementById("filterCheckIn").value;
-        const checkOut = document.getElementById("filterCheckOut").value;
-        const createdMonth =
-          document.getElementById("filterCreatedMonth").value;
+        currentFilter = {
+          payment: document.getElementById("filterPayment").value,
+          bStat: document.getElementById("filterBillStatus").value,
+          sStat: document.getElementById("filterStayStatus").value,
+          checkIn: document.getElementById("filterCheckIn").value,
+          checkOut: document.getElementById("filterCheckOut").value,
+          createdMonth: document.getElementById("filterCreatedMonth").value,
+        };
 
         const filtered = bills.filter((b) => {
-          if (payment && b.paymentMethod !== payment) return false;
-          if (bStat && b.billStatus !== bStat) return false;
-          if (sStat && getStayStatus(b) !== sStat) return false;
-          if (checkIn && b.checkInDate.slice(0, 10) !== checkIn) return false;
-          if (checkOut && b.checkOutDate?.slice(0, 10) !== checkOut)
+          if (
+            currentFilter.payment &&
+            b.paymentMethod !== currentFilter.payment
+          )
             return false;
-          if (createdMonth) {
-            const billMonth = b.createdAt?.slice(0, 7); // yyyy-mm
-            if (billMonth !== createdMonth) return false;
+
+          if (currentFilter.bStat && b.billStatus !== currentFilter.bStat)
+            return false;
+
+          if (currentFilter.sStat && getStayStatus(b) !== currentFilter.sStat)
+            return false;
+          if (
+            currentFilter.checkIn &&
+            b.checkInDate.slice(0, 10) !== currentFilter.checkIn
+          )
+            return false;
+
+          if (
+            currentFilter.checkOut &&
+            b.checkOutDate?.slice(0, 10) !== currentFilter.checkOut
+          )
+            return false;
+
+          if (currentFilter.createdMonth) {
+            const billMonth = b.createdAt?.slice(0, 7);
+
+            if (billMonth !== currentFilter.createdMonth) return false;
           }
           return true;
         });
@@ -1978,17 +2034,21 @@
         document
           .querySelectorAll(".filter-item select, .filter-item input")
           .forEach((i) => (i.value = ""));
+
+        currentFilter = null;
+
         renderBills(bills);
+
         $("#filterPanel").fadeOut();
       }
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
           text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
+          confirmButtonText: "Xác nhận",
           cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {

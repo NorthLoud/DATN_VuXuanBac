@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý voucher | Admin</title>
+    <title>Quản lý mã giảm giá | Admin</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
       rel="stylesheet"
@@ -509,7 +509,7 @@
             <ul class="submenu" id="utilSub">
               <li><a href="utillity.html">Danh sách tiện ích</a></li>
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
-              <li><a href="room-util.html">Tiện ích phòng</a></li>
+              <li><a href="room-util.html">Tiện ích loại phòng</a></li>
             </ul>
           </li>
         </ul>
@@ -518,7 +518,7 @@
         <ul class="side-nav">
           <li>
             <a href="voucher.html" class="active"
-              ><i class="fas fa-ticket-alt"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -531,7 +531,7 @@
           </li>
           <li>
             <a href="review.html"
-              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+              ><i class="fas fa-comment-alt"></i> Theo dõi đánh giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -585,7 +585,7 @@
       <div class="content-body">
         <div class="page-header">
           <div>
-            <h2>Quản Lý Voucher</h2>
+            <h2>Quản Lý Mã Giảm Giá</h2>
             <p style="color: var(--text-muted)">
               Theo dõi và quản lý danh sách mã giảm giá của hệ thống.
             </p>
@@ -598,7 +598,8 @@
               class="btn btn-primary btn-luxury"
               onclick="openAddVoucherModal()"
             >
-              <i class="fas fa-plus" style="margin-right: 6px"></i>Thêm voucher
+              <i class="fas fa-plus" style="margin-right: 6px"></i>Thêm mã giảm
+              giá
             </button>
           </div>
           <div class="toolbar-right">
@@ -637,13 +638,15 @@
               <thead>
                 <tr>
                   <!-- <th style="width: 5%">ID</th> -->
-                  <th style="width: 15%">Mã Voucher</th>
-                  <th style="width: 15%">Tiêu đề</th>
+                  <th style="width: 15%; text-align: center">Mã Voucher</th>
+                  <th style="width: 15%; text-align: center">Tiêu đề</th>
                   <th style="width: 20%">Bắt đầu / Kết thúc</th>
-                  <th style="width: 12%">Đơn tối thiểu (VND)</th>
-                  <th style="width: 10%">Mức giảm</th>
-                  <th style="width: 10%">Đã dùng<br />/ tổng</th>
-                  <th style="width: 10%">Trạng thái</th>
+                  <th style="width: 12%; text-align: center">
+                    Đơn tối thiểu (VND)
+                  </th>
+                  <th style="width: 10%; text-align: center">Mức giảm</th>
+                  <th style="width: 10%; text-align: center">Đã dùng</th>
+                  <th style="width: 10%; text-align: center">Trạng thái</th>
                   <th style="text-align: center; width: 10%">Thao tác</th>
                 </tr>
               </thead>
@@ -697,7 +700,7 @@
               id="voucherModalTitle"
               style="font-weight: 800"
             >
-              Thêm voucher
+              Thêm mã giảm giá
             </h5>
             <button type="button" class="close" data-dismiss="modal">
               &times;
@@ -708,7 +711,7 @@
 
             <div class="row">
               <div class="col-md-6 form-group">
-                <label>Mã Voucher</label>
+                <label>Mã Giảm Giá</label>
                 <input
                   type="text"
                   id="voucherCode"
@@ -1210,7 +1213,7 @@
           }
           allVouchers = await res.json();
           document.getElementById("voucherCount").innerText =
-            `Tổng cộng ${allVouchers.length || 0} voucher`;
+            `Tổng cộng ${allVouchers.length || 0} mã giảm giá`;
           searchVoucher(); // Will filter and render
         } catch (error) {
           showError("Không thể kết nối server");
@@ -1272,12 +1275,12 @@
             : "0 ";
 
           tr.innerHTML = `
-            <td style="font-weight: 700; color: var(--primary)">${v.voucherCode}</td>
+            <td style="font-weight: 700; color: var(--primary); text-align: center">${v.voucherCode}</td>
             <td style="font-weight: 600">${v.title || "-"}</td>
-            <td>${timeHtml}</td>
-            <td style="font-weight: 600">${minBill}</td>
-            <td><b class="text-danger">${v.discountValue ? v.discountValue.toLocaleString() : 0} ${v.discountType === "PERCENT" ? "%" : "VNĐ"}</b></td>
-            <td>${v.usedCount} / ${v.quantity || "∞"}</td>
+            <td >${timeHtml}</td>
+            <td style="font-weight: 600; text-align: center">${minBill}</td>
+            <td style="text-align: center"><b class="text-danger">${v.discountValue ? v.discountValue.toLocaleString() : 0} ${v.discountType === "PERCENT" ? "%" : "VNĐ"}</b></td>
+            <td style="text-align: center">${v.usedCount} / ${v.quantity || "∞"}</td>
             <td><span class="badge badge-${v.status}">${getVoucherStatusVN(v.status)}</span></td>
             <td style="text-align: center">
               <div style="display: flex; justify-content: center; align-items: center; white-space: nowrap;">
@@ -1314,7 +1317,8 @@
       }
 
       function openAddVoucherModal() {
-        document.getElementById("voucherModalTitle").innerText = "Thêm voucher";
+        document.getElementById("voucherModalTitle").innerText =
+          "Thêm mã giảm giá";
         document.getElementById("voucherId").value = "";
         document.getElementById("voucherCode").value = "";
         document.getElementById("voucherTitle").value = "";
@@ -1653,9 +1657,10 @@
       function logout() {
         Swal.fire({
           title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
+          confirmButtonText: "Xác nhận",
           cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((result) => {

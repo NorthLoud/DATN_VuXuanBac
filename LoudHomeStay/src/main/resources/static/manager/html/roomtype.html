@@ -739,11 +739,20 @@
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu show" id="roomSub">
-              <li><a href="roomtype.html" class="active">Loại phòng</a></li>
+              <li>
+                <a href="roomtype.html" class="active">Quản lý loại phòng</a>
+              </li>
               <li><a href="room.html">Danh sách phòng</a></li>
             </ul>
           </li>
           <li>
+            <a href="room-util.html"
+              ><i class="fas fa-concierge-bell"></i>Quản lý tiện ích<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <!-- <li>
             <a
               href="javascript:void(0)"
               onclick="$('#utilSub').toggleClass('show')"
@@ -755,22 +764,21 @@
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li><a href="room-util.html">Tiện ích phòng</a></li>
             </ul>
-          </li>
+          </li> -->
         </ul>
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i>Mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
@@ -881,7 +889,7 @@
         <div class="table-card">
           <div class="table-header">
             <h5 style="margin: 0; font-weight: 700; font-size: 16px">
-              Danh sách thông tin loại phòng
+              Danh sách loại phòng
             </h5>
             <span
               id="roomCount"
@@ -1069,7 +1077,7 @@
               Hủy
             </button>
             <button class="btn btn-primary btn-luxury" onclick="saveRoomType()">
-              Lưu cấu hình
+              Lưu
             </button>
           </div>
         </div>
@@ -1808,6 +1816,8 @@
           text: "Xóa loại phòng này sẽ ảnh hưởng đến các phòng thuộc loại này!",
           icon: "warning",
           showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         });
 
@@ -1962,9 +1972,12 @@
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {
           if (res.isConfirmed) {

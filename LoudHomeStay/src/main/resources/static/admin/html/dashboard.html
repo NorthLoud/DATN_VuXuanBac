@@ -499,7 +499,7 @@
             <ul class="submenu" id="utilSub">
               <li><a href="utillity.html">Danh sách tiện ích</a></li>
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
-              <li><a href="room-util.html">Tiện ích phòng</a></li>
+              <li><a href="room-util.html">Tiện ích loại phòng</a></li>
             </ul>
           </li>
         </ul>
@@ -507,21 +507,20 @@
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-ticket-alt"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt phòng<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
             <a href="review.html"
-              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+              ><i class="fas fa-comment-alt"></i> Theo dõi đánh giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -590,23 +589,24 @@
           <div>
             <h2>Dashboard</h2>
             <p style="color: var(--text-muted)">
-              Theo dõi tổng quan hoạt động kinh doanh và hiệu suất vận hành.
+              Theo dõi doanh thu, đơn đặt phòng và các chỉ số hoạt động trên
+              toàn hệ thống.
             </p>
           </div>
         </div>
 
         <!-- ====== PHẦN 1: THỐNG KÊ TỔNG QUAN HỆ THỐNG ====== -->
         <div class="row mb-4" style="row-gap: 20px">
-          <div class="col-md-3">
+          <div class="col-md-4">
             <div class="stat-card bg-income">
               <div>
-                <div class="stat-title">Tổng doanh thu(VND)</div>
+                <div class="stat-title">Tổng doanh thu</div>
                 <div class="stat-value" id="ovTotalIncome">0 đ</div>
               </div>
               <i class="fas fa-wallet"></i>
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <div class="stat-card bg-users">
               <div>
                 <div class="stat-title">Tài khoản hoạt động</div>
@@ -615,7 +615,7 @@
               <i class="fas fa-users"></i>
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <div class="stat-card bg-hotels">
               <div>
                 <div class="stat-title">Khách sạn hoạt động</div>
@@ -624,7 +624,7 @@
               <i class="fas fa-hotel"></i>
             </div>
           </div>
-          <div class="col-md-3">
+          <!-- <div class="col-md-3">
             <div class="stat-card bg-rooms">
               <div>
                 <div class="stat-title">Phòng trống hoạt động</div>
@@ -632,7 +632,7 @@
               </div>
               <i class="fas fa-door-open"></i>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- ====== PHẦN 2: THANH BỘ LỌC THỐNG NHẤT ====== -->
@@ -726,36 +726,36 @@
 
         <!-- ====== 3 Ô KẾT QUẢ THEO THÁNG ====== -->
         <div class="row mb-5" style="row-gap: 20px">
-          <div class="col-md-3">
+          <div class="col-md-4">
             <div class="result-box">
               <h5>Doanh thu</h5>
               <p id="rsIncomeHotel" style="color: var(--primary)">0 đ</p>
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <div class="result-box" style="border-bottom-color: var(--success)">
-              <h5>Đơn hoàn thành</h5>
+              <h5>Tổng đơn đặt phòng</h5>
               <p id="rsCompleted" style="color: var(--success)">0</p>
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <div class="result-box" style="border-bottom-color: var(--danger)">
               <h5>Đơn bị hủy</h5>
               <p id="rsCanceled" style="color: var(--danger)">0</p>
             </div>
           </div>
-          <div class="col-md-3">
+          <!-- <div class="col-md-3">
             <div class="result-box" style="border-bottom-color: var(--warning)">
               <h5>Đánh giá</h5>
               <p id="rsReview" style="color: var(--warning)">0</p>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- ====== TIÊU ĐỀ BIỂU ĐỒ ====== -->
-        <div class="d-flex align-items-center mb-3">
-          <h4 style="margin: 0; font-weight: 700">Biểu đồ phân tích</h4>
-        </div>
+        <!-- <div class="d-flex align-items-center mb-3">
+          <h4 style="margin: 0; font-weight: 700">Biểu đồ</h4>
+        </div> -->
 
         <!-- ====== BIỂU ĐỒ THEO NĂM ====== -->
         <div class="row mb-4" style="row-gap: 24px">
@@ -780,7 +780,7 @@
                   class="fas fa-hotel text-indigo"
                   style="color: var(--primary)"
                 ></i>
-                Top 5 Khách sạn doanh thu cao nhất trong khoảng lọc
+                Top 5 khách sạn doanh thu cao nhất trong khoảng thời gian
               </div>
               <div style="position: relative; height: 320px">
                 <canvas id="chartTopHotels"></canvas>
@@ -793,7 +793,7 @@
             <div class="chart-box">
               <div class="chart-title">
                 <i class="fas fa-bed text-success"></i>
-                Top 5 Loại phòng được đặt nhiều nhất trong khoảng lọc
+                Top 5 loại phòng được đặt nhiều nhất trong khoảng thời gian
               </div>
               <div style="position: relative; height: 320px">
                 <canvas id="chartTopRoomTypes"></canvas>
@@ -855,9 +855,10 @@
         document.getElementById("rsIncomeHotel").innerText = formatMoney(
           data.incomeHotel || data.income || 0,
         );
-        document.getElementById("rsCompleted").innerText = data.completed || 0;
+        document.getElementById("rsCompleted").innerText =
+          (data.completed || 0) + (data.canceled || 0);
         document.getElementById("rsCanceled").innerText = data.canceled || 0;
-        document.getElementById("rsReview").innerText = data.review || 0;
+        // document.getElementById("rsReview").innerText = data.review || 0;
 
         updateChartTitles(data);
         drawCharts(data);
@@ -907,17 +908,20 @@
 
         if (charts.chartIncomeHotel) charts.chartIncomeHotel.destroy();
         charts.chartIncomeHotel = new Chart(ctxIncome, {
-          type: "bar",
+          type: "line",
           data: {
             labels,
             datasets: [
               {
                 label: "Doanh thu khách sạn",
                 data: data.hotelIncome || Array(len).fill(0),
-                backgroundColor: gradientHotel,
                 borderColor: "rgba(16, 185, 129, 1)",
-                borderWidth: 2,
-                borderRadius: 8,
+                backgroundColor: "rgba(16, 185, 129, 0.15)",
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: "rgba(16, 185, 129, 1)",
               },
             ],
           },
@@ -1030,7 +1034,16 @@
           data: {
             labels:
               data.topRoomTypeNames && data.topRoomTypeNames.length
-                ? data.topRoomTypeNames
+                ? data.topRoomTypeNames.map((item) => {
+                    const match = item.match(/(.*)\s\((.*)\)/);
+
+                    if (!match) return item;
+
+                    return [
+                      match[1], // Tên phòng
+                      match[2], // Tên khách sạn
+                    ];
+                  })
                 : ["Chưa có dữ liệu"],
             datasets: [
               {
@@ -1095,9 +1108,10 @@
       function logout() {
         Swal.fire({
           title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
+          confirmButtonText: "Xác nhận",
           cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((result) => {
@@ -1133,22 +1147,22 @@
             `${data.activeUser || 0} / ${data.totalUser || 0}`;
           document.getElementById("ovActiveHotel").innerText =
             `${data.activeHotel || 0} / ${data.totalHotel || 0}`;
-          document.getElementById("ovActiveRoom").innerText =
-            `${data.activeRoom || 0} / ${data.totalRoom || 0}`;
+          // document.getElementById("ovActiveRoom").innerText =
+          //   `${data.activeRoom || 0} / ${data.totalRoom || 0}`;
         }
       }
 
       // Khởi tạo
       document.addEventListener("DOMContentLoaded", () => {
-        // Đặt mặc định: từ đầu tháng này đến hôm nay
         const now = new Date();
         const todayStr = now.toLocaleDateString("sv-SE");
-        const firstOfMonth = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          1,
-        ).toLocaleDateString("sv-SE");
-        document.getElementById("startDate").value = firstOfMonth;
+
+        // Lấy 7 ngày gần nhất (bao gồm hôm nay)
+        const startDate = new Date(now);
+        startDate.setDate(now.getDate() - 6);
+
+        document.getElementById("startDate").value =
+          startDate.toLocaleDateString("sv-SE");
         document.getElementById("endDate").value = todayStr;
 
         // Load khách sạn xong thì mới load số liệu (tất cả khách sạn mặc định)

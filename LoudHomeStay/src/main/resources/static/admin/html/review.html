@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard | Quản lý đánh giá</title>
+    <title>Admin Dashboard | Theo dõi đánh giá</title>
 
     <!-- External Assets -->
     <link
@@ -446,7 +446,7 @@
             <ul class="submenu" id="utilSub">
               <li><a href="utillity.html">Danh sách tiện ích</a></li>
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
-              <li><a href="room-util.html">Tiện ích phòng</a></li>
+              <li><a href="room-util.html">Tiện ích loại phòng</a></li>
             </ul>
           </li>
         </ul>
@@ -454,21 +454,20 @@
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-ticket-alt"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt phòng<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
             <a href="review.html" class="active"
-              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+              ><i class="fas fa-comment-alt"></i> Theo dõi đánh giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -521,7 +520,7 @@
       <div class="content-body">
         <div class="page-header">
           <div>
-            <h2>Quản Lý Đánh Giá</h2>
+            <h2>Theo dõi đánh giá</h2>
             <p style="color: var(--text-muted)">
               Theo dõi tất cả các ý kiến đóng góp từ khách hàng
             </p>
@@ -597,7 +596,7 @@
               <thead>
                 <tr>
                   <th style="width: 50px">ID</th>
-                  <th style="width: 140px">Khách hàng</th>
+                  <th style="text-align: center; width: 140px">Khách hàng</th>
                   <th style="width: 160px">Khách sạn</th>
                   <th>Nội dung đánh giá</th>
                   <th style="width: 90px">Điểm</th>
@@ -712,7 +711,7 @@
             (r, idx) => `
           <tr>
             <td class="text-center" style="font-weight: 600; color: var(--text-muted);">${r.reviewId}</td>
-            <td><div style="font-weight: 700;">${r.username}</div></td>
+            <td><div style="text-align: center; font-weight: 700;">${r.username}</div></td>
             <td><div style="font-weight: 600; color: var(--primary); font-size: 13px;">${r.hotelName}</div></td>
             <!-- <td><div style="font-weight: 600; color: var(--secondary); font-size: 13px;">${r.roomTypeNames || "-"}</div></td> -->
             <td style="max-width: 200px;"><p class="text-truncate-1" style="margin:0; font-size: 13px; text-align: center;">${r.comment || "<i>Không có bình luận</i>"}</p></td>
@@ -865,9 +864,12 @@
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {
           if (res.isConfirmed) {

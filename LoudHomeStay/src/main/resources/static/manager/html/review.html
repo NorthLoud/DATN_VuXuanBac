@@ -166,6 +166,17 @@
         padding: 40px;
       }
 
+      .page-header {
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .page-header h2 {
+        font-size: 28px;
+        font-weight: 800;
+      }
+
       /* Filter Pills */
       .filter-container {
         display: flex;
@@ -484,11 +495,18 @@
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu" id="roomSub">
-              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="roomtype.html">Quản lý loại phòng</a></li>
               <li><a href="room.html">Danh sách phòng</a></li>
             </ul>
           </li>
           <li>
+            <a href="room-util.html"
+              ><i class="fas fa-concierge-bell"></i>Quản lý tiện ích<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <!-- <li>
             <a
               href="javascript:void(0)"
               onclick="$('#utilSub').toggleClass('show')"
@@ -500,22 +518,21 @@
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li><a href="room-util.html">Tiện ích phòng</a></li>
             </ul>
-          </li>
+          </li> -->
         </ul>
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i>Mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
@@ -589,12 +606,14 @@
       </header>
 
       <div class="content-body">
-        <div class="page-header mb-4">
-          <h2>Theo dõi đánh giá</h2>
-          <p class="text-muted">
-            Theo dõi tất cả các ý kiến đóng góp từ khách hàng đối với khách sạn
-            đang quản lý.
-          </p>
+        <div class="page-header">
+          <div>
+            <h2>Theo dõi đánh giá</h2>
+            <p style="color: var(--text-muted)">
+              Theo dõi tất cả các ý kiến đóng góp từ khách hàng đối với khách
+              sạn đang quản lý.
+            </p>
+          </div>
         </div>
 
         <div class="filter-container">
@@ -971,9 +990,12 @@
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {
           if (res.isConfirmed) {

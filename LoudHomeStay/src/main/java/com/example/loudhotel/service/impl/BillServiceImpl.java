@@ -346,6 +346,10 @@ public class BillServiceImpl implements BillService {
 
     private void checkManagerPermission(Bill bill) {
 
+        if (SecurityUtil.hasRole("ADMIN")) {
+            return;
+        }
+
         Long currentUserId = SecurityUtil.getCurrentUserId();
 
         Long managerId = bill.getHotel().getManager().getUserId();
@@ -368,7 +372,9 @@ public class BillServiceImpl implements BillService {
 
         boolean isUser = bill.getUser().getUserId().equals(currentUserId);
 
-        if (!isManager && !isUser) {
+        boolean isAdmin = SecurityUtil.hasRole("ADMIN");
+
+        if (!isManager && !isUser && !isAdmin) {
             throw new BadRequestException("Không có quyền hủy");
         }
 
@@ -378,9 +384,7 @@ public class BillServiceImpl implements BillService {
 
         if (isUser) {
             bill.setCancelReason(Bill.CancelReason.USER_CANCEL);
-        }
-
-        if (isManager) {
+        } else {
             bill.setCancelReason(Bill.CancelReason.HOTEL_CANCEL);
         }
 

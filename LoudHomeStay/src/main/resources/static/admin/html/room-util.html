@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tiện ích phòng | LoudHomeStay Admin</title>
+    <title>Tiện ích loại phòng | LoudHomeStay Admin</title>
 
     <!-- External Assets -->
     <link
@@ -471,7 +471,7 @@
               <li><a href="utillity.html">Danh sách tiện ích</a></li>
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li>
-                <a href="room-util.html" class="active">Tiện ích phòng</a>
+                <a href="room-util.html" class="active">Tiện ích loại phòng</a>
               </li>
             </ul>
           </li>
@@ -480,7 +480,7 @@
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-ticket-alt"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -493,7 +493,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="review.html"
-              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+              ><i class="fas fa-comment-alt"></i> Theo dõi đánh giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -546,9 +546,9 @@
       <div class="content-body">
         <div class="page-header">
           <div>
-            <h2>Tiện Ích Phòng</h2>
+            <h2>Quản Lý Tiện Ích Loại Phòng</h2>
             <p style="color: var(--text-muted)">
-              Quản lý các tiện nghi và dịch vụ bên trong từng loại phòng cụ thể.
+              Quản lý các tiện ích được áp dụng cho từng loại phòng.
             </p>
           </div>
         </div>
@@ -633,7 +633,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" style="font-weight: 800">
-              Quản lý tiện ích loại phòng:
+              Gán tiện ích cho loại phòng:
               <span id="mTypeName" class="text-primary">---</span>
             </h5>
             <button type="button" class="close" data-dismiss="modal">
@@ -680,7 +680,7 @@
               Hủy
             </button>
             <button class="btn btn-primary btn-luxury" onclick="saveUtility()">
-              Lưu thay đổi
+              Lưu
             </button>
           </div>
         </div>
@@ -917,9 +917,12 @@
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {
           if (res.isConfirmed) {

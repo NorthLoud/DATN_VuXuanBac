@@ -457,11 +457,18 @@
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu" id="roomSub">
-              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="roomtype.html">Quản lý loại phòng</a></li>
               <li><a href="room.html">Danh sách phòng</a></li>
             </ul>
           </li>
           <li>
+            <a href="room-util.html"
+              ><i class="fas fa-concierge-bell"></i>Quản lý tiện ích<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <!-- <li>
             <a
               href="javascript:void(0)"
               onclick="$('#utilSub').toggleClass('show')"
@@ -473,22 +480,21 @@
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li><a href="room-util.html">Tiện ích phòng</a></li>
             </ul>
-          </li>
+          </li> -->
         </ul>
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
           <li>
             <a href="voucher.html" class="active"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i>Mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
@@ -563,20 +569,20 @@
       <div class="content-body">
         <div class="page-header">
           <div>
-            <h2>Quản Lý Voucher</h2>
+            <h2>Theo dõi mã giảm giá</h2>
             <p style="color: var(--text-muted)">
-              Theo dõi các mã giảm giá đang được sử dụng trên toàn hệ thống và
-              tại khách sạn.
+              Theo dõi các mã giảm giá đang được sử dụng tại khách sạn phụ
+              trách.
             </p>
           </div>
         </div>
 
-        <div class="toolbar">
+        <!-- <div class="toolbar">
           <div class="toolbar-left"></div>
           <div class="toolbar-right">
             <div class="search-box"></div>
           </div>
-        </div>
+        </div> -->
 
         <div class="table-card">
           <div
@@ -588,7 +594,9 @@
               gap: 16px;
             "
           >
-            <h5 style="margin: 0; font-weight: 700">Danh sách loại phòng</h5>
+            <h5 style="margin: 0; font-weight: 700; font-size: 16px">
+              Danh sách mã giảm giá
+            </h5>
 
             <div style="position: relative; display: flex; align-items: center">
               <i
@@ -622,14 +630,16 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th style="width: 5%">STT</th>
+                  <th style="width: 5%; text-align: center">STT</th>
                   <th style="width: 15%">Mã Voucher</th>
                   <th style="width: 15%">Tiêu đề</th>
                   <th style="width: 20%">Bắt đầu / Kết thúc</th>
-                  <th style="width: 12%">Đơn tối thiểu (VND)</th>
+                  <th style="width: 12%; text-align: center">
+                    Đơn tối thiểu (VND)
+                  </th>
                   <th style="width: 10%">Mức giảm</th>
-                  <th style="width: 10%">Đã dùng<br />/ tổng</th>
-                  <th style="width: 10%">Trạng thái</th>
+                  <th style="width: 10%; text-align: center">Đã dùng</th>
+                  <th style="width: 10%; text-align: center">Trạng thái</th>
                   <th style="text-align: center; width: 10%">Thao tác</th>
                 </tr>
               </thead>
@@ -917,28 +927,49 @@
 
       async function loadHotels() {
         const token = localStorage.getItem("accessToken");
+
         try {
-          const res = await fetch(`http://localhost:8080/api/hotels`, {
-            headers: { Authorization: "Bearer " + token },
+          const res = await fetch("http://localhost:8080/api/hotels", {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
           });
-          if (res.ok) {
-            allHotels = await res.json();
-            const container = document.getElementById("hotelCheckboxList");
-            container.innerHTML = "";
-            allHotels.forEach((h) => {
-              const div = document.createElement("div");
-              div.className = "custom-control custom-checkbox mb-1";
-              div.innerHTML = `
-                <input type="checkbox" class="custom-control-input hotel-cb" id="hotel_cb_${h.hotelId}" value="${h.hotelId}">
-                <label class="custom-control-label" for="hotel_cb_${h.hotelId}" style="text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 13px;">${h.hotelName}</label>
-              `;
-              container.appendChild(div);
-            });
+
+          if (!res.ok) {
+            console.error("Load hotels failed:", res.status);
+            return;
           }
+
+          allHotels = await res.json();
         } catch (e) {
-          console.error("Could not load hotels");
+          console.error(e);
         }
       }
+
+      // async function loadHotels() {
+      //   const token = localStorage.getItem("accessToken");
+      //   try {
+      //     const res = await fetch(`http://localhost:8080/api/hotels`, {
+      //       headers: { Authorization: "Bearer " + token },
+      //     });
+      //     if (res.ok) {
+      //       allHotels = await res.json();
+      //       const container = document.getElementById("hotelCheckboxList");
+      //       container.innerHTML = "";
+      //       allHotels.forEach((h) => {
+      //         const div = document.createElement("div");
+      //         div.className = "custom-control custom-checkbox mb-1";
+      //         div.innerHTML = `
+      //           <input type="checkbox" class="custom-control-input hotel-cb" id="hotel_cb_${h.hotelId}" value="${h.hotelId}">
+      //           <label class="custom-control-label" for="hotel_cb_${h.hotelId}" style="text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 13px;">${h.hotelName}</label>
+      //         `;
+      //         container.appendChild(div);
+      //       });
+      //     }
+      //   } catch (e) {
+      //     console.error("Could not load hotels");
+      //   }
+      // }
       loadHotels();
 
       async function loadVouchers() {
@@ -1013,10 +1044,10 @@
             <td style="font-weight: 700; color: var(--primary)">${v.voucherCode}</td>
             <td style="font-weight: 600">${v.title || "-"}</td>
             <td>${timeHtml}</td>
-            <td style="font-weight: 600">${minBill}</td>
-            <td><b class="text-danger">${v.discountValue ? v.discountValue.toLocaleString() : 0} ${v.discountType === "PERCENT" ? "%" : "VNĐ"}</b></td>
-            <td>${v.usedCount} / ${v.quantity || "∞"}</td>
-            <td><span class="badge badge-${v.status}">${v.status}</span></td>
+            <td style="font-weight: 600; text-align: center">${minBill}</td>
+            <td style="text-align: center"><b class="text-danger">${v.discountValue ? v.discountValue.toLocaleString() : 0} ${v.discountType === "PERCENT" ? "%" : "VNĐ"}</b></td>
+            <td style="text-align: center">${v.usedCount} / ${v.quantity || "∞"}</td>
+            <td style="text-align: center"><span class="badge badge-${v.status}">${v.status}</span></td>
             <td style="text-align: center">
               <button 
                 class="btn-action" 
@@ -1163,9 +1194,10 @@
       function logout() {
         Swal.fire({
           title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
+          confirmButtonText: "Xác nhận",
           cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((result) => {

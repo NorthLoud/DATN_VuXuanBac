@@ -429,10 +429,10 @@
       }
 
       .g-nav.prev {
-        left: 15px;
+        left: 20px;
       }
       .g-nav.next {
-        right: 15px;
+        right: 20px;
       }
 
       .gallery-thumbs {
@@ -455,6 +455,135 @@
         opacity: 1;
         border: 3px solid #0071c2;
         transform: scale(1.08);
+      }
+
+      .hotel-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow-md);
+      }
+
+      .hotel-banner {
+        width: 100%;
+        height: 350px;
+        object-fit: cover;
+      }
+
+      .hotel-content {
+        padding: 30px;
+      }
+
+      .hotel-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 10px;
+      }
+
+      .hotel-address {
+        color: var(--text-muted);
+        margin-bottom: 20px;
+      }
+
+      .hotel-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin: 25px 0;
+      }
+
+      .stat-box {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 14px;
+        text-align: center;
+      }
+
+      .stat-box h4 {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 5px;
+      }
+
+      .stat-box p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+
+      .hotel-desc {
+        margin-top: 20px;
+        line-height: 1.8;
+        color: #475569;
+      }
+
+      .hotel-gallery {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        overflow-x: auto;
+      }
+
+      .hotel-gallery img {
+        width: 140px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .hotel-utils {
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .util-badge {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .util-badge i {
+        color: #10b981;
+        margin-right: 5px;
+      }
+      .hotel-images {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 10px;
+        height: 320px;
+      }
+
+      .hotel-main-img img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 20px 0 0 0;
+      }
+
+      .hotel-side-imgs {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .hotel-side-imgs img {
+        width: 100%;
+        height: 155px;
+        object-fit: cover;
+      }
+
+      .hotel-side-imgs img:first-child {
+        border-radius: 0 20px 0 0;
+      }
+
+      .hotel-side-imgs img:last-child {
+        border-radius: 0 0 0 0;
       }
     </style>
 
@@ -490,39 +619,44 @@
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu" id="roomSub">
-              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="roomtype.html">Quản lý loại phòng</a></li>
               <li><a href="room.html">Danh sách phòng</a></li>
             </ul>
           </li>
           <li>
+            <a href="room-util.html"
+              ><i class="fas fa-concierge-bell"></i>Quản lý tiện ích<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <!-- <li>
             <a
               href="javascript:void(0)"
               onclick="$('#utilSub').toggleClass('show')"
             >
               <i class="fas fa-concierge-bell"></i> Quản lý tiện ích
-
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu" id="utilSub">
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li><a href="room-util.html">Tiện ích phòng</a></li>
             </ul>
-          </li>
+          </li> -->
         </ul>
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i>Mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
@@ -620,28 +754,7 @@
           </div>
         </div>
 
-        <div class="table-card">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Ảnh</th>
-                <th>Tên khách sạn</th>
-                <th>Địa chỉ</th>
-                <th>Đánh giá TB</th>
-                <th>Số phòng</th>
-                <th>Tình trạng</th>
-                <th style="text-align: center">Chi tiết</th>
-              </tr>
-            </thead>
-            <tbody id="hotelTableBody">
-              <tr>
-                <td colspan="7" class="text-center py-5">
-                  <i class="fas fa-spinner fa-spin mr-2"></i> Đang tải...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <div id="hotelCardContainer"></div>
       </div>
     </div>
 
@@ -753,6 +866,7 @@
     <script>
       const API_HOTEL = "http://localhost:8080/api/hotels";
       const API_IMG = "http://localhost:8080/api/images";
+      const API_TYPE = "http://localhost:8080/api/room-types";
       const token = localStorage.getItem("accessToken");
 
       let hotelList = [];
@@ -765,6 +879,8 @@
       let previewIdx = 0;
       let previewImagesList = [];
       let previewIndex = 0;
+      let hotelUtilities = [];
+      let roomTypeCount = 0;
 
       async function loadHotels(page = 0) {
         try {
@@ -778,43 +894,162 @@
           });
           const data = await res.json();
           hotelList = data.content || [];
+          roomTypeCount = await loadRoomTypeCount();
+
+          if (hotelList.length > 0) {
+            hotelUtilities = await loadHotelUtilities(hotelList[0].hotelId);
+          }
+
           renderHotels();
         } catch (e) {
           console.error(e);
         }
       }
 
-      function renderHotels() {
-        const tbody = document.getElementById("hotelTableBody");
-        tbody.innerHTML = "";
-        hotelList.forEach((h) => {
-          const statusCls =
-            h.hotelStatus === "ACTIVE"
-              ? "bg-active"
-              : h.hotelStatus === "MAINTENANCE"
-                ? "bg-maintenance"
-                : "bg-inactive";
-          const statusText =
-            h.hotelStatus === "ACTIVE"
-              ? "Hoạt động"
-              : h.hotelStatus === "MAINTENANCE"
-                ? "Bảo trì"
-                : "Ngừng hoạt động";
+      async function loadHotelUtilities(hotelId) {
+        try {
+          const res = await fetch(`${API_HOTEL}/${hotelId}/utilities`, {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
 
-          tbody.innerHTML += `
-                    <tr>
-                        <td><img src="${getImgUrl(h.mainImage)}" class="hotel-img-mini"></td>
-                        <td style="font-weight: 700;">${h.hotelName}</td>
-                        <td style="font-size: 13px; max-width: 250px;">${h.address}</td>
-                        <td class="text-warning"><b>${(h.averageRating || 0).toFixed(1)}</b></td>
-                        <td><span class="badge badge-light" style="font-weight: 800;">${h.roomsTotal || 0}</span></td>
-                        <td><span class="badge-status ${statusCls}">${statusText}</span></td>
-                        <td class="text-center">
-                            <button class="btn-action" title="Xem chi tiết" onclick="viewHotelDetail(${h.hotelId})"><i class="fas fa-eye"></i></button>
-                        </td>
-                    </tr>
-                `;
-        });
+          return await res.json();
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+
+      function renderHotels() {
+        const container = document.getElementById("hotelCardContainer");
+
+        if (!hotelList.length) {
+          container.innerHTML = `
+        <div class="table-card p-5 text-center">
+          Không có dữ liệu khách sạn
+        </div>
+      `;
+          return;
+        }
+
+        const h = hotelList[0];
+
+        const statusCls =
+          h.hotelStatus === "ACTIVE"
+            ? "bg-active"
+            : h.hotelStatus === "MAINTENANCE"
+              ? "bg-maintenance"
+              : "bg-inactive";
+
+        const statusText =
+          h.hotelStatus === "ACTIVE"
+            ? "Hoạt động"
+            : h.hotelStatus === "MAINTENANCE"
+              ? "Bảo trì"
+              : "Ngừng hoạt động";
+
+        container.innerHTML = `
+    <div class="hotel-card">
+
+      <img
+        src="${getImgUrl(h.mainImage)}"
+        class="hotel-banner"
+        style="cursor:pointer"
+        onclick="openHotelGallery(${h.hotelId})"
+      >
+
+      <div class="hotel-content">
+
+        <div class="d-flex justify-content-between align-items-start">
+
+          <div>
+            <h2 class="hotel-title">${h.hotelName}</h2>
+
+            <div class="hotel-address">
+              <i class="fas fa-map-marker-alt mr-2"></i>
+              ${h.address}
+            </div>
+          </div>
+
+          <span class="badge-status ${statusCls}">
+            ${statusText}
+          </span>
+
+        </div>
+
+        <div class="hotel-stats">
+
+          <div class="stat-box">
+            <h4>${(h.averageRating || 0).toFixed(1)}</h4>
+            <p>Điểm đánh giá</p>
+          </div>
+
+          <div class="stat-box">
+            <h4>${roomTypeCount}</h4>
+            <p>Tổng số loại phòng</p>
+          </div>
+
+          <div class="stat-box">
+            <h4>${h.roomsTotal || 0}</h4>
+            <p>Tổng số phòng</p>
+          </div>
+
+          
+
+        </div>
+
+        <div class="hotel-utils">
+          ${
+            hotelUtilities.length
+              ? hotelUtilities
+                  .map(
+                    (u) => `
+                      <span class="util-badge">
+                        <i class="fas fa-check-circle"></i>
+                        ${u.name}
+                      </span>
+                    `,
+                  )
+                  .join("")
+              : '<span class="text-muted">Chưa có tiện ích</span>'
+          }
+        </div>
+
+        <div class="hotel-desc">
+          ${h.introduction || "Khách sạn chưa cập nhật thông tin giới thiệu."}
+        </div>
+
+        <div class="mt-4">
+          <button
+            class="btn btn-primary btn-luxury"
+            onclick="openHotelGallery(${h.hotelId})"
+          >
+            <i class="fas fa-images mr-2"></i>
+            Xem thư viện ảnh
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+      }
+
+      async function loadRoomTypeCount() {
+        try {
+          const res = await fetch(API_TYPE + "/my/summary?page=0&size=1", {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+
+          const data = await res.json();
+
+          return data.totalElements || 0;
+        } catch (e) {
+          console.error(e);
+          return 0;
+        }
       }
 
       function getImgUrl(path) {
@@ -1029,7 +1264,43 @@
         renderPreview();
         $("#hotelModal").modal("show");
       }
+      async function openHotelGallery(id) {
+        try {
+          const res = await fetch(`${API_HOTEL}/${id}/images`, {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
 
+          const images = await res.json();
+
+          if (!images || images.length === 0) {
+            showError("Khách sạn chưa có ảnh");
+            return;
+          }
+
+          previewImagesList = [];
+
+          const mainImg = images.find((i) => i.main) || images[0];
+
+          previewImagesList.push(getImgUrl(mainImg.imageUrl));
+
+          images
+            .filter((i) => i.imageId !== mainImg.imageId)
+            .forEach((img) => {
+              previewImagesList.push(getImgUrl(img.imageUrl));
+            });
+
+          previewIndex = 0;
+
+          document.getElementById("previewGallery").style.display = "flex";
+
+          renderPreviewGallery();
+        } catch (e) {
+          console.error(e);
+          showError("Không tải được thư viện ảnh");
+        }
+      }
       async function deleteExistingImg(imgId) {
         if (!confirm("Xóa ảnh này?")) return;
         const res = await fetch(`${API_IMG}/${imgId}`, {
@@ -1214,10 +1485,12 @@
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {
           if (res.isConfirmed) {

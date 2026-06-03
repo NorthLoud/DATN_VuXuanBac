@@ -141,12 +141,12 @@ public class SecurityConfig {
                         // tạo đơn
                         .requestMatchers(HttpMethod.POST,"/api/bills").authenticated()
                         // MANAGER thao tác đơn thuộc hotel của mình
-                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/pay").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/check-in").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/check-out").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/confirm-extra-fee").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/pay").hasAnyRole("ADMIN","MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/check-in").hasAnyRole("ADMIN","MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/check-out").hasAnyRole("ADMIN","MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/bills/*/confirm-extra-fee").hasAnyRole("ADMIN","MANAGER")
                         .requestMatchers(HttpMethod.PUT,"/api/bills/*/cancel")
-                        .hasAnyRole("MANAGER","USER")
+                        .hasAnyRole("MANAGER","USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/bills/*/hold").hasAnyRole("USER","MANAGER")
 
                         // admin không được thao tác trạng thái

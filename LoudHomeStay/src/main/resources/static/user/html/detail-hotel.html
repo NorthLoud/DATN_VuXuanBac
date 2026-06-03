@@ -992,7 +992,7 @@
       }
 
       .review-scroll {
-        max-height: 250px;
+        max-height: 100px;
         overflow-y: auto;
         padding-right: 5px;
       }
@@ -2495,7 +2495,15 @@
         ).length;
 
         if (currentCount >= max) {
-          return alert("Đã đạt tối đa phòng loại này!");
+          return Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Đã đạt tối đa số phòng trống loại này!',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+          });
         }
 
         selectedRooms.push({
@@ -2503,6 +2511,16 @@
           guestCount: 1,
           quantity: 1,
           uniqueId: Date.now() + Math.random(),
+        });
+
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Đã thêm phòng vào danh sách',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true
         });
 
         renderBookingSummary();
@@ -2539,7 +2557,7 @@
                                     <span style="min-width:15px; text-align:center;">${item.guestCount}</span> 
                                     <button onclick="changeGuest(${idx},1)">+</button>
                                 </div>
-                                <span style="font-size:10px;">Max ${r.capacity}</span>
+                                <span style="font-size:10px;">Tối đa ${r.capacity}</span>
                             </div>
                         </div>
                         <div style="text-align:right;">

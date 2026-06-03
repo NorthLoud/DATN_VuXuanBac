@@ -293,6 +293,7 @@
       }
       /* Search Box */
       .search-box {
+        margin-left: 100px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -442,7 +443,7 @@
               </li>
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li>
-                <a href="room-util.html">Tiện ích phòng</a>
+                <a href="room-util.html">Tiện ích loại phòng</a>
               </li>
             </ul>
           </li>
@@ -452,7 +453,7 @@
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-ticket-alt"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -465,7 +466,7 @@
           </li>
           <li>
             <a href="review.html"
-              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+              ><i class="fas fa-comment-alt"></i> Theo dõi đánh giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -522,8 +523,7 @@
           <div>
             <h2>Quản Lý Tiện Ích</h2>
             <p style="color: var(--text-muted)">
-              Quản lý danh sách tiện ích của hệ thống dành cho phòng và khách
-              sạn.
+              Quản lý danh mục tiện ích áp dụng cho khách sạn và loại phòng
             </p>
           </div>
         </div>
@@ -556,7 +556,9 @@
 
         <div class="table-card">
           <div class="table-header">
-            <h5 style="margin: 0; font-weight: 700">Danh sách tiện ích</h5>
+            <h5 style="margin: 0; font-weight: 700; font-size: 16px">
+              Danh sách tiện ích
+            </h5>
             <select
               id="filterUtilityType"
               class="form-control"
@@ -569,7 +571,7 @@
               onchange="searchUtility()"
             >
               <option value="">Tất cả loại tiện ích</option>
-              <option value="ROOM">Tiện ích phòng</option>
+              <option value="ROOM">Tiện ích loại phòng</option>
               <option value="HOTEL">Tiện ích khách sạn</option>
             </select>
           </div>
@@ -577,13 +579,19 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th onclick="changeSort('id')" style="width: 15%">
+                  <th
+                    onclick="changeSort('id')"
+                    style="text-align: center; width: 15%"
+                  >
                     ID <span id="sort-id"></span>
                   </th>
-                  <th onclick="changeSort('name')" style="width: 40%">
+                  <th
+                    onclick="changeSort('name')"
+                    style="text-align: center; width: 40%"
+                  >
                     Tên tiện ích <span id="sort-name"></span>
                   </th>
-                  <th style="width: 25%">Loại tiện ích</th>
+                  <th style="text-align: center; width: 25%">Loại tiện ích</th>
                   <th style="text-align: center; width: 20%">Thao tác</th>
                 </tr>
               </thead>
@@ -658,7 +666,7 @@
             <div class="form-group mt-3">
               <label>Loại tiện ích</label>
               <select id="utilityTypeInput" class="form-control">
-                <option value="ROOM">Tiện ích phòng (ROOM)</option>
+                <option value="ROOM">Tiện ích loại phòng (ROOM)</option>
                 <option value="HOTEL">Tiện ích khách sạn (HOTEL)</option>
               </select>
             </div>
@@ -669,7 +677,7 @@
               Hủy
             </button>
             <button class="btn btn-primary btn-luxury" onclick="saveUtility()">
-              Lưu tiện ích
+              Lưu
             </button>
           </div>
         </div>
@@ -735,9 +743,9 @@
                 ? '<span class="badge badge-primary" style="padding: 6px 10px; border-radius: 8px;">Khách sạn</span>'
                 : '<span class="badge badge-secondary" style="padding: 6px 10px; border-radius: 8px;">Khác</span>';
           tr.innerHTML = `
-            <td style="font-weight: 600; color: var(--text-muted)">${u.id}</td>
-            <td style="font-weight: 600">${u.name}</td>
-            <td>${typeLabel}</td>
+            <td style="text-align: center; font-weight: 600; color: var(--text-muted)">${u.id}</td>
+            <td style="text-align: center; font-weight: 600">${u.name}</td>
+            <td style="text-align: center">${typeLabel}</td>
             <td style="text-align: center">
               <button class="btn-action" onclick="openEditUtilityModal(${u.id})" title="Sửa"><i class="fa fa-edit"></i></button>
               <button class="btn-action text-danger" onclick="deleteUtility(${u.id})" title="Xóa"><i class="fa fa-trash"></i></button>
@@ -1000,9 +1008,10 @@
       function logout() {
         Swal.fire({
           title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
+          confirmButtonText: "Xác nhận",
           cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((result) => {

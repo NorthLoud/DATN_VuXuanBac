@@ -327,6 +327,7 @@ public class HotelServiceImpl implements HotelService {
                                                         .minPrice(minPrice)
                                                         .availableRooms(availableRooms)
                                                         .utilities(utilities)
+                                                        .introduction(h.getIntroduction())
                                                         .build();
                                 })
                                 .toList();

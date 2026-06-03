@@ -735,6 +735,11 @@
         color: var(--text-muted);
         line-height: 1.7;
         font-size: 14px;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .hotel-price {
@@ -997,22 +1002,22 @@
 
           <label class="filter-item">
             <input type="checkbox" class="rating-filter" value="Tuyệt vời" />
-            Tuyệt vời
+            Tuyệt vời (9.0 - 10)
           </label>
 
           <label class="filter-item">
             <input type="checkbox" class="rating-filter" value="Rất tốt" />
-            Rất tốt
+            Rất tốt (8.0 - 8.9)
           </label>
 
           <label class="filter-item">
             <input type="checkbox" class="rating-filter" value="Tốt" />
-            Tốt
+            Tốt (7.0 - 7.9)
           </label>
 
           <label class="filter-item">
             <input type="checkbox" class="rating-filter" value="Bình thường" />
-            Bình thường
+            Bình thường (< 7.0)
           </label>
         </div>
       </aside>
@@ -1063,7 +1068,7 @@
         const suggestionBox = document.getElementById("hotelSuggestions");
 
         suggestionBox.innerHTML = allHotels
-          .slice(0, 8)
+          .slice(0, 100)
           .map(
             (hotel) => `
               <div 
@@ -1080,7 +1085,7 @@
         suggestionBox.style.display = "block";
       }
 
-      function filterHotelsBySidebar() {
+      async function filterHotelsBySidebar() {
         const selectedRatings = [
           ...document.querySelectorAll(".rating-filter:checked"),
         ].map((item) => item.value);
@@ -1118,7 +1123,7 @@
           (hotel) => Number(hotel.minPrice || 0) <= maxPrice,
         );
 
-        renderHotels(filteredHotels);
+        await renderHotels(filteredHotels);
       }
 
       async function loadHotelOptions() {
@@ -1208,7 +1213,7 @@
         if (avg >= 7) return "Tốt";
         return "Bình thường";
       }
-      function renderHotels(hotels) {
+      async function renderHotels(hotels) {
         const list = document.getElementById("hotelList");
 
         list.innerHTML = "";
@@ -1233,19 +1238,32 @@
           return;
         }
 
-        hotels.forEach((hotel) => {
+        for (const hotel of hotels) {
           const image = hotel.mainImage
             ? `${API_URL}${hotel.mainImage}`
             : "https://via.placeholder.com/600x400";
 
-          const rating = Number(hotel.averageRating || 0).toFixed(1);
+          const ratingValue = Number(hotel.averageRating || 0);
+          const ratingFormatted = ratingValue.toFixed(1);
+
+          // Fetch reviews to get accurate count
+          let reviewCount = 0;
+          try {
+            const rRes = await fetch(
+              `${API_URL}/api/reviews/hotel/${hotel.hotelId}`,
+            );
+            const reviews = await rRes.json();
+            reviewCount = reviews.length;
+          } catch (e) {
+            reviewCount = hotel.reviewCount || 0;
+          }
 
           const html = `
       <div class="hotel-card">
 
         <div class="hotel-image">
           <img src="${image}" alt="${hotel.hotelName}" />
-          <div class="rating-badge">${rating}</div>
+          <div class="rating-badge">${ratingFormatted}</div>
         </div>
 
         <div class="hotel-content">
@@ -1305,8 +1323,8 @@
               </div>
 
               <div class="review">
-                ${getRatingLabel(parseFloat(rating))}
-                • ${hotel.reviewCount || 0} đánh giá
+                ${getRatingLabel(ratingValue)}
+                • ${reviewCount} đánh giá
               </div>
 
             </div>
@@ -1318,7 +1336,7 @@
     `;
 
           list.insertAdjacentHTML("beforeend", html);
-        });
+        }
       }
 
       async function loadHotels() {
@@ -1362,11 +1380,11 @@
             <i class="fas fa-hotel fa-3x" style="color:#cbd5e1;"></i>
 
             <h3 style="margin-top:20px;">
-              Không có phòng trống phù hợp
+              Không có khách sạn phù hợp
             </h3>
 
             <p style="margin-top:10px;color:var(--text-muted);">
-              Vui lòng chọn khoảng thời gian khác.
+              Vui lòng chọn tiêu chí tìm kiếm khác.
             </p>
           </div>
         `;
@@ -1374,7 +1392,7 @@
             return;
           }
 
-          renderHotels(hotels);
+          await renderHotels(hotels);
         } catch (error) {
           console.error(error);
 
@@ -1402,7 +1420,7 @@
           `&checkOut=${checkOut}` +
           `&roomCount=${roomCount}`;
       }
-      function sortHotels() {
+      async function sortHotels() {
         const sortValue = document.getElementById("sortSelect").value;
 
         let sortedHotels = [...searchedHotels];
@@ -1420,7 +1438,7 @@
             (a, b) => (b.averageRating || 0) - (a.averageRating || 0),
           );
         }
-        renderHotels(sortedHotels);
+        await renderHotels(sortedHotels);
       }
     </script>
     <script>

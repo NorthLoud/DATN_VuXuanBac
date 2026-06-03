@@ -45,12 +45,32 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         dto.setTotalUtil(utilitiesRepository.count());
 
         List<User> users = userRepository.findAll();
-        dto.setTotalUser((long) users.size());
-        dto.setActiveUser(users.stream().filter(u -> (u.getIsDeleted() == null || !u.getIsDeleted()) && u.getStatus() == User.Status.ACTIVE).count());
+
+        long totalUser = users.stream()
+                .filter(u -> u.getIsDeleted() == null || !u.getIsDeleted())
+                .count();
+
+        long activeUser = users.stream()
+                .filter(u -> (u.getIsDeleted() == null || !u.getIsDeleted())
+                        && u.getStatus() == User.Status.ACTIVE)
+                .count();
+
+        dto.setTotalUser(totalUser);
+        dto.setActiveUser(activeUser);
 
         List<Hotel> hotels = hotelRepository.findAll();
-        dto.setTotalHotel((long) hotels.size());
-        dto.setActiveHotel(hotels.stream().filter(h -> (h.getIsDeleted() == null || !h.getIsDeleted()) && h.getHotelStatus() == Hotel.HotelStatus.ACTIVE).count());
+
+        long totalHotel = hotels.stream()
+                .filter(h -> h.getIsDeleted() == null || !h.getIsDeleted())
+                .count();
+
+        long activeHotel = hotels.stream()
+                .filter(h -> (h.getIsDeleted() == null || !h.getIsDeleted())
+                        && h.getHotelStatus() == Hotel.HotelStatus.ACTIVE)
+                .count();
+
+        dto.setTotalHotel(totalHotel);
+        dto.setActiveHotel(activeHotel);
 
         List<Room> rooms = roomRepository.findAll();
         dto.setTotalRoom((long) rooms.size());
@@ -131,8 +151,14 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                         if (b.getBillDetails() != null) {
                             for (BillDetail bd : b.getBillDetails()) {
                                 if (bd.getRoomType() != null) {
-                                    String typeName = bd.getRoomType().getTypeName();
-                                    roomTypeBookingMap.put(typeName, roomTypeBookingMap.getOrDefault(typeName, 0L) + 1L);
+                                    String roomTypeName = bd.getRoomType().getTypeName();
+
+                                    String key = roomTypeName + " (" + hotelName + ")";
+
+                                    roomTypeBookingMap.put(
+                                            key,
+                                            roomTypeBookingMap.getOrDefault(key, 0L) + 1L
+                                    );
                                 }
                             }
                         }
@@ -174,8 +200,15 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                         if (b.getBillDetails() != null) {
                             for (BillDetail bd : b.getBillDetails()) {
                                 if (bd.getRoomType() != null) {
-                                    String typeName = bd.getRoomType().getTypeName();
-                                    roomTypeBookingMap.put(typeName, roomTypeBookingMap.getOrDefault(typeName, 0L) + 1L);
+                                    String roomTypeName = bd.getRoomType().getTypeName();
+
+
+                                    String key = roomTypeName + " (" + hotelName + ")";
+
+                                    roomTypeBookingMap.put(
+                                            key,
+                                            roomTypeBookingMap.getOrDefault(key, 0L) + 1L
+                                    );
                                 }
                             }
                         }
@@ -270,8 +303,15 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 if (b.getBillDetails() != null) {
                     for (BillDetail bd : b.getBillDetails()) {
                         if (bd.getRoomType() != null) {
-                            String typeName = bd.getRoomType().getTypeName();
-                            roomTypeBookingMap.put(typeName, roomTypeBookingMap.getOrDefault(typeName, 0L) + 1L);
+                            String roomTypeName = bd.getRoomType().getTypeName();
+
+
+                            String key = roomTypeName + " (" + hotelName + ")";
+
+                            roomTypeBookingMap.put(
+                                    key,
+                                    roomTypeBookingMap.getOrDefault(key, 0L) + 1L
+                            );
                         }
                     }
                 }

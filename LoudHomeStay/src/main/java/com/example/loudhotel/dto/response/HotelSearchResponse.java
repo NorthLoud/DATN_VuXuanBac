@@ -25,4 +25,6 @@ public class HotelSearchResponse {
 
     private List<String> utilities;
 
+    private String introduction;
+
 }

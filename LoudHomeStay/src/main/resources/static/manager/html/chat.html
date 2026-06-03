@@ -721,9 +721,9 @@
         font-weight: 600;
       }
     </style>
-  
+
     <!-- <link rel="stylesheet" href="/css/chatbot.css" /> -->
-</head>
+  </head>
 
   <body>
     <!-- Sidebar -->
@@ -759,11 +759,18 @@
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu" id="roomSub">
-              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="roomtype.html">Quản lý loại phòng</a></li>
               <li><a href="room.html">Danh sách phòng</a></li>
             </ul>
           </li>
           <li>
+            <a href="room-util.html"
+              ><i class="fas fa-concierge-bell"></i>Quản lý tiện ích<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <!-- <li>
             <a
               href="javascript:void(0)"
               onclick="$('#utilSub').toggleClass('show')"
@@ -775,23 +782,22 @@
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li><a href="room-util.html">Tiện ích phòng</a></li>
             </ul>
-          </li>
+          </li> -->
         </ul>
 
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i>Mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
@@ -836,7 +842,11 @@
       <header class="top-bar">
         <div style="width: 400px; position: relative"></div>
         <div class="d-flex align-items-center gap-4">
-          <div class="d-flex align-items-center gap-2" style="cursor: pointer" onclick="location.href='profile.html'">
+          <div
+            class="d-flex align-items-center gap-2"
+            style="cursor: pointer"
+            onclick="location.href = 'profile.html'"
+          >
             <div
               style="
                 width: 35px;
@@ -861,7 +871,7 @@
 
       <div class="chat-container">
         <div class="chat-list">
-          <div class="chat-list-header">Đoạn chat</div>
+          <div class="chat-list-header">Hỗ trợ khách hàng</div>
           <div class="chat-partners" id="partnerList"></div>
         </div>
 
@@ -990,7 +1000,7 @@
         const list = document.getElementById("partnerList");
         list.innerHTML = "";
         partners.forEach((p) => {
-          const displayName = p.fullName;
+          const displayName = p.username || p.userName || p.fullName;
           const isUnread = p.unreadCount > 0;
           const div = document.createElement("div");
           div.className = `chat-item ${isUnread ? "unread" : ""} ${p.userId == activePartnerId && p.hotelId == activeHotelId ? "active" : ""}`;
@@ -1289,11 +1299,23 @@
       }
 
       function logout() {
-        localStorage.clear();
-        window.location.href = "/login.html";
+        Swal.fire({
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
+          confirmButtonColor: "#ef4444",
+        }).then((res) => {
+          if (res.isConfirmed) {
+            localStorage.clear();
+            window.location.href = "/login.html";
+          }
+        });
       }
     </script>
-  
+
     <!-- <script src="/js/chatbot.js" defer></script> -->
-</body>
+  </body>
 </html>

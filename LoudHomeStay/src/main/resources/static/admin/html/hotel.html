@@ -80,7 +80,7 @@
       .page-header p { font-size: 14px; color: var(--text-muted); }
 
       /* Search Box */
-      .search-box { display: flex; align-items: center; gap: 8px; background: white; border-radius: 12px; border: 1.5px solid #e2e8f0; padding: 0 12px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
+      .search-box { margin-left: 100px; display: flex; align-items: center; gap: 8px; background: white; border-radius: 12px; border: 1.5px solid #e2e8f0; padding: 0 12px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
       .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
       .search-box input { border: none; background: transparent; flex: 1; padding: 10px 4px; font-size: 14px; outline: none; color: var(--text-main); }
       .search-box input::placeholder { color: #cbd5e1; }
@@ -88,7 +88,7 @@
       .search-box button:hover { color: var(--primary); }
 
       /* Action Buttons */
-      .btn-action { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: var(--secondary); display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; margin-right: 4px; font-size: 14px; }
+      .btn-action { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: var(--secondary); display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer;  font-size: 14px; }
       .btn-action:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
       .btn-action.text-danger:hover { border-color: var(--danger); color: var(--danger); background: #fef2f2; }
       .btn-luxury { padding: 10px 22px; border-radius: 10px; font-weight: 600; transition: 0.3s; font-size: 14px; border: none; }
@@ -409,7 +409,7 @@
             <ul class="submenu" id="utilSub">
               <li><a href="utillity.html">Danh sách tiện ích</a></li>
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
-              <li><a href="room-util.html">Tiện ích phòng</a></li>
+              <li><a href="room-util.html">Tiện ích loại phòng</a></li>
             </ul>
           </li>
         </ul>
@@ -417,7 +417,7 @@
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-ticket-alt"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -431,7 +431,7 @@
           </li>
           <li>
             <a href="review.html"
-              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+              ><i class="fas fa-comment-alt"></i> Theo dõi đánh giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -517,14 +517,14 @@
             <table class="admin-table">
               <thead>
                 <tr >
-                  <th>ID</th>
-                  <th>Ảnh</th>
-                  <th>Tên khách sạn</th>
-                  <th>Email Quản lý</th>
-                  <th>Điểm tb</th>
-                  <th>Số phòng</th>
-                  <th>Tình trạng</th>
-                  <th>Thao tác</th>
+                  <th style="text-align: center;">ID</th>
+                  <th style="text-align: center;">Ảnh</th>
+                  <th style="text-align: center;">Tên khách sạn</th>
+                  <th style="text-align: center;">Email Quản lý</th>
+                  <th style="text-align: center;">Điểm đánh giá</th>
+                  <th style="text-align: center;">Số lượng phòng</th>
+                  <th style="text-align: center;">Tình trạng</th>
+                  <th style="text-align: center;">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="hotelTableBody">
@@ -919,13 +919,13 @@
             `;
 
             tbody.innerHTML += `
-              <tr>
+              <tr style="text-align: center;">
                 <td style="color: var(--text-muted); font-weight: 600;">${h.hotelId}</td>
                 <td>${image}</td>
                 <td style="font-weight: 700;">${h.hotelName}</td>
                 <td style="font-size: 13px;">${h.managerEmail || "---"}</td>
                 <td class="text-warning"><b>${(h.averageRating || 0).toFixed(1)}/10</b></td>
-                <td><span class="badge badge-light" style="font-weight: 700; margin-left: 30px;">${h.roomsTotal || 0}</span></td>
+                <td><span class="badge badge-light" style="font-weight: 700;">${h.roomsTotal || 0}</span></td>
                 <td><span class="badge-status ${statusCls}">${statusText}</span></td>
                 <td class="text-center">${topButtons}</td>
               </tr>`;
@@ -1238,8 +1238,8 @@
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#ef4444",
-    confirmButtonText: "Xóa",
-    cancelButtonText: "Hủy"
+    confirmButtonText: "Xác nhận",
+    cancelButtonText: "Hủy",
   });
 
   // người dùng bấm Hủy
@@ -1572,12 +1572,12 @@
         function logout() {
           Swal.fire({
             title: "Xác nhận đăng xuất?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Đăng xuất",
-            cancelButtonText: "Hủy",
-            confirmButtonColor: "#ef4444",
-            cancelButtonColor: "#6b7280",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
+          confirmButtonColor: "#ef4444",
           }).then((result) => {
             if (!result.isConfirmed) return;
 

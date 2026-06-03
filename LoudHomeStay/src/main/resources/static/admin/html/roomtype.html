@@ -539,6 +539,7 @@
 
       /* Search Box */
       .search-box {
+        margin-left: 100px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -806,7 +807,7 @@
             <ul class="submenu" id="utilSub">
               <li><a href="utillity.html">Danh sách tiện ích</a></li>
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
-              <li><a href="room-util.html">Tiện ích phòng</a></li>
+              <li><a href="room-util.html">Tiện ích loại phòng</a></li>
             </ul>
           </li>
         </ul>
@@ -814,7 +815,7 @@
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-ticket-alt"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -827,7 +828,7 @@
           </li>
           <li>
             <a href="review.html"
-              ><i class="fas fa-comment-alt"></i> Quản lý đánh giá<i
+              ><i class="fas fa-comment-alt"></i> Theo dõi đánh giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
@@ -882,8 +883,8 @@
           <div>
             <h2>Quản Lý Loại Phòng</h2>
             <p style="color: var(--text-muted)">
-              Quản lý thông tin từng loại phòng của tất cả các khách sạn trong
-              hệ thống.
+              Quản lý thông tin các loại phòng của tất cả khách sạn trong hệ
+              thống.
             </p>
           </div>
         </div>
@@ -2008,6 +2009,8 @@
           text: "Xóa loại phòng này sẽ ảnh hưởng đến các phòng thuộc loại này!",
           icon: "warning",
           showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         });
 
@@ -2179,9 +2182,12 @@
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {
           if (res.isConfirmed) {

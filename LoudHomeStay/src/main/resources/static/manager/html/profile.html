@@ -246,11 +246,18 @@
               <i class="fas fa-chevron-down" style="font-size: 10px"></i>
             </a>
             <ul class="submenu" id="roomSub">
-              <li><a href="roomtype.html">Loại phòng</a></li>
+              <li><a href="roomtype.html">Quản lý loại phòng</a></li>
               <li><a href="room.html">Danh sách phòng</a></li>
             </ul>
           </li>
           <li>
+            <a href="room-util.html"
+              ><i class="fas fa-concierge-bell"></i>Quản lý tiện ích<i
+                class="fas fa-chevron-down-o"
+              ></i
+            ></a>
+          </li>
+          <!-- <li>
             <a
               href="javascript:void(0)"
               onclick="$('#utilSub').toggleClass('show')"
@@ -262,22 +269,21 @@
               <li><a href="hotel-util.html">Tiện ích khách sạn</a></li>
               <li><a href="room-util.html">Tiện ích phòng</a></li>
             </ul>
-          </li>
+          </li> -->
         </ul>
         <div class="nav-group-label">Kinh doanh</div>
         <ul class="side-nav">
           <li>
             <a href="voucher.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý voucher<i
+              ><i class="fas fa-ticket-alt"></i>Mã giảm giá<i
                 class="fas fa-chevron-down-o"
               ></i
             ></a>
           </li>
           <li>
             <a href="bill.html"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt<i
-                class="fas fa-chevron-down-o"
-              ></i
+              ><i class="fas fa-file-invoice-dollar"></i> Quản lý đơn đặt
+              phòng<i class="fas fa-chevron-down-o"></i
             ></a>
           </li>
           <li>
@@ -461,6 +467,16 @@
                     minlength="6"
                   />
                 </div>
+                <div class="form-group">
+                  <label>Xác nhận mật khẩu mới</label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    class="form-control"
+                    placeholder="Nhập lại mật khẩu mới..."
+                    minlength="6"
+                  />
+                </div>
 
                 <div class="text-right mt-4">
                   <button
@@ -515,13 +531,14 @@
           document.getElementById("email").value = currentUser.email || "";
           document.getElementById("phone").value = currentUser.phone || "";
           document.getElementById("password").value = ""; // Để trống mật khẩu
+          document.getElementById("confirmPassword").value = "";
 
           // Cập nhật giao diện bên trái và header
           const initial = (currentUser.firstName || "M")
             .charAt(0)
             .toUpperCase();
           document.getElementById("profileAvatar").innerText = initial;
-          document.getElementById("headerAvatar").innerText = initial;
+          // document.getElementById("headerAvatar").innerText = initial;
 
           const fullName =
             currentUser.fullName ||
@@ -532,8 +549,8 @@
             ).trim();
           document.getElementById("profileFullName").innerText =
             fullName || "Manager";
-          document.getElementById("headerName").innerText =
-            currentUser.username || "Manager";
+          // document.getElementById("headerName").innerText =
+          //   currentUser.username || "Manager";
           document.getElementById("profileRole").innerText =
             currentUser.role || "MANAGER";
 
@@ -557,6 +574,13 @@
         event.preventDefault();
 
         const passwordVal = document.getElementById("password").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        if (passwordVal && passwordVal !== confirmPassword) {
+          showError("Mật khẩu xác nhận không khớp");
+          return;
+        }
         const body = {
           username: document.getElementById("username").value.trim(),
           firstName: document.getElementById("firstName").value.trim(),
@@ -647,10 +671,12 @@
 
       function logout() {
         Swal.fire({
-          title: "Đăng xuất?",
+          title: "Xác nhận đăng xuất?",
+          text: "Bạn sẽ quay lại màn hình đăng nhập.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Đăng xuất",
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
           confirmButtonColor: "#ef4444",
         }).then((res) => {
           if (res.isConfirmed) {
